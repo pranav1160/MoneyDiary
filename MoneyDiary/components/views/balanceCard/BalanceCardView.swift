@@ -10,7 +10,7 @@ struct BalanceCardView: View {
     
     let data: BalanceCardData
     @State private var isBalanceHidden: Bool = false
-    var backgroundColor: Color = Color(.lightBlue)
+    let backgroundColor: Color
     
     private func format(_ value: Double) -> String {
         "\(data.currencySymbol)\(String(format: "%.2f", value))"
@@ -81,5 +81,5 @@ struct BalanceCardView: View {
 
 
 #Preview {
-    BalanceCardView(data: .mock)
+    BalanceCardView(data: .mock,backgroundColor: .white)
 }

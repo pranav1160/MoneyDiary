@@ -7,32 +7,51 @@
 
 import SwiftUI
 
+
+
 struct WelcomeView: View {
+    
     var body: some View {
-        ZStack {
-            Image(._1Onboard)
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea() 
-            
-            VStack {
+        NavigationStack {
+            VStack(spacing: 24) {
+                
                 Spacer()
                 
-                NavigationLink {
-                    OnboardingAvatarView()
-                } label: {
-                    Image(systemName: "arrowshape.right.circle.fill")
-                        .font(.system(size: 40))
-                        .foregroundStyle(.white)
+                LogoView()
+                
+                // App Name
+                Text("MoneyDiary")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                
+                
+                
+                Text("Welcome")
+                    .font(.title2)
+                    .foregroundStyle(.accent)
+                
+                Text("Know where your money goes — effortlessly.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                
+                Spacer()
+                
+                OnboardingNavigationButton(title: "Get Started") {
+                    OnboardingPrivacyView()
                 }
-                .padding(.bottom, 40)
+
             }
+            
         }
     }
 }
 
 
 #Preview {
-    WelcomeView()
-        .environment(AppState())
+    
+        WelcomeView()
+            .environment(AppState())
+  
 }

@@ -9,13 +9,9 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var showSettings = false
-    
-    
     var body: some View {
         ScrollView{
-            
             balanceCard
-            
             HStack{
                 Text("Overview")
                     .font(.title)
@@ -23,9 +19,21 @@ struct HomeView: View {
                 Spacer()
             }
             .padding(.horizontal)
-
-            gridItems
-
+            
+            //budgetsuggestionsection
+            VStack(alignment: .leading){
+                Text("Not sure how much to allocate??\n we can suggest some amounts based on your income")
+                    .font(.title3)
+                Text("Try it!!")
+                    .font(.title2)
+                    .foregroundStyle(.accent)
+            }
+            .frame(maxWidth: .infinity,alignment: .leading)
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -42,95 +50,9 @@ struct HomeView: View {
     }
     
     private var balanceCard:some View{
-        BalanceCardView(data:.mock)
+        BalanceCardView(data:.mock, backgroundColor: Color.blue)
     }
-    private var gridItems:some View{
-        DataGridView(
-            items: [
-                DataItem(
-                    title: "Budgets",
-                    color: .lightGreen,
-                    imageName: "chart.bar"
-                ) {
-                    print("Budgets tapped")
-                },
-                
-                DataItem(
-                    title: "Loans",
-                    color: .lightPink,
-                    imageName: "banknote"
-                ) {
-                    print("Loans tapped")
-                },
-                
-                DataItem(
-                    title: "Goals",
-                    color: .lightRed,
-                    imageName: "flag"
-                ) {
-                    print("Goals tapped")
-                },
-                
-                DataItem(
-                    title: "Labels",
-                    color: .lightPurple,
-                    imageName: "tag"
-                ) {
-                    print("Labels tapped")
-                },
-                
-                DataItem(
-                    title: "Analytics",
-                    color: .lightPeach,
-                    imageName: "chart.line.uptrend.xyaxis"
-                ) {
-                    print("Analytics tapped")
-                },
-                
-                DataItem(
-                    title: "Recurring",
-                    color: .lightOrange,
-                    imageName: "square.grid.2x2"
-                ) {
-                    print("Recurring tapped")
-                },
-                
-                DataItem(
-                    title: "Categories",
-                    color: .lightYellow,
-                    imageName: "square.grid.2x2"
-                ) {
-                    print("Categories tapped")
-                },
-                
-                DataItem(
-                    title: "Weekly Summary",
-                    color: .lightBlue,
-                    imageName: "square.grid.2x2"
-                ) {
-                    print("Weekly Summary tapped")
-                },
-                
-                DataItem(
-                    title: "Places",
-                    color: .lightGreen,
-                    imageName: "square.grid.2x2"
-                ) {
-                    print("Places tapped")
-                },
-                
-                DataItem(
-                    title: "Person",
-                    color: .lightPink,
-                    imageName: "square.grid.2x2"
-                ) {
-                    print("Person tapped")
-                },
-                
-            ]
-        )
-    }
-    
+   
 }
 
 #Preview {

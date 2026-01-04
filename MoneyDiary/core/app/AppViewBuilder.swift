@@ -13,7 +13,6 @@ struct AppViewBuilder<TabBarView: View, OnboardingView: View>: View {
     var showTabBar: Bool
     @ViewBuilder var tabBarView: TabBarView
     @ViewBuilder var onBoardingView: OnboardingView
-    
     var body: some View {
         ZStack {
             if showTabBar {
