@@ -10,7 +10,57 @@ struct CategoryItem: Identifiable {
     let id = UUID()
     let title: String
     let emoji: String
-    let color: Color
+    let categoryColor: CategoryColor
+    let categoryType:CategoryType? = nil
+    let period:CategoryPeriod? = nil
+}
+
+enum CategoryType: String, CaseIterable {
+    case expense = "Expense"
+    case savings = "Savings"
+}
+
+enum CategoryPeriod: String, CaseIterable {
+    case weekly = "Weekly"
+    case monthly = "Monthly"
+}
+
+enum CategoryColor: String, CaseIterable, Identifiable,ShapeStyle {
+    case black = "CategoryBlack"
+    
+    case blue = "CategoryBlue"
+    case blue2 = "CategoryBlue2"
+    case blue3 = "CategoryBlue3"
+    case blue4 = "CategoryBlue4"
+    case blue5 = "CategoryBlue5"
+    
+    case brown = "CategoryBrown"
+    
+    case green = "CategoryGreen"
+    case green2 = "CategoryGreen2"
+    case green3 = "CategoryGreen3"
+    
+    case orange = "CategoryOrange"
+    
+    case pink = "CategoryPink"
+    case pink2 = "CategoryPink2"
+    
+    case purple = "CategoryPurple"
+    case purple2 = "CategoryPurple2"
+    case purple3 = "CategoryPurple3"
+    
+    case red = "CategoryRed"
+    case red1 = "CategoryRed1"
+    case red2 = "CategoryRed2"
+    
+    case yellow = "CategoryYellow"
+    case yellow2 = "CategoryYellow2"
+    
+    var id: String { rawValue }
+    
+    var color: Color {
+        Color(rawValue)
+    }
 }
 
 extension CategoryItem {
@@ -21,31 +71,31 @@ extension CategoryItem {
     static let rent = CategoryItem(
         title: "Rent",
         emoji: "🏠",
-        color: .pink
+        categoryColor: .pink
     )
     
     static let utilities = CategoryItem(
         title: "Utilities",
         emoji: "💡",
-        color: .pink
+        categoryColor: .pink
     )
     
     static let phoneBill = CategoryItem(
         title: "Phone Bill",
         emoji: "📱",
-        color: .pink
+        categoryColor: .pink
     )
     
     static let internet = CategoryItem(
         title: "Internet",
         emoji: "🌐",
-        color: .pink
+        categoryColor: .pink
     )
     
     static let insurance = CategoryItem(
         title: "Insurance",
         emoji: "🛡️",
-        color: .pink
+        categoryColor: .pink
     )
     
     static let essentials: [CategoryItem] = [
@@ -60,19 +110,19 @@ extension CategoryItem {
     static let coffee = CategoryItem(
         title: "Coffee shops",
         emoji: "☕️",
-        color: .orange
+        categoryColor: .orange
     )
     
     static let eatingOut = CategoryItem(
         title: "Eating out",
         emoji: "🍽️",
-        color: .orange
+        categoryColor: .orange
     )
     
     static let groceries = CategoryItem(
         title: "Groceries",
         emoji: "🛒",
-        color: .orange
+        categoryColor: .orange
     )
     
     static let foodAndDrink: [CategoryItem] = [
@@ -85,13 +135,13 @@ extension CategoryItem {
     static let gas = CategoryItem(
         title: "Gas",
         emoji: "⛽️",
-        color: .purple
+        categoryColor: .purple
     )
     
     static let rides = CategoryItem(
         title: "Ubers / Lyft",
         emoji: "🚕",
-        color: .purple
+        categoryColor: .purple
     )
     
     static let transportation: [CategoryItem] = [
@@ -104,19 +154,19 @@ extension CategoryItem {
     static let clothes = CategoryItem(
         title: "Clothes",
         emoji: "👕",
-        color: .blue
+        categoryColor: .blue
     )
     
     static let electronics = CategoryItem(
         title: "Electronics",
         emoji: "💻",
-        color: .blue
+        categoryColor: .blue
     )
     
     static let onlineShopping = CategoryItem(
         title: "Online shopping",
         emoji: "📦",
-        color: .blue
+        categoryColor: .blue
     )
     
     static let shopping: [CategoryItem] = [
@@ -129,19 +179,19 @@ extension CategoryItem {
     static let movies = CategoryItem(
         title: "Movies",
         emoji: "🎬",
-        color: .red
+        categoryColor: .red
     )
     
     static let games = CategoryItem(
         title: "Games",
         emoji: "🎮",
-        color: .red
+        categoryColor: .red
     )
     
     static let subscriptions = CategoryItem(
         title: "Subscriptions",
         emoji: "📺",
-        color: .red
+        categoryColor: .red
     )
     
     static let entertainment: [CategoryItem] = [
@@ -155,19 +205,19 @@ extension CategoryItem {
     static let gym = CategoryItem(
         title: "Gym",
         emoji: "🏋️",
-        color: .green
+        categoryColor: .green
     )
     
     static let medical = CategoryItem(
         title: "Medical",
         emoji: "💊",
-        color: .green
+        categoryColor: .green
     )
     
     static let wellness = CategoryItem(
         title: "Wellness",
         emoji: "🧘‍♂️",
-        color: .green
+        categoryColor: .green
     )
     
     static let health: [CategoryItem] = [
@@ -181,19 +231,19 @@ extension CategoryItem {
     static let flights = CategoryItem(
         title: "Flights",
         emoji: "✈️",
-        color: .teal
+        categoryColor: .brown
     )
     
     static let hotels = CategoryItem(
         title: "Hotels",
         emoji: "🏨",
-        color: .teal
+        categoryColor: .green
     )
     
     static let localTravel = CategoryItem(
         title: "Local travel",
         emoji: "🚌",
-        color: .teal
+        categoryColor: .black
     )
     
     static let travel: [CategoryItem] = [
@@ -207,19 +257,19 @@ extension CategoryItem {
     static let gifts = CategoryItem(
         title: "Gifts",
         emoji: "🎁",
-        color: .yellow
+        categoryColor: .yellow
     )
     
     static let selfCare = CategoryItem(
         title: "Self care",
         emoji: "💆‍♂️",
-        color: .yellow
+        categoryColor: .yellow
     )
     
     static let hobbies = CategoryItem(
         title: "Hobbies",
         emoji: "🎨",
-        color: .yellow
+        categoryColor: .yellow
     )
     
     static let personal: [CategoryItem] = [
@@ -232,19 +282,19 @@ extension CategoryItem {
     static let savings = CategoryItem(
         title: "Savings",
         emoji: "💰",
-        color: .mint
+        categoryColor: .blue3
     )
     
     static let investments = CategoryItem(
         title: "Investments",
         emoji: "📈",
-        color: .mint
+        categoryColor: .blue3
     )
     
     static let loans = CategoryItem(
         title: "Loans",
         emoji: "🏦",
-        color: .mint
+        categoryColor: .pink2
     )
     
     static let finance: [CategoryItem] = [

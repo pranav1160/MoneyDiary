@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var showSettings = false
+    
     var body: some View {
         ScrollView{
             balanceCard
@@ -19,6 +20,15 @@ struct HomeView: View {
                 Spacer()
             }
             .padding(.horizontal)
+            
+            NavigationLink {
+                CreateCategoryView()
+            } label: {
+                Text("Create Category")
+                    .font(.title2)
+                    .foregroundStyle(.categoryBlue)
+            }
+
             
             //budgetsuggestionsection
             VStack(alignment: .leading){
