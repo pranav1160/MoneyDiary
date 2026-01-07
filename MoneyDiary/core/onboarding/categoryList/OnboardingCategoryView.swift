@@ -34,49 +34,7 @@ struct OnboardingListCategoryView: View {
                         color: .pink,
                         items: CategoryItem.essentials
                     )
-                    
-                    // MARK: - Food & Drink
-                    CategorySectionView(
-                        title: "Food & Drink",
-                        color: .orange,
-                        items: CategoryItem.foodAndDrink
-                    )
-                    
-                    // MARK: - Transportation
-                    CategorySectionView(
-                        title: "Transportation",
-                        color: .purple,
-                        items: CategoryItem.transportation
-                    )
-                    
-                    // MARK: - Shopping
-                    CategorySectionView(
-                        title: "Shopping",
-                        color: .blue,
-                        items: CategoryItem.shopping
-                    )
-                    
-                    // MARK: - Entertainment
-                    CategorySectionView(
-                        title: "Entertainment",
-                        color: .red,
-                        items: CategoryItem.entertainment
-                    )
-                    
-                    // MARK: - Health & Fitness
-                    CategorySectionView(
-                        title: "Health & Fitness",
-                        color: .green,
-                        items: CategoryItem.health
-                    )
-                    
-                    // MARK: - Travel
-                    CategorySectionView(
-                        title: "Travel",
-                        color: .teal,
-                        items: CategoryItem.travel
-                    )
-                    
+                
                     // MARK: - Personal
                     CategorySectionView(
                         title: "Personal",

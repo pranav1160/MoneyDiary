@@ -7,20 +7,23 @@
 import SwiftUI
 
 struct CreateCategoryView: View {
-    
     @Environment(\.dismiss) private var dismiss
-    
+    @EnvironmentObject private var categoryStore: CategoryStore
+
+    @State private var selectedEmoji: String = "👽"
     @State private var selectedColor: CategoryColor = .blue
     @State private var categoryName: String = ""
     @State private var categoryType: CategoryType = .expense
     @State private var categoryAmount: Double = 0
     @State private var categoryPeriod: CategoryPeriod = .monthly
     
-    private var emojiPickerSection:some View{
-        // MARK: - Preview
-        EmojiPickerView(selectedColor: $selectedColor)
-        
+    private var emojiPickerSection: some View {
+        EmojiPickerView(
+            selectedColor: $selectedColor,
+            selectedEmoji: $selectedEmoji
+        )
     }
+
     
     private var categoryAttributesSection:some View{
         VStack{
@@ -83,6 +86,19 @@ struct CreateCategoryView: View {
         }
     }
     
+    private func createCategory() {
+        let category = CategoryItem(
+            title: categoryName,
+            emoji:  selectedEmoji,
+            categoryColor: selectedColor,
+            categoryType: categoryType,
+            period: categoryPeriod
+        )
+        categoryStore.addCategory(category)
+        dismiss()
+    }
+
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 28) {
@@ -124,6 +140,7 @@ struct CreateCategoryView: View {
     }
     
     private func onSaveClicked(){
+        createCategory()
         dismiss()
     }
     

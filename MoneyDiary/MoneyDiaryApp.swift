@@ -10,9 +10,15 @@ import SwiftData
 
 @main
 struct MoneyDiaryApp: App {
+    
+    @StateObject private var categoryStore = CategoryStore()
+    @StateObject private var transactionStore = TransactionStore()
+    
     var body: some Scene {
         WindowGroup {
             AppView()
+                .environmentObject(categoryStore)
+                .environmentObject(transactionStore)
         }
     }
 }

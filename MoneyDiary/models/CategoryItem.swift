@@ -11,8 +11,8 @@ struct CategoryItem: Identifiable {
     let title: String
     let emoji: String
     let categoryColor: CategoryColor
-    let categoryType:CategoryType? = nil
-    let period:CategoryPeriod? = nil
+    let categoryType:CategoryType
+    let period:CategoryPeriod
 }
 
 enum CategoryType: String, CaseIterable {
@@ -65,244 +65,115 @@ enum CategoryColor: String, CaseIterable, Identifiable,ShapeStyle {
 
 extension CategoryItem {
     
-    
-    
     // MARK: - Essentials
     static let rent = CategoryItem(
         title: "Rent",
         emoji: "🏠",
-        categoryColor: .pink
+        categoryColor: .pink,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let utilities = CategoryItem(
         title: "Utilities",
         emoji: "💡",
-        categoryColor: .pink
+        categoryColor: .pink,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let phoneBill = CategoryItem(
         title: "Phone Bill",
         emoji: "📱",
-        categoryColor: .pink
+        categoryColor: .pink,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let internet = CategoryItem(
         title: "Internet",
         emoji: "🌐",
-        categoryColor: .pink
+        categoryColor: .pink,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let insurance = CategoryItem(
         title: "Insurance",
         emoji: "🛡️",
-        categoryColor: .pink
+        categoryColor: .pink,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let essentials: [CategoryItem] = [
-        .rent,
-        .utilities,
-        .phoneBill,
-        .internet,
-        .insurance
+        rent, utilities, phoneBill, internet, insurance
     ]
-    
-    // MARK: - Food & Drink
-    static let coffee = CategoryItem(
-        title: "Coffee shops",
-        emoji: "☕️",
-        categoryColor: .orange
-    )
-    
-    static let eatingOut = CategoryItem(
-        title: "Eating out",
-        emoji: "🍽️",
-        categoryColor: .orange
-    )
-    
-    static let groceries = CategoryItem(
-        title: "Groceries",
-        emoji: "🛒",
-        categoryColor: .orange
-    )
-    
-    static let foodAndDrink: [CategoryItem] = [
-        .coffee,
-        .eatingOut,
-        .groceries
-    ]
-    
-    // MARK: - Transportation
-    static let gas = CategoryItem(
-        title: "Gas",
-        emoji: "⛽️",
-        categoryColor: .purple
-    )
-    
-    static let rides = CategoryItem(
-        title: "Ubers / Lyft",
-        emoji: "🚕",
-        categoryColor: .purple
-    )
-    
-    static let transportation: [CategoryItem] = [
-        .gas,
-        .rides
-    ]
-    
-    
-    // MARK: - Shopping
-    static let clothes = CategoryItem(
-        title: "Clothes",
-        emoji: "👕",
-        categoryColor: .blue
-    )
-    
-    static let electronics = CategoryItem(
-        title: "Electronics",
-        emoji: "💻",
-        categoryColor: .blue
-    )
-    
-    static let onlineShopping = CategoryItem(
-        title: "Online shopping",
-        emoji: "📦",
-        categoryColor: .blue
-    )
-    
-    static let shopping: [CategoryItem] = [
-        .clothes,
-        .electronics,
-        .onlineShopping
-    ]
+}
 
-    // MARK: - Entertainment
-    static let movies = CategoryItem(
-        title: "Movies",
-        emoji: "🎬",
-        categoryColor: .red
-    )
-    
-    static let games = CategoryItem(
-        title: "Games",
-        emoji: "🎮",
-        categoryColor: .red
-    )
-    
-    static let subscriptions = CategoryItem(
-        title: "Subscriptions",
-        emoji: "📺",
-        categoryColor: .red
-    )
-    
-    static let entertainment: [CategoryItem] = [
-        .movies,
-        .games,
-        .subscriptions
-    ]
 
-    
-    // MARK: - Health & Fitness
-    static let gym = CategoryItem(
-        title: "Gym",
-        emoji: "🏋️",
-        categoryColor: .green
-    )
-    
-    static let medical = CategoryItem(
-        title: "Medical",
-        emoji: "💊",
-        categoryColor: .green
-    )
-    
-    static let wellness = CategoryItem(
-        title: "Wellness",
-        emoji: "🧘‍♂️",
-        categoryColor: .green
-    )
-    
-    static let health: [CategoryItem] = [
-        .gym,
-        .medical,
-        .wellness
-    ]
 
-    
-    // MARK: - Travel
-    static let flights = CategoryItem(
-        title: "Flights",
-        emoji: "✈️",
-        categoryColor: .brown
-    )
-    
-    static let hotels = CategoryItem(
-        title: "Hotels",
-        emoji: "🏨",
-        categoryColor: .green
-    )
-    
-    static let localTravel = CategoryItem(
-        title: "Local travel",
-        emoji: "🚌",
-        categoryColor: .black
-    )
-    
-    static let travel: [CategoryItem] = [
-        .flights,
-        .hotels,
-        .localTravel
-    ]
-
+extension CategoryItem {
     
     // MARK: - Personal
     static let gifts = CategoryItem(
         title: "Gifts",
         emoji: "🎁",
-        categoryColor: .yellow
+        categoryColor: .yellow,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let selfCare = CategoryItem(
         title: "Self care",
         emoji: "💆‍♂️",
-        categoryColor: .yellow
+        categoryColor: .yellow,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let hobbies = CategoryItem(
         title: "Hobbies",
         emoji: "🎨",
-        categoryColor: .yellow
+        categoryColor: .yellow,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let personal: [CategoryItem] = [
-        .gifts,
-        .selfCare,
-        .hobbies
+        gifts, selfCare, hobbies
     ]
+}
 
+
+extension CategoryItem {
+    
     // MARK: - Finance
     static let savings = CategoryItem(
         title: "Savings",
         emoji: "💰",
-        categoryColor: .blue3
+        categoryColor: .blue3,
+        categoryType: .savings,
+        period: .monthly
     )
     
     static let investments = CategoryItem(
         title: "Investments",
         emoji: "📈",
-        categoryColor: .blue3
+        categoryColor: .blue3,
+        categoryType: .savings,
+        period: .monthly
     )
     
     static let loans = CategoryItem(
         title: "Loans",
         emoji: "🏦",
-        categoryColor: .pink2
+        categoryColor: .pink2,
+        categoryType: .expense,
+        period: .monthly
     )
     
     static let finance: [CategoryItem] = [
-        .savings,
-        .investments,
-        .loans
+        savings, investments, loans
     ]
-
-    
-    
 }

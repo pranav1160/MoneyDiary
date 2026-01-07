@@ -10,17 +10,19 @@ import ElegantEmojiPicker
 
 
 struct EmojiPickerView: View {
-    @Binding var selectedColor:CategoryColor
-    @State private var isEmojiPickerPresented = false
-    @State private var selectedEmoji: Emoji? = nil
+    @Binding var selectedColor: CategoryColor
+    @Binding var selectedEmoji: String
     
+    @State private var isEmojiPickerPresented = false
+    @State private var internalEmoji: Emoji? = nil
+
     var body: some View {
         VStack {
             Circle()
                 .fill(selectedColor.color)
                 .frame(width: 90, height: 90)
                 .overlay(
-                    Text(selectedEmoji?.emoji ?? "👽")
+                    Text(selectedEmoji)
                         .font(.largeTitle)
                         .foregroundStyle(.white)
                 )
@@ -32,17 +34,24 @@ struct EmojiPickerView: View {
             }
             .buttonStyle(.bordered)
             .controlSize(.small)
-            
-
         }
         .emojiPicker(
             isPresented: $isEmojiPickerPresented,
-            selectedEmoji: $selectedEmoji,
+            selectedEmoji: $internalEmoji,
             detents: [.medium]
         )
+        .onChange(of: internalEmoji) { _, newValue in
+            if let emoji = newValue {
+                selectedEmoji = emoji.emoji
+            }
+        }
     }
+
 }
 
 #Preview {
-    EmojiPickerView(selectedColor: .constant(.green))
+    EmojiPickerView(
+        selectedColor: .constant(.green),
+        selectedEmoji: .constant("🙂")
+    )
 }

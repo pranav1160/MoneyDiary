@@ -6,12 +6,18 @@
 //
 import Foundation
 
-struct Expense: Identifiable {
+struct Transaction: Identifiable {
     let id: UUID
     let title: String
     let amount: Double
     let date: Date
-    let categoryId: UUID
-    let accountId: UUID
+    let transactionType: TransactionType
     let isRecurring: Bool
+    let categoryId: UUID
+}
+
+
+enum TransactionType:String, CaseIterable{
+    case expense = "Expense"
+    case income = "Income"
 }
