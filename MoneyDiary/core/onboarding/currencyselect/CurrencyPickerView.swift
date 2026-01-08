@@ -8,13 +8,23 @@ import SwiftUI
 
 struct CurrencyPickerView: View {
     
-    @State private var selectedCode = "INR"
-    let sortedCurrencies = UICurrency.mockCurrencies.sorted { $0.name < $1.name }
-
+    @EnvironmentObject private var currencyManager: CurrencyManager
+    
+    let sortedCurrencies = Currency.mockCurrencies.sorted { $0.name < $1.name }
     
     var body: some View {
         VStack(spacing: 24) {
-            Picker("Currency", selection: $selectedCode) {
+            Picker(
+                "Currency",
+                selection: Binding(
+                    get: { currencyManager.selectedCurrency.code },
+                    set: { newCode in
+                        if let currency = Currency.mockCurrencies.first(where: { $0.code == newCode }) {
+                            currencyManager.selectedCurrency = currency
+                        }
+                    }
+                )
+            ) {
                 ForEach(sortedCurrencies) { currency in
                     HStack {
                         Text(currency.flag)
@@ -28,13 +38,14 @@ struct CurrencyPickerView: View {
             .pickerStyle(.wheel)
             .frame(height: 220)
             .clipped()
-            
         }
         .padding()
         .navigationTitle("Currency")
     }
 }
 
+
 #Preview {
     CurrencyPickerView()
+        .environmentObject(CurrencyManager())
 }

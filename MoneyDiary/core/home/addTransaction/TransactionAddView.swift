@@ -28,7 +28,7 @@ struct TransactionAddView: View {
     }
     
     // MARK: - Mock Categories
-    private var categories: [CategoryItem]{
+    private var categories: [Category]{
         categoryStore.categories
     }
     
@@ -39,18 +39,20 @@ struct TransactionAddView: View {
             VStack(spacing: 0) {
                 
                 header
-                
                 Divider().opacity(0.3)
                 
-                formSection
-                
-                Divider().opacity(0.3)
-                
-                categorySection
-                
-                Spacer()
+                ScrollView {
+                    VStack(spacing: 0) {
+                        formSection
+                        
+                        Divider().opacity(0.3)
+                        
+                        categorySection
+                    }
+                }
             }
         }
+
         .navigationDestination(
             isPresented: $navigateToAddCategory,
             destination: {
@@ -205,7 +207,7 @@ private extension TransactionAddView {
             }
     }
     
-    func categoryRow(_ category: CategoryItem) -> some View {
+    func categoryRow(_ category: Category) -> some View {
         HStack(spacing: 12) {
             
             ZStack {
@@ -266,7 +268,10 @@ private extension TransactionAddView {
             let amount = Double(amount),
             let categoryId = selectedCategoryId,
             let category = categoryStore.categories.first(where: { $0.id == categoryId })
-        else { return }
+        else {
+            print("cant add without category")
+            return
+        }
         
         let transaction = Transaction(
             id: UUID(),
@@ -278,7 +283,7 @@ private extension TransactionAddView {
             categoryId: category.id
         )
         
-        transactionStore.addTransaction(transaction)
+        transactionStore.add(transaction)
         dismiss()
     }
 
@@ -286,10 +291,8 @@ private extension TransactionAddView {
     
 }
 
-
-
-
-
 #Preview {
     TransactionAddView(amount: "100")
+        .environmentObject(TransactionStore())
+        .environmentObject(CategoryStore())
 }

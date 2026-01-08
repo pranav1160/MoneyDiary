@@ -11,7 +11,7 @@ struct TransactionRow: View {
     let transaction: Transaction
     @EnvironmentObject private var categoryStore: CategoryStore
 
-    private var category: CategoryItem? {
+    private var category: Category? {
         categoryStore.categories.first {
             $0.id == transaction.categoryId
         }

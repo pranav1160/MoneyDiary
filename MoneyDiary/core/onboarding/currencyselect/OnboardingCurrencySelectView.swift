@@ -20,8 +20,6 @@ struct OnboardingCurrencySelectView: View {
                     .padding()
             }
             
-            
-            
             //currency section
             CurrencyPickerView()
                 .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 24))

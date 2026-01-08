@@ -14,7 +14,6 @@ struct CreateCategoryView: View {
     @State private var selectedColor: CategoryColor = .blue
     @State private var categoryName: String = ""
     @State private var categoryType: CategoryType = .expense
-    @State private var categoryAmount: Double = 0
     @State private var categoryPeriod: CategoryPeriod = .monthly
     
     private var emojiPickerSection: some View {
@@ -53,11 +52,6 @@ struct CreateCategoryView: View {
                     .font(.headline)
                 
                 HStack(spacing: 12) {
-                    AppNumericField(
-                        title: "Amount",
-                        value: $categoryAmount
-                    )
-                    
                     Picker("Period", selection: $categoryPeriod) {
                         ForEach(CategoryPeriod.allCases,id: \.self) { period in
                             Text(period.rawValue).tag(period)
@@ -87,7 +81,7 @@ struct CreateCategoryView: View {
     }
     
     private func createCategory() {
-        let category = CategoryItem(
+        let category = Category(
             title: categoryName,
             emoji:  selectedEmoji,
             categoryColor: selectedColor,

@@ -30,19 +30,14 @@ struct HomeView: View {
                 // MARK: - Summary Cards
                 summarySection
                 
-                // MARK: - Quick Actions
-                quickActionsSection
+                
                 
                 // MARK: - Categories Preview
                 categoriesSection
                 
-                ForEach(transactionStore.transactions) { transaction in
-                    NavigationLink {
-                        TransactionDetailView(transaction: transaction)
-                    } label: {
-                        TransactionRow(transaction: transaction)
-                    }
-                }
+                // MARK: - Quick Actions
+                quickActionsSection
+               
 
 
             }
@@ -62,10 +57,7 @@ struct HomeView: View {
         .navigationDestination(isPresented: $showSettings) {
             SettingsView()
         }
-        .onAppear {
-            print("Home categories:", categoryStore.categories)
-            print("Added category, total:", categoryStore.categories.count)
-        }
+        
         
 
     }
@@ -135,12 +127,7 @@ struct HomeView: View {
                 actionRow(title: "Create Category", color: .categoryBlue)
             }
             
-            NavigationLink {
-                AmountDialPadView()
-                    .toolbar(.hidden, for: .tabBar)
-            } label: {
-                actionRow(title: "Add Expense", color: .accent)
-            }
+            
         }
         .padding(.horizontal)
     }
@@ -156,6 +143,7 @@ struct HomeView: View {
                     .fill(.ultraThinMaterial)
             )
     }
+    
     private var categoriesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             
@@ -181,12 +169,13 @@ struct HomeView: View {
                             .padding()
                             .background(
                                 RoundedRectangle(cornerRadius: 14)
-                                    .fill(.ultraThinMaterial)
+                                    .fill(category.categoryColor.color.opacity(0.7))
                             )
                         }
                     }
                     .padding(.horizontal)
                 }
+
             }
         }
     }

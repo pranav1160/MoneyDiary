@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct CategoryItem: Identifiable {
+struct Category: Identifiable {
     let id = UUID()
     let title: String
     let emoji: String
@@ -63,10 +63,13 @@ enum CategoryColor: String, CaseIterable, Identifiable,ShapeStyle {
     }
 }
 
-extension CategoryItem {
+extension Category {
+    
+    static let mockCategories: [Category] =
+    essentials + personal + finance
     
     // MARK: - Essentials
-    static let rent = CategoryItem(
+    static let rent = Category(
         title: "Rent",
         emoji: "🏠",
         categoryColor: .pink,
@@ -74,7 +77,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let utilities = CategoryItem(
+    static let utilities = Category(
         title: "Utilities",
         emoji: "💡",
         categoryColor: .pink,
@@ -82,7 +85,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let phoneBill = CategoryItem(
+    static let phoneBill = Category(
         title: "Phone Bill",
         emoji: "📱",
         categoryColor: .pink,
@@ -90,7 +93,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let internet = CategoryItem(
+    static let internet = Category(
         title: "Internet",
         emoji: "🌐",
         categoryColor: .pink,
@@ -98,7 +101,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let insurance = CategoryItem(
+    static let insurance = Category(
         title: "Insurance",
         emoji: "🛡️",
         categoryColor: .pink,
@@ -106,17 +109,17 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let essentials: [CategoryItem] = [
+    static let essentials: [Category] = [
         rent, utilities, phoneBill, internet, insurance
     ]
 }
 
 
 
-extension CategoryItem {
+extension Category {
     
     // MARK: - Personal
-    static let gifts = CategoryItem(
+    static let gifts = Category(
         title: "Gifts",
         emoji: "🎁",
         categoryColor: .yellow,
@@ -124,7 +127,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let selfCare = CategoryItem(
+    static let selfCare = Category(
         title: "Self care",
         emoji: "💆‍♂️",
         categoryColor: .yellow,
@@ -132,7 +135,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let hobbies = CategoryItem(
+    static let hobbies = Category(
         title: "Hobbies",
         emoji: "🎨",
         categoryColor: .yellow,
@@ -140,16 +143,16 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let personal: [CategoryItem] = [
+    static let personal: [Category] = [
         gifts, selfCare, hobbies
     ]
 }
 
 
-extension CategoryItem {
+extension Category {
     
     // MARK: - Finance
-    static let savings = CategoryItem(
+    static let savings = Category(
         title: "Savings",
         emoji: "💰",
         categoryColor: .blue3,
@@ -157,7 +160,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let investments = CategoryItem(
+    static let investments = Category(
         title: "Investments",
         emoji: "📈",
         categoryColor: .blue3,
@@ -165,7 +168,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let loans = CategoryItem(
+    static let loans = Category(
         title: "Loans",
         emoji: "🏦",
         categoryColor: .pink2,
@@ -173,7 +176,7 @@ extension CategoryItem {
         period: .monthly
     )
     
-    static let finance: [CategoryItem] = [
+    static let finance: [Category] = [
         savings, investments, loans
     ]
 }

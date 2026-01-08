@@ -16,16 +16,22 @@ struct TabBarView: View {
                     .tabItem {
                         Label("Home", systemImage: "house.fill")
                     }
-           
-            AccountView()
+            
+            NavigationStack{
+                TransactionView()
+            }
                 .tabItem {
-                    Label("Accounts", systemImage: "person.fill")
+                    Label("Expense", systemImage: "chart.line.text.clipboard")
                 }
             
-            ReportView()
+            NavigationStack{
+                BudgetView()
+            }
                 .tabItem {
-                    Label("Reports", systemImage: "chart.line.text.clipboard")
+                    Label("Budget", systemImage: "person.fill")
                 }
+            
+            
             
             SearchView()
                 .tabItem {
@@ -39,7 +45,3 @@ struct TabBarView: View {
     TabBarView()
 }
 
-
-#Preview {
-    TabBarView()
-}

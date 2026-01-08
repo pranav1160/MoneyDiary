@@ -11,7 +11,7 @@ struct CategorySectionView: View {
     
     let title: String
     let color: Color
-    let items: [CategoryItem]
+    let items: [Category]
     
     @State private var selectedIds: Set<UUID> = []
     

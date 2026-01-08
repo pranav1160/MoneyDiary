@@ -6,16 +6,17 @@
 //
 import Foundation
 
-struct UICurrency: Identifiable {
-    let id = UUID()
+struct Currency: Identifiable, Hashable , Equatable, Codable {
+    var id: String { code }
     let code: String
     let name: String
     let symbol: String
     let flag: String
 }
 
-extension UICurrency {
-    static let mockCurrencies: [UICurrency] = [
+
+extension Currency {
+    static let mockCurrencies: [Currency] = [
         // 🇮🇳 Asia
         .init(code: "INR", name: "Indian Rupee", symbol: "₹", flag: "🇮🇳"),
         .init(code: "JPY", name: "Japanese Yen", symbol: "¥", flag: "🇯🇵"),

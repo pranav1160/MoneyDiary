@@ -67,7 +67,7 @@ struct DataCardView: View {
         imageName: "chart.bar.fill",
         backgroundColor: Color(.lightGreen),
         onTap: {
-            print("tapped")
+           
         }
     )
 }

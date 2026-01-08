@@ -15,7 +15,7 @@ struct TransactionDetailView: View {
     @EnvironmentObject private var categoryStore: CategoryStore
     @Environment(\.dismiss) private var dismiss
 
-    private var category: CategoryItem? {
+    private var category: Category? {
         categoryStore.categories.first {
             $0.id == transaction.categoryId
         }
