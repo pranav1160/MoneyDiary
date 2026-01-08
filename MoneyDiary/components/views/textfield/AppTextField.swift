@@ -22,7 +22,7 @@ struct AppTextField: View {
 
             if let systemImage {
                 Image(systemName: systemImage)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appSecondary)
             }
 
             Group {

@@ -12,6 +12,8 @@ struct TransactionAddView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var transactionStore: TransactionStore
+    @EnvironmentObject private var budgetManager: BudgetManager
+    @EnvironmentObject private var currencyMnager:CurrencyManager
 
     
     @State private var navigateToAddCategory:Bool = false
@@ -83,8 +85,6 @@ struct TransactionAddView: View {
             }
             .presentationDetents([.medium])
         }
-
-        .foregroundStyle(.white)
     }
 }
 
@@ -181,7 +181,7 @@ private extension TransactionAddView {
             
             Text("CATEGORIES")
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appSecondary)
             
             ForEach(categories) { category in
                 categoryRow(category)
@@ -199,7 +199,7 @@ private extension TransactionAddView {
             .frame(height: 52)
             .overlay {
                 Text("Add new category")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appSecondary)
             }
             .onTapGesture {
                 //navigate to add category
@@ -222,9 +222,20 @@ private extension TransactionAddView {
                 Text(category.title)
                     .font(.headline)
                 
-                Text("$2,500.00 left")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let status = budgetStatus(for: category) {
+                    Text(
+                        "\(currencyMnager.selectedCurrency.symbol)\(Int(status.remaining)) left"
+                    )
+                        .font(.caption)
+                        .foregroundStyle(
+                            status.isOverBudget ? .red : .appSecondary
+                        )
+                } else {
+                    Text("No budget")
+                        .font(.caption)
+                        .foregroundStyle(.appSecondary)
+                }
+
             }
             
             Spacer()
@@ -232,7 +243,7 @@ private extension TransactionAddView {
             Image(systemName: selectedCategoryId == category.id
                   ? "checkmark.circle.fill"
                   : "circle")
-            .foregroundStyle(selectedCategoryId == category.id ? .green : .secondary)
+            .foregroundStyle(selectedCategoryId == category.id ? .green : .appSecondary)
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -247,7 +258,7 @@ private extension TransactionAddView {
     ) -> some View {
         HStack {
             Text(title)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appSecondary)
             
             Spacer()
             
@@ -255,6 +266,17 @@ private extension TransactionAddView {
         }
         .frame(height: 56)
     }
+    
+    private func budgetStatus(for category: Category) -> BudgetStatus? {
+        budgetManager.budgetStatuses.first {
+            $0.budget.categoryId == category.id && $0.budget.isActive
+        }
+    }
+    
+    private var currencySymbol:String{
+        return currencyMnager.selectedCurrency.symbol
+    }
+
     
     private func onAddTransactionPressed(){
         //save the expense
@@ -295,4 +317,10 @@ private extension TransactionAddView {
     TransactionAddView(amount: "100")
         .environmentObject(TransactionStore())
         .environmentObject(CategoryStore())
+        .environmentObject(
+            BudgetManager(
+                budgetStore: BudgetStore(),
+                transactionStore: TransactionStore()
+            )
+        )
 }

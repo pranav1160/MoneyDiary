@@ -12,7 +12,7 @@ struct AmountDialPadView: View {
 
     @State private var amount: String = ""
     @State private var navigateToExpenseAddView:Bool = false
- 
+    @EnvironmentObject private var currencyManager:CurrencyManager
     private let buttons: [[String]] = [
         ["1","2","3"],
         ["4","5","6"],
@@ -42,7 +42,7 @@ struct AmountDialPadView: View {
                 Spacer()
 
                 // Amount
-                Text("$\(amount)")
+                Text("\(currencySymbol)\(amount)")
                     .font(.system(size: 56, weight: .bold))
                     .foregroundStyle(.green)
 
@@ -83,6 +83,10 @@ struct AmountDialPadView: View {
             isPresented: $navigateToExpenseAddView) {
                 TransactionAddView(amount: amount)
             }
+    }
+    
+    private var currencySymbol:String{
+        return currencyManager.selectedCurrency.symbol
     }
 
     // MARK: - Dial Button

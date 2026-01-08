@@ -29,7 +29,7 @@ struct TransactionRow: View {
 
                 Text(category?.title ?? "Unknown")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appSecondary)
             }
 
             Spacer()

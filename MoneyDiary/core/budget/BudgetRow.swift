@@ -26,7 +26,7 @@ struct BudgetRow: View {
                     
                     Text("₹\(Int(status.spent)) / ₹\(Int(budget.amount))")
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.appSecondary)
                 }
                 
                 Spacer()

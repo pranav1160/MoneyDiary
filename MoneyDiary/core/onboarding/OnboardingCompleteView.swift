@@ -50,7 +50,7 @@ private extension OnboardingCompleteView {
             
             Text("Your MoneyDiary is ready. Start tracking your expenses and build better habits today.")
                 .font(.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appSecondary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
         }

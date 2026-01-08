@@ -24,7 +24,7 @@ struct OnboardingListCategoryView: View {
                         
                         Text("Here are some suggestions for you (you can always add/edit these later)")
                             .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.appSecondary)
                     }
                     
                    

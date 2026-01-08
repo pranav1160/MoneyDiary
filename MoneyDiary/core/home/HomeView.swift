@@ -103,7 +103,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appSecondary)
             
             Text("₹\(value, specifier: "%.0f")")
                 .font(.title2)
@@ -153,7 +153,7 @@ struct HomeView: View {
             
             if categoryStore.categories.isEmpty {
                 Text("No categories yet")
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appSecondary)
                     .padding(.horizontal)
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {

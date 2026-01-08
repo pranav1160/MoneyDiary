@@ -75,7 +75,7 @@ struct TransactionDetailView: View {
     private func detailRow(title: String, value: String) -> some View {
         HStack {
             Text(title)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.appSecondary)
 
             Spacer()
 

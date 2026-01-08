@@ -32,7 +32,7 @@ struct WelcomeView: View {
                 
                 Text("Know where your money goes — effortlessly.")
                     .font(.body)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
                 

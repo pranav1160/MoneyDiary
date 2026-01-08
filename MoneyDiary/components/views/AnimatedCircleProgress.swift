@@ -98,7 +98,7 @@ struct AnimatedCircleProgress: View {
                 
                 Text("of \(Int(totalVal))")
                     .font(.system(size: size * 0.1, weight: .medium, design: .rounded))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.appSecondary)
             }
         }
         .frame(width: size, height: size)
