@@ -55,24 +55,30 @@ enum BudgetPeriod: String, Codable, CaseIterable {
 // MARK: - Mock Data
 
 extension Budget {
+    
     static let mockBudgets: [Budget] = [
         Budget(
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000001")!,
             name: "Monthly Groceries",
-            amount: 500.0,
+            amount: 5000,
             period: .monthly,
-            categoryId: Category.mockCategories[0].id
+            categoryId: Category.eggs.id
         ),
         Budget(
-            name: "Total Monthly Budget",
-            amount: 2000.0,
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000002")!,
+            name: "House Rent",
+            amount: 25000,
             period: .monthly,
-            categoryId: Category.mockCategories[1].id
+            categoryId: Category.rent.id
         ),
         Budget(
-            name: "Weekly Entertainment",
-            amount: 100.0,
-            period: .weekly,
-            categoryId: Category.mockCategories[3].id
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000003")!,
+            name: "Savings Goal",
+            amount: 10000,
+            period: .monthly,
+            categoryId: Category.savings.id
         )
     ]
+    
+    static let empty: [Budget] = []
 }

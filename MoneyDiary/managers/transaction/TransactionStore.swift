@@ -38,7 +38,7 @@ final class TransactionStore: ObservableObject {
     
     // MARK: - Mocks (internal write access)
     func loadMockTransactions() {
-        transactions = Transaction.transactionMocks
+        transactions = Transaction.mocks
     }
     
 }

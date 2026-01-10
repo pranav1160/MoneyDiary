@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct HomeView: View {
-    
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var transactionStore: TransactionStore
-    
     @State private var showSettings = false
     
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                
                 // MARK: - Header
                 HStack {
                     Text("Overview")
@@ -26,20 +23,12 @@ struct HomeView: View {
                     Spacer()
                 }
                 .padding(.horizontal)
-                
                 // MARK: - Summary Cards
                 summarySection
-                
-                
-                
                 // MARK: - Categories Preview
                 categoriesSection
-                
                 // MARK: - Quick Actions
                 quickActionsSection
-               
-
-
             }
             .padding(.bottom, 40)
         }
@@ -62,72 +51,50 @@ struct HomeView: View {
 
     }
     
-    private var totalExpense: Double {
-        transactionStore.transactions
-            .filter { $0.transactionType == .expense }
-            .map { $0.amount }
-            .reduce(0, +)
+    private var monthlyExpense: Double {
+        transactionStore.totalThisMonth(for: .expense)
     }
     
-    private var totalIncome: Double {
-        transactionStore.transactions
-            .filter { $0.transactionType == .income }
-            .map { $0.amount }
-            .reduce(0, +)
+    private var monthlyIncome: Double {
+        transactionStore.totalThisMonth(for: .income)
     }
+
+
 
     
     private var summarySection: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 24) {
             
-            summaryCard(
-                title: "Expense",
-                value: totalExpense,
-                color: .red
-            )
-            
-            summaryCard(
-                title: "Income",
-                value: totalIncome,
-                color: .green
-            )
+            VStack(spacing: 8) {
+                AnimatedCircleProgress(
+                    strokeColor: .red,
+                    inputVal: monthlyExpense,
+                    totalVal: monthlyIncome,
+                    size: 120,
+                    strokeWidth: 10
+                )
+                
+                Text("Expense")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                
+                Text("\(monthlyExpense, format: .currency(code: "INR"))")
+                    .font(.headline)
+                    .foregroundStyle(.red)
+            }
         }
         .padding(.horizontal)
     }
 
-    private func summaryCard(
-        title: String,
-        value: Double,
-        color: Color
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.appSecondary)
-            
-            Text("₹\(value, specifier: "%.0f")")
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundStyle(color)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.ultraThinMaterial)
-        )
-    }
+
 
     private var quickActionsSection: some View {
         VStack(spacing: 12) {
-            
             NavigationLink {
                 CreateCategoryView()
             } label: {
                 actionRow(title: "Create Category", color: .categoryBlue)
             }
-            
-            
         }
         .padding(.horizontal)
     }

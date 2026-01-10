@@ -30,24 +30,12 @@ struct OnboardingListCategoryView: View {
                    
                     // MARK: - Essentials
                     CategorySectionView(
-                        title: "Essentials",
-                        color: .pink,
-                        items: Category.essentials
+                        title: "All",
+                        color: .appSecondary,
+                        items: Category.mockCategories
                     )
                 
-                    // MARK: - Personal
-                    CategorySectionView(
-                        title: "Personal",
-                        color: .yellow,
-                        items: Category.personal
-                    )
-                    
-                    // MARK: - Finance
-                    CategorySectionView(
-                        title: "Finance",
-                        color: .mint,
-                        items: Category.finance
-                    )
+                   
 
 
                     

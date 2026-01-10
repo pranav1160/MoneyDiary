@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct Category: Identifiable {
-    let id = UUID()
+    let id : UUID
     let title: String
     let emoji: String
     let categoryColor: CategoryColor
@@ -17,7 +17,7 @@ struct Category: Identifiable {
 
 enum CategoryType: String, CaseIterable {
     case expense = "Expense"
-    case savings = "Savings"
+    case income = "Income"
 }
 
 enum CategoryPeriod: String, CaseIterable {
@@ -65,11 +65,28 @@ enum CategoryColor: String, CaseIterable, Identifiable,ShapeStyle {
 
 extension Category {
     
-    static let mockCategories: [Category] =
-    essentials + personal + finance
+    enum MockID {
+        static let eggs = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        static let rent = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
+        static let utilities = UUID(uuidString: "00000000-0000-0000-0000-000000000003")!
+        static let phoneBill = UUID(uuidString: "00000000-0000-0000-0000-000000000004")!
+        static let internet = UUID(uuidString: "00000000-0000-0000-0000-000000000005")!
+        static let savings = UUID(uuidString: "00000000-0000-0000-0000-000000000006")!
+        static let investments = UUID(uuidString: "00000000-0000-0000-0000-000000000007")!
+        static let salary = UUID(uuidString: "00000000-0000-0000-0000-000000000008")!
+    }
     
-    // MARK: - Essentials
+    static let eggs = Category(
+        id: MockID.eggs,
+        title: "Eggs",
+        emoji: "🥚",
+        categoryColor: .red,
+        categoryType: .expense,
+        period: .monthly
+    )
+    
     static let rent = Category(
+        id: MockID.rent,
         title: "Rent",
         emoji: "🏠",
         categoryColor: .pink,
@@ -78,6 +95,7 @@ extension Category {
     )
     
     static let utilities = Category(
+        id: MockID.utilities,
         title: "Utilities",
         emoji: "💡",
         categoryColor: .pink,
@@ -86,6 +104,7 @@ extension Category {
     )
     
     static let phoneBill = Category(
+        id: MockID.phoneBill,
         title: "Phone Bill",
         emoji: "📱",
         categoryColor: .pink,
@@ -94,6 +113,7 @@ extension Category {
     )
     
     static let internet = Category(
+        id: MockID.internet,
         title: "Internet",
         emoji: "🌐",
         categoryColor: .pink,
@@ -101,82 +121,34 @@ extension Category {
         period: .monthly
     )
     
-    static let insurance = Category(
-        title: "Insurance",
-        emoji: "🛡️",
-        categoryColor: .pink,
-        categoryType: .expense,
+    static let salary = Category(
+        id: MockID.salary,
+        title: "Salary",
+        emoji: "💵",
+        categoryColor: .blue5,
+        categoryType: .income,
         period: .monthly
     )
     
-    static let essentials: [Category] = [
-        rent, utilities, phoneBill, internet, insurance
-    ]
-}
-
-
-
-extension Category {
-    
-    // MARK: - Personal
-    static let gifts = Category(
-        title: "Gifts",
-        emoji: "🎁",
-        categoryColor: .yellow,
-        categoryType: .expense,
-        period: .monthly
-    )
-    
-    static let selfCare = Category(
-        title: "Self care",
-        emoji: "💆‍♂️",
-        categoryColor: .yellow,
-        categoryType: .expense,
-        period: .monthly
-    )
-    
-    static let hobbies = Category(
-        title: "Hobbies",
-        emoji: "🎨",
-        categoryColor: .yellow,
-        categoryType: .expense,
-        period: .monthly
-    )
-    
-    static let personal: [Category] = [
-        gifts, selfCare, hobbies
-    ]
-}
-
-
-extension Category {
-    
-    // MARK: - Finance
     static let savings = Category(
+        id: MockID.savings,
         title: "Savings",
         emoji: "💰",
         categoryColor: .blue3,
-        categoryType: .savings,
+        categoryType: .income,
         period: .monthly
     )
     
     static let investments = Category(
+        id: MockID.investments,
         title: "Investments",
         emoji: "📈",
         categoryColor: .blue3,
-        categoryType: .savings,
+        categoryType: .income,
         period: .monthly
     )
     
-    static let loans = Category(
-        title: "Loans",
-        emoji: "🏦",
-        categoryColor: .pink2,
-        categoryType: .expense,
-        period: .monthly
-    )
-    
-    static let finance: [Category] = [
-        savings, investments, loans
+    static let mockCategories: [Category] = [
+        eggs, rent, utilities, phoneBill, internet, savings, investments,salary
     ]
 }

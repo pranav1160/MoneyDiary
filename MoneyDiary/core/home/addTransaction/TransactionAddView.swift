@@ -29,31 +29,33 @@ struct TransactionAddView: View {
         _amount = State(initialValue: amount)
     }
     
-    // MARK: - Mock Categories
-    private var categories: [Category]{
-        categoryStore.categories
+    // MARK: - Categories
+   
+    private var selectedCategoryType: CategoryType {
+        transactionType == .expense ? .expense : .income
     }
+    private var filteredCategories: [Category] {
+        categoryStore.categories.filter {
+            $0.categoryType == selectedCategoryType
+        }
+    }
+
     
     var body: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
+        VStack(spacing: 0) {
+            header
+            Divider().opacity(0.3)
             
-            VStack(spacing: 0) {
-                
-                header
-                Divider().opacity(0.3)
-                
-                ScrollView {
-                    VStack(spacing: 0) {
-                        formSection
-                        
-                        Divider().opacity(0.3)
-                        
-                        categorySection
-                    }
+            ScrollView {
+                VStack(spacing: 0) {
+                    formSection
+                    Divider().opacity(0.3)
+                    categorySection
                 }
             }
         }
+        .background(.background)
+
 
         .navigationDestination(
             isPresented: $navigateToAddCategory,
@@ -183,7 +185,7 @@ private extension TransactionAddView {
                 .font(.caption)
                 .foregroundStyle(.appSecondary)
             
-            ForEach(categories) { category in
+            ForEach(filteredCategories) { category in
                 categoryRow(category)
             }
             

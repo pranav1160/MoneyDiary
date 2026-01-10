@@ -27,7 +27,6 @@ struct BudgetCalculator {
             transaction.categoryId == budget.categoryId &&
             transaction.date >= startDate
         }
-
     }
 
     func spentAmount(

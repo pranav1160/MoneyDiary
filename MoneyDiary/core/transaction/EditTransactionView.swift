@@ -76,5 +76,5 @@ struct EditTransactionView: View {
 }
 
 #Preview {
-    EditTransactionView(transaction: Transaction.transactionMocks[0])
+    EditTransactionView(transaction: Transaction.mocks[0])
 }

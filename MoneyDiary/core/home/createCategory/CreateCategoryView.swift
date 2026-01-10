@@ -82,6 +82,7 @@ struct CreateCategoryView: View {
     
     private func createCategory() {
         let category = Category(
+            id: UUID(),
             title: categoryName,
             emoji:  selectedEmoji,
             categoryColor: selectedColor,

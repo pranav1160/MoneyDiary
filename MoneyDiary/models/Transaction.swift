@@ -16,7 +16,6 @@ struct Transaction: Identifiable {
     let categoryId: UUID
 }
 
-
 enum TransactionType:String, CaseIterable{
     case expense = "Expense"
     case income = "Income"
@@ -24,95 +23,96 @@ enum TransactionType:String, CaseIterable{
 
 extension Transaction {
     
-    static let transactionMocks: [Transaction] = {
-        
-        let categories = Category.mockCategories
-        let expenseCategories = categories.filter { $0.categoryType == .expense }
-        let savingsCategories = categories.filter { $0.categoryType == .savings }
-        
-        return [
-            // MARK: - Expenses
-            Transaction(
-                id: UUID(),
-                title: "House Rent",
-                amount: 12000,
-                date: Date().daysAgo(2),
-                transactionType: .expense,
-                isRecurring: true,
-                categoryId: expenseCategories.first { $0.title == "Rent" }!.id
+    static func mock(
+        id: UUID,
+        title: String,
+        amount: Double,
+        daysAgo: Int,
+        type: TransactionType,
+        recurring: Bool,
+        category: Category
+    ) -> Transaction {
+        Transaction(
+            id: id,
+            title: title,
+            amount: amount,
+            date: .daysAgo(daysAgo),
+            transactionType: type,
+            isRecurring: recurring,
+            categoryId: category.id
+        )
+    }
+}
+
+
+extension Transaction {
+    
+    static let mocks: [Transaction] = [
+            .mock(
+                id: UUID(uuidString: "20000000-0000-0000-0000-000000000001")!,
+                title: "Eggs Purchase",
+                amount: 120,
+                daysAgo: 3,
+                type: .expense,
+                recurring: false,
+                category: .eggs
             ),
-            
-            Transaction(
-                id: UUID(),
+
+            .mock(
+                id: UUID(uuidString: "20000000-0000-0000-0000-000000000002")!,
+                title: "House Rent",
+                amount: 24000,
+                daysAgo: 1,
+                type: .expense,
+                recurring: true,
+                category: .rent
+            ),
+        
+            .mock(
+                id: UUID(uuidString: "20000000-0000-0000-0000-000000000003")!,
                 title: "Electricity Bill",
                 amount: 1800,
-                date: Date().daysAgo(5),
-                transactionType: .expense,
-                isRecurring: true,
-                categoryId: expenseCategories.first { $0.title == "Utilities" }!.id
+                daysAgo: 5,
+                type: .expense,
+                recurring: true,
+                category: .utilities
             ),
-            
-            Transaction(
-                id: UUID(),
-                title: "Mobile Recharge",
-                amount: 699,
-                date: Date().daysAgo(7),
-                transactionType: .expense,
-                isRecurring: true,
-                categoryId: expenseCategories.first { $0.title == "Phone Bill" }!.id
-            ),
-            
-            Transaction(
-                id: UUID(),
-                title: "Netflix Subscription",
-                amount: 499,
-                date: Date().daysAgo(10),
-                transactionType: .expense,
-                isRecurring: true,
-                categoryId: expenseCategories.first { $0.title == "Internet" }!.id
-            ),
-            
-            // MARK: - Personal
-            Transaction(
-                id: UUID(),
-                title: "Gym Membership",
-                amount: 1500,
-                date: Date().daysAgo(3),
-                transactionType: .expense,
-                isRecurring: true,
-                categoryId: expenseCategories.first { $0.title == "Self care" }!.id
-            ),
-            
-            Transaction(
-                id: UUID(),
-                title: "Painting Supplies",
-                amount: 850,
-                date: Date().daysAgo(12),
-                transactionType: .expense,
-                isRecurring: false,
-                categoryId: expenseCategories.first { $0.title == "Hobbies" }!.id
-            ),
-            
-            // MARK: - Savings
-            Transaction(
-                id: UUID(),
-                title: "Monthly Savings",
-                amount: 5000,
-                date: Date().daysAgo(1),
-                transactionType: .income,
-                isRecurring: true,
-                categoryId: savingsCategories.first { $0.title == "Savings" }!.id
-            ),
-            
-            Transaction(
-                id: UUID(),
-                title: "Mutual Fund SIP",
-                amount: 3000,
-                date: Date().daysAgo(6),
-                transactionType: .income,
-                isRecurring: true,
-                categoryId: savingsCategories.first { $0.title == "Investments" }!.id
+        
+            .mock(
+                id: UUID(uuidString: "20000000-0000-0000-0000-000000000004")!,
+                title: "Salary",
+                amount: 80000,
+                daysAgo: 0,
+                type: .income,
+                recurring: true,
+                category: .savings
             )
-        ]
-    }()
+        
+    ]
+    
+    static let empty: [Transaction] = []
+}
+
+
+extension Transaction {
+    static let edgeCases: [Transaction] = [
+        .mock(
+            id: UUID(),
+            title: "Zero Amount",
+            amount: 0,
+            daysAgo: 2,
+            type: .expense,
+            recurring: false,
+            category: .eggs
+        ),
+        .mock(
+            id: UUID(),
+            title: "Future Transaction",
+            amount: 500,
+            daysAgo: -3,
+            type: .expense,
+            recurring: false,
+            category: .rent
+        )
+    ]
 }
