@@ -8,17 +8,16 @@
 import SwiftUI
 
 struct TransactionAddView: View {
-    
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var transactionStore: TransactionStore
     @EnvironmentObject private var budgetManager: BudgetManager
-    @EnvironmentObject private var currencyMnager:CurrencyManager
+    @EnvironmentObject private var currencyManager: CurrencyManager
+
 
     
     @State private var navigateToAddCategory:Bool = false
     @State private var transactionName: String = ""
-    @State private var transactionType: TransactionType = .expense
     @State private var amount: String
     @State private var selectedCategoryId: UUID?
     @State private var selectedDate: Date = .now
@@ -28,19 +27,6 @@ struct TransactionAddView: View {
     init(amount: String) {
         _amount = State(initialValue: amount)
     }
-    
-    // MARK: - Categories
-   
-    private var selectedCategoryType: CategoryType {
-        transactionType == .expense ? .expense : .income
-    }
-    private var filteredCategories: [Category] {
-        categoryStore.categories.filter {
-            $0.categoryType == selectedCategoryType
-        }
-    }
-
-    
     var body: some View {
         VStack(spacing: 0) {
             header
@@ -60,7 +46,7 @@ struct TransactionAddView: View {
         .navigationDestination(
             isPresented: $navigateToAddCategory,
             destination: {
-                CreateCategoryView()
+                CategoryFormView(mode: .create)
                     .presentationDetents([.medium])
             }
         )
@@ -103,7 +89,7 @@ private extension TransactionAddView {
             
             Spacer()
             
-            Text("$\(amount)")
+            Text("\(currencyManager.selectedCurrency.symbol)\(amount)")
                 .font(.system(size: 28, weight: .bold))
             
             Spacer()
@@ -135,19 +121,7 @@ private extension TransactionAddView {
                 }
             )
             
-            row(
-                title: "Type",
-                trailing: {
-                    Picker("", selection: $transactionType) {
-                        ForEach(TransactionType.allCases, id: \.self) { type in
-                            Text(type.rawValue.capitalized)
-                                .tag(type)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 200)
-                }
-            )
+         
 
             
             row(
@@ -185,7 +159,7 @@ private extension TransactionAddView {
                 .font(.caption)
                 .foregroundStyle(.appSecondary)
             
-            ForEach(filteredCategories) { category in
+            ForEach(categoryStore.categories) { category in
                 categoryRow(category)
             }
             
@@ -226,7 +200,7 @@ private extension TransactionAddView {
                 
                 if let status = budgetStatus(for: category) {
                     Text(
-                        "\(currencyMnager.selectedCurrency.symbol)\(Int(status.remaining)) left"
+                        "\(currencyManager.selectedCurrency.symbol)\(Int(status.remaining)) left"
                     )
                         .font(.caption)
                         .foregroundStyle(
@@ -276,7 +250,7 @@ private extension TransactionAddView {
     }
     
     private var currencySymbol:String{
-        return currencyMnager.selectedCurrency.symbol
+        return currencyManager.selectedCurrency.symbol
     }
 
     
@@ -302,7 +276,6 @@ private extension TransactionAddView {
             title: transactionName,
             amount: amount,
             date: selectedDate,
-            transactionType: transactionType,
             isRecurring: false,
             categoryId: category.id
         )

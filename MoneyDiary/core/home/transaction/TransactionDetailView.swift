@@ -33,15 +33,12 @@ struct TransactionDetailView: View {
                     Text("₹\(transaction.amount, specifier: "%.0f")")
                         .font(.largeTitle)
                         .fontWeight(.bold)
-                        .foregroundStyle(
-                            transaction.transactionType == .expense ? .red : .green
-                        )
+                        
                 }
 
                 // MARK: - Details Card
                 VStack(spacing: 16) {
                     detailRow(title: "Title", value: transaction.title)
-                    detailRow(title: "Type", value: transaction.transactionType.rawValue)
                     detailRow(title: "Category", value: category?.title ?? "Unknown")
                     detailRow(
                         title: "Date",

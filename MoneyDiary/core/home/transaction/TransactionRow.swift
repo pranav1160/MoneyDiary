@@ -35,9 +35,6 @@ struct TransactionRow: View {
             Spacer()
 
             Text("₹\(transaction.amount, specifier: "%.0f")")
-                .foregroundStyle(
-                    transaction.transactionType == .expense ? .red : .green
-                )
         }
         .padding()
     }

@@ -16,7 +16,6 @@ struct EditTransactionView: View {
     @State private var title: String
     @State private var amount: String
     @State private var date: Date
-    @State private var type: TransactionType
     
     private let transaction: Transaction
     
@@ -25,7 +24,6 @@ struct EditTransactionView: View {
         _title = State(initialValue: transaction.title)
         _amount = State(initialValue: String(transaction.amount))
         _date = State(initialValue: transaction.date)
-        _type = State(initialValue: transaction.transactionType)
     }
     
     var body: some View {
@@ -37,12 +35,7 @@ struct EditTransactionView: View {
                 TextField("Amount", text: $amount)
                     .keyboardType(.decimalPad)
                 
-                Picker("Type", selection: $type) {
-                    ForEach(TransactionType.allCases, id: \.self) {
-                        Text($0.rawValue)
-                    }
-                }
-                .pickerStyle(.segmented)
+       
                 
                 DatePicker("Date", selection: $date, displayedComponents: .date)
             }
@@ -65,7 +58,6 @@ struct EditTransactionView: View {
             title: title,
             amount: amount,
             date: date,
-            transactionType: type,
             isRecurring: transaction.isRecurring,
             categoryId: transaction.categoryId
         )

@@ -35,7 +35,6 @@ struct BudgetCalculator {
     ) -> Double {
         
         transactions
-            .filter { $0.transactionType == .expense }
             .reduce(0) { $0 + abs($1.amount) }
     }
 }

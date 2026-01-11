@@ -70,13 +70,6 @@ extension Budget {
             amount: 25000,
             period: .monthly,
             categoryId: Category.rent.id
-        ),
-        Budget(
-            id: UUID(uuidString: "10000000-0000-0000-0000-000000000003")!,
-            name: "Savings Goal",
-            amount: 10000,
-            period: .monthly,
-            categoryId: Category.savings.id
         )
     ]
     

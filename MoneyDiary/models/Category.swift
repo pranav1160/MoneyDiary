@@ -11,13 +11,7 @@ struct Category: Identifiable {
     let title: String
     let emoji: String
     let categoryColor: CategoryColor
-    let categoryType:CategoryType
     let period:CategoryPeriod
-}
-
-enum CategoryType: String, CaseIterable {
-    case expense = "Expense"
-    case income = "Income"
 }
 
 enum CategoryPeriod: String, CaseIterable {
@@ -81,7 +75,6 @@ extension Category {
         title: "Eggs",
         emoji: "🥚",
         categoryColor: .red,
-        categoryType: .expense,
         period: .monthly
     )
     
@@ -90,7 +83,6 @@ extension Category {
         title: "Rent",
         emoji: "🏠",
         categoryColor: .pink,
-        categoryType: .expense,
         period: .monthly
     )
     
@@ -99,7 +91,6 @@ extension Category {
         title: "Utilities",
         emoji: "💡",
         categoryColor: .pink,
-        categoryType: .expense,
         period: .monthly
     )
     
@@ -108,7 +99,6 @@ extension Category {
         title: "Phone Bill",
         emoji: "📱",
         categoryColor: .pink,
-        categoryType: .expense,
         period: .monthly
     )
     
@@ -117,38 +107,10 @@ extension Category {
         title: "Internet",
         emoji: "🌐",
         categoryColor: .pink,
-        categoryType: .expense,
-        period: .monthly
-    )
-    
-    static let salary = Category(
-        id: MockID.salary,
-        title: "Salary",
-        emoji: "💵",
-        categoryColor: .blue5,
-        categoryType: .income,
-        period: .monthly
-    )
-    
-    static let savings = Category(
-        id: MockID.savings,
-        title: "Savings",
-        emoji: "💰",
-        categoryColor: .blue3,
-        categoryType: .income,
-        period: .monthly
-    )
-    
-    static let investments = Category(
-        id: MockID.investments,
-        title: "Investments",
-        emoji: "📈",
-        categoryColor: .blue3,
-        categoryType: .income,
         period: .monthly
     )
     
     static let mockCategories: [Category] = [
-        eggs, rent, utilities, phoneBill, internet, savings, investments,salary
+        eggs, rent, utilities, phoneBill, internet
     ]
 }

@@ -25,10 +25,11 @@ struct HomeView: View {
                 .padding(.horizontal)
                 // MARK: - Summary Cards
                 summarySection
-                // MARK: - Categories Preview
-                categoriesSection
                 // MARK: - Quick Actions
                 quickActionsSection
+                // MARK: - Categories Preview
+                categoriesSection
+                
             }
             .padding(.bottom, 40)
         }
@@ -52,12 +53,9 @@ struct HomeView: View {
     }
     
     private var monthlyExpense: Double {
-        transactionStore.totalThisMonth(for: .expense)
+        transactionStore.totalThisMonth()
     }
-    
-    private var monthlyIncome: Double {
-        transactionStore.totalThisMonth(for: .income)
-    }
+   
 
 
 
@@ -69,7 +67,7 @@ struct HomeView: View {
                 AnimatedCircleProgress(
                     strokeColor: .red,
                     inputVal: monthlyExpense,
-                    totalVal: monthlyIncome,
+                    totalVal: 50000,
                     size: 120,
                     strokeWidth: 10
                 )
@@ -91,7 +89,7 @@ struct HomeView: View {
     private var quickActionsSection: some View {
         VStack(spacing: 12) {
             NavigationLink {
-                CreateCategoryView()
+                CategoryFormView(mode: .create)
             } label: {
                 actionRow(title: "Create Category", color: .categoryBlue)
             }
@@ -123,29 +121,21 @@ struct HomeView: View {
                     .foregroundStyle(.appSecondary)
                     .padding(.horizontal)
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(categoryStore.categories) { category in
-                            VStack(spacing: 6) {
-                                Text(category.emoji)
-                                    .font(.largeTitle)
-                                
-                                Text(category.title)
-                                    .font(.caption)
-                            }
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 14)
-                                    .fill(category.categoryColor.color.opacity(0.7))
-                            )
+                VStack(spacing: 10) {
+                    ForEach(categoryStore.categories) { category in
+                        NavigationLink {
+                            CategoryFormView(mode: .edit(category))
+                        } label: {
+                            CategoryRow(category: category)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .padding(.horizontal)
                 }
-
+                .padding(.horizontal)
             }
         }
     }
+
     
   
 
