@@ -8,7 +8,11 @@
 
 import SwiftUI
 
-struct BudgetCreateView: View {
+enum BudgetFormMode{
+    case category,overall
+}
+
+struct BudgetFormView: View {
 
     @EnvironmentObject private var budgetStore: BudgetStore
     @EnvironmentObject private var categoryStore: CategoryStore
@@ -19,6 +23,7 @@ struct BudgetCreateView: View {
     @State private var selectedPeriod: BudgetPeriod = .monthly
     @State private var selectedCategoryId: UUID?
     @State private var isActive: Bool = true
+    let mode:BudgetFormMode
 
     var body: some View {
         NavigationStack {
@@ -38,18 +43,20 @@ struct BudgetCreateView: View {
                     }
                 }
 
-                // MARK: - Category
-                Section("Category") {
-                    Picker("Category", selection: $selectedCategoryId) {
-                        Text("Select category").tag(UUID?.none)
-
-                        ForEach(categoryStore.categories) { category in
-                            Text("\(category.emoji) \(category.title)")
-                                .tag(UUID?.some(category.id))
+                if mode == .category{
+                    // MARK: - Category
+                    Section("Category") {
+                        Picker("Category", selection: $selectedCategoryId) {
+                            Text("Select category").tag(UUID?.none)
+                            
+                            ForEach(categoryStore.categories) { category in
+                                Text("\(category.emoji) \(category.title)")
+                                    .tag(UUID?.some(category.id))
+                            }
                         }
                     }
                 }
-
+                
                 // MARK: - Status
                 Section {
                     Toggle("Active", isOn: $isActive)
@@ -75,25 +82,23 @@ struct BudgetCreateView: View {
     }
 }
 
-private extension BudgetCreateView {
+private extension BudgetFormView {
     
     var isFormValid: Bool {
         !name.isEmpty &&
         Double(amount) != nil &&
-        selectedCategoryId != nil
+        (mode == .overall || selectedCategoryId != nil)
     }
     
     func createBudget() {
         guard
-            let amount = Double(amount),
-            let categoryId = selectedCategoryId
-        else { return }
+            let amount = Double(amount) else { return }
         
         let budget = Budget(
             name: name,
             amount: amount,
             period: selectedPeriod,
-            categoryId: categoryId,
+            categoryId: mode == .overall ? nil : selectedCategoryId,
             isActive: isActive
         )
         

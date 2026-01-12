@@ -21,8 +21,6 @@ struct BudgetView: View {
                                 emoji: categoryStore.emoji(for: status.budget.categoryId),
                                 status: status
                             )
-
-                        
                     }
                 }
             }
@@ -30,7 +28,15 @@ struct BudgetView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
-                        BudgetCreateView()
+                        BudgetFormView(mode: .category)
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        BudgetFormView(mode: .overall)
                     } label: {
                         Image(systemName: "plus")
                     }

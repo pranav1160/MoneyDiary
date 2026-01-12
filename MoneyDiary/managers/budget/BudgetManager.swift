@@ -11,7 +11,6 @@ import Combine
 
 @MainActor
 final class BudgetManager: ObservableObject {
-
     @Published private(set) var budgetStatuses: [BudgetStatus] = []
 
     private let calculator = BudgetCalculator()
@@ -27,7 +26,6 @@ final class BudgetManager: ObservableObject {
     ) {
         self.budgetStore = budgetStore
         self.transactionStore = transactionStore
-
         bind()
     }
 

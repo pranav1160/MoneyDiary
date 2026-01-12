@@ -16,7 +16,7 @@ struct Budget: Identifiable, Codable {
     let name: String
     let amount: Double
     let period: BudgetPeriod
-    let categoryId: UUID
+    let categoryId: UUID?
     let startDate: Date
     var isActive: Bool
     
@@ -25,7 +25,7 @@ struct Budget: Identifiable, Codable {
         name: String,
         amount: Double,
         period: BudgetPeriod,
-        categoryId: UUID,
+        categoryId: UUID? = nil,
         startDate: Date = Date(),
         isActive: Bool = true
     ) {

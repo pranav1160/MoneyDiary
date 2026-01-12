@@ -11,12 +11,20 @@ import Foundation
 @MainActor
 final class BudgetStore: ObservableObject {
     @Published private(set) var budgets: [Budget] = []
+    var overallBudget: Budget? {
+        budgets.first { $0.categoryId == nil }
+    }
+
     
     init() {
         loadMocks()
     }
 
     func addBudget(_ budget: Budget) {
+        if budget.categoryId == nil{
+            // Remove existing overall budget (if any)
+            budgets.removeAll { $0.categoryId == nil }
+        }
         budgets.append(budget)
     }
 

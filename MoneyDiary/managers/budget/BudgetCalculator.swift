@@ -24,8 +24,12 @@ struct BudgetCalculator {
         )
 
         return transactions.filter { transaction in
-            transaction.categoryId == budget.categoryId &&
-            transaction.date >= startDate
+            if budget.categoryId == nil {
+                transaction.date >= startDate
+            } else {
+                transaction.categoryId == budget.categoryId &&
+                transaction.date >= startDate
+            }
         }
     }
 
