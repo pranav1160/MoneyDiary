@@ -16,15 +16,13 @@ struct BudgetView: View {
             List {
                 Section("Budgets") {
                     ForEach(budgetManager.budgetStatuses, id: \.budget.id) { status in
-                        if let category = categoryStore.categories.first(where: {
-                            $0.id == status.budget.categoryId
-                        }) {
                             BudgetRow(
                                 budget: status.budget,
-                                emoji: category.emoji,
+                                emoji: categoryStore.emoji(for: status.budget.categoryId),
                                 status: status
                             )
-                        }
+
+                        
                     }
                 }
             }

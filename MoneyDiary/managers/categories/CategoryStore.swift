@@ -28,4 +28,9 @@ final class CategoryStore: ObservableObject {
     func loadMockCategories() {
         categories = Category.mockCategories
     }
+    
+    func emoji(for categoryId: UUID) -> String {
+        categories.first { $0.id == categoryId }?.emoji ?? "💰"
+    }
+
 }
