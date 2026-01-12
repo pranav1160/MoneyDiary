@@ -12,6 +12,12 @@ enum BudgetFormMode{
     case category,overall
 }
 
+enum BudgetFormPurpose {
+    case create
+    case edit(Budget)
+}
+
+
 struct BudgetFormView: View {
 
     @EnvironmentObject private var budgetStore: BudgetStore
@@ -24,6 +30,49 @@ struct BudgetFormView: View {
     @State private var selectedCategoryId: UUID?
     @State private var isActive: Bool = true
     let mode:BudgetFormMode
+    let purpose: BudgetFormPurpose
+    
+    var existingId: UUID {
+        if case .edit(let budget) = purpose {
+            return budget.id
+        }
+        return UUID()
+    }
+    
+    var actionTitle: String {
+        switch purpose {
+        case .create: return "Save"
+        case .edit: return "Update"
+        }
+    }
+
+
+
+    
+    init(
+        mode: BudgetFormMode,
+        purpose: BudgetFormPurpose
+    ) {
+        self.mode = mode
+        self.purpose = purpose
+        
+        switch purpose {
+        case .create:
+            _name = State(initialValue: "")
+            _amount = State(initialValue: "")
+            _selectedPeriod = State(initialValue: .monthly)
+            _selectedCategoryId = State(initialValue: nil)
+            _isActive = State(initialValue: true)
+            
+        case .edit(let budget):
+            _name = State(initialValue: budget.name)
+            _amount = State(initialValue: String(budget.amount))
+            _selectedPeriod = State(initialValue: budget.period)
+            _selectedCategoryId = State(initialValue: budget.categoryId)
+            _isActive = State(initialValue: budget.isActive)
+        }
+    }
+
 
     var body: some View {
         NavigationStack {
@@ -71,8 +120,8 @@ struct BudgetFormView: View {
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Save") {
-                        createBudget()
+                    Button(actionTitle) {
+                        saveBudget()
                         dismiss()
                     }
                     .disabled(!isFormValid)
@@ -90,11 +139,11 @@ private extension BudgetFormView {
         (mode == .overall || selectedCategoryId != nil)
     }
     
-    func createBudget() {
-        guard
-            let amount = Double(amount) else { return }
+    func saveBudget() {
+        guard let amount = Double(amount) else { return }
         
         let budget = Budget(
+            id: existingId,
             name: name,
             amount: amount,
             period: selectedPeriod,
@@ -102,6 +151,13 @@ private extension BudgetFormView {
             isActive: isActive
         )
         
-        budgetStore.addBudget(budget)
+        switch purpose {
+        case .create:
+            budgetStore.addBudget(budget)
+            
+        case .edit:
+            budgetStore.updateBudget(budget)
+        }
     }
+
 }

@@ -11,24 +11,40 @@ struct BudgetView: View {
     @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var categoryStore: CategoryStore
     
+    @State private var editingBudget: Budget?
+
     var body: some View {
         VStack{
             List {
                 Section("Budgets") {
                     ForEach(budgetManager.budgetStatuses, id: \.budget.id) { status in
-                            BudgetRow(
-                                budget: status.budget,
-                                emoji: categoryStore.emoji(for: status.budget.categoryId),
-                                status: status
-                            )
+                        BudgetRow(
+                            budget: status.budget,
+                            emoji: categoryStore.emoji(for: status.budget.categoryId),
+                            status: status
+                        )
+                        .contentShape(Rectangle())   // makes whole row tappable
+                        .onTapGesture {
+                            editingBudget = status.budget
+                        }
                     }
                 }
+            }
+            .sheet(item: $editingBudget) { budget in
+                BudgetFormView(
+                    mode: budget.categoryId == nil ? .overall : .category,
+                    purpose: .edit(budget)
+                )
             }
             .navigationTitle("Budgets")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink {
-                        BudgetFormView(mode: .category)
+                        BudgetFormView(
+                            mode: .category,
+                            purpose: .create
+                        )
+
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -36,7 +52,11 @@ struct BudgetView: View {
                 
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink {
-                        BudgetFormView(mode: .overall)
+                        BudgetFormView(
+                            mode: .overall,
+                            purpose: .create
+                        )
+
                     } label: {
                         Image(systemName: "plus")
                     }

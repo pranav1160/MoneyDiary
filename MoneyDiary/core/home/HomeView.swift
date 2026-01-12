@@ -29,7 +29,6 @@ struct HomeView: View {
                 quickActionsSection
                 // MARK: - Categories Preview
                 categoriesSection
-                
             }
             .padding(.bottom, 40)
         }
@@ -47,9 +46,6 @@ struct HomeView: View {
         .navigationDestination(isPresented: $showSettings) {
             SettingsView()
         }
-        
-        
-
     }
     
     private var monthlyExpense: Double {

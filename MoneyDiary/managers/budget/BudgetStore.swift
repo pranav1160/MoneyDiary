@@ -27,6 +27,18 @@ final class BudgetStore: ObservableObject {
         }
         budgets.append(budget)
     }
+    
+    func updateBudget(_ updated: Budget) {
+        guard let index = budgets.firstIndex(where: { $0.id == updated.id }) else { return }
+        
+        // If editing overall budget, ensure uniqueness
+        if updated.categoryId == nil {
+            budgets.removeAll { $0.categoryId == nil && $0.id != updated.id }
+        }
+        
+        budgets[index] = updated
+    }
+
 
     func budgets(for categoryId: UUID) -> [Budget] {
         budgets.filter { $0.categoryId == categoryId }
