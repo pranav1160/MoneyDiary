@@ -11,13 +11,8 @@ struct Category: Identifiable {
     let title: String
     let emoji: String
     let categoryColor: CategoryColor
-    let period:CategoryPeriod
 }
 
-enum CategoryPeriod: String, CaseIterable {
-    case weekly = "Weekly"
-    case monthly = "Monthly"
-}
 
 enum CategoryColor: String, CaseIterable, Identifiable,ShapeStyle {
     case black = "CategoryBlack"
@@ -48,8 +43,6 @@ enum CategoryColor: String, CaseIterable, Identifiable,ShapeStyle {
     case red2 = "CategoryRed2"
     
     case yellow = "CategoryYellow"
-    case yellow2 = "CategoryYellow2"
-    
     var id: String { rawValue }
     
     var color: Color {
@@ -74,40 +67,35 @@ extension Category {
         id: MockID.eggs,
         title: "Eggs",
         emoji: "🥚",
-        categoryColor: .red,
-        period: .monthly
+        categoryColor: .red
     )
     
     static let rent = Category(
         id: MockID.rent,
         title: "Rent",
         emoji: "🏠",
-        categoryColor: .pink,
-        period: .monthly
+        categoryColor: .pink
     )
     
     static let utilities = Category(
         id: MockID.utilities,
         title: "Utilities",
         emoji: "💡",
-        categoryColor: .pink,
-        period: .monthly
+        categoryColor: .green
     )
     
     static let phoneBill = Category(
         id: MockID.phoneBill,
         title: "Phone Bill",
         emoji: "📱",
-        categoryColor: .pink,
-        period: .monthly
+        categoryColor: .orange
     )
     
     static let internet = Category(
         id: MockID.internet,
         title: "Internet",
         emoji: "🌐",
-        categoryColor: .pink,
-        period: .monthly
+        categoryColor: .yellow
     )
     
     static let mockCategories: [Category] = [

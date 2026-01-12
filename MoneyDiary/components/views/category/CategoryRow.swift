@@ -6,6 +6,8 @@
 //
 import SwiftUI
 
+
+
 struct CategoryRow: View {
     let category: Category
 
@@ -16,25 +18,17 @@ struct CategoryRow: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(category.title)
-                    .font(.body)
+                    .font(.title3)
                     .fontWeight(.medium)
-
-                Text(category.period.rawValue)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            Image(systemName: "chevron.right")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+            RoundedRectangle(cornerRadius: 5)
+                .fill(category.categoryColor.color)
+                .frame(width: 25,height: 25)
         }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 14)
-                .fill(category.categoryColor.color.opacity(0.15))
-        )
+        
     }
 }
 

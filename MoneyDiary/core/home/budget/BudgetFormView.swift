@@ -8,14 +8,8 @@
 
 import SwiftUI
 
-enum BudgetFormMode{
-    case category,overall
-}
 
-enum BudgetFormPurpose {
-    case create
-    case edit(Budget)
-}
+
 
 
 struct BudgetFormView: View {

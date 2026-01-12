@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-enum TransactionFormPurpose {
-    case create
-    case edit(Transaction)
-}
 
 
 struct TransactionFormView: View {

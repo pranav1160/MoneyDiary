@@ -32,8 +32,9 @@ struct TabBarView: View {
                 }
             
             
-            
-            SearchView()
+            NavigationStack{
+                SearchView()
+            }
                 .tabItem {
                     Label("Search", systemImage: "magnifyingglass")
                 }

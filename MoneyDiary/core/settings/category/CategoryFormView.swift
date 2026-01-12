@@ -15,7 +15,6 @@ struct CategoryFormView: View {
     @State private var selectedEmoji: String
     @State private var selectedColor: CategoryColor
     @State private var categoryName: String
-    @State private var categoryPeriod: CategoryPeriod
     
     // MARK: - Init for Create & Edit
     init(mode: CategoryFormMode) {
@@ -26,13 +25,11 @@ struct CategoryFormView: View {
             _selectedEmoji = State(initialValue: "👽") //pick random emoji
             _selectedColor = State(initialValue: .blue)
             _categoryName = State(initialValue: "")
-            _categoryPeriod = State(initialValue: .monthly)
             
         case .edit(let category):
             _selectedEmoji = State(initialValue: category.emoji)
             _selectedColor = State(initialValue: category.categoryColor)
             _categoryName = State(initialValue: category.title)
-            _categoryPeriod = State(initialValue: category.period)
         }
     }
 
@@ -61,23 +58,6 @@ struct CategoryFormView: View {
                     .font(.headline)
                 AppTextField(title: "e.g. Food, Rent, Salary", text: $categoryName)
             }
-            
-         
-            
-            // MARK: - Amount + Period
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Budget")
-                    .font(.headline)
-                
-                HStack(spacing: 12) {
-                    Picker("Period", selection: $categoryPeriod) {
-                        ForEach(CategoryPeriod.allCases,id: \.self) { period in
-                            Text(period.rawValue).tag(period)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                }
-            }
         }
         
     }
@@ -94,7 +74,6 @@ struct CategoryFormView: View {
                 .padding()
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 300) // 👈 FIX
         }
     }
     
@@ -103,8 +82,7 @@ struct CategoryFormView: View {
             id: UUID(),
             title: categoryName,
             emoji:  selectedEmoji,
-            categoryColor: selectedColor,
-            period: categoryPeriod
+            categoryColor: selectedColor
         )
         categoryStore.addCategory(category)
     }
@@ -167,7 +145,6 @@ struct CategoryFormView: View {
             title: categoryName,
             emoji: selectedEmoji,
             categoryColor: selectedColor,
-            period: categoryPeriod
         )
         
         categoryStore.updateCategory(updated)

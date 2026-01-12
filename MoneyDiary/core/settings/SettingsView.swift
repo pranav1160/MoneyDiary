@@ -10,19 +10,34 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppState.self) private var appstate
+    @State private var navigateToCategoryList = false
     var body: some View {
+       
         
         List{
-            Section{
-                Button{
-                    signOut()
-                }label: {
-                    Text("SignOut")
-                        .foregroundStyle(.red)
-                }
-            }
+            SettingsLabel(
+                text: "Sign Out",
+                sfIcon: "arrow.backward",
+                color: Color.categoryPink,
+                indicatorText: nil,
+                onTapFunc: signOut
+            )
+            
+            SettingsLabel(
+                text: "Categories",
+                sfIcon: "square.grid.2x2.fill",
+                color: Color.categoryPurple2,
+                indicatorText: nil,
+                onTapFunc: {navigateToCategoryList = true}
+            )
         }
-        
+        .navigationDestination(
+            isPresented: $navigateToCategoryList,
+            destination: {
+                CategoryListView()
+            }
+        )
+        .toolbar(.hidden, for: .tabBar)
         .navigationTitle("Settings")
     }
     
@@ -37,7 +52,7 @@ struct SettingsView: View {
 #Preview {
     NavigationStack{
         SettingsView()
-            
+        
     }
     .environment(AppState(showTabBar: true))
 }
