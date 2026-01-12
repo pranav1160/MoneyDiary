@@ -7,7 +7,14 @@
 
 import SwiftUI
 
-struct TransactionAddView: View {
+enum TransactionFormPurpose {
+    case create
+    case edit(Transaction)
+}
+
+
+struct TransactionFormView: View {
+    let purpose: TransactionFormPurpose
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var transactionStore: TransactionStore
@@ -24,9 +31,27 @@ struct TransactionAddView: View {
     @State private var showDatePicker = false
     
     
-    init(amount: String) {
-        _amount = State(initialValue: amount)
+    init(
+        purpose: TransactionFormPurpose,
+        amount: String = ""
+    ) {
+        self.purpose = purpose
+        
+        switch purpose {
+        case .create:
+            _transactionName = State(initialValue: "")
+            _amount = State(initialValue: amount)
+            _selectedCategoryId = State(initialValue: nil)
+            _selectedDate = State(initialValue: .now)
+            
+        case .edit(let transaction):
+            _transactionName = State(initialValue: transaction.title)
+            _amount = State(initialValue: String(abs(transaction.amount)))
+            _selectedCategoryId = State(initialValue: transaction.categoryId)
+            _selectedDate = State(initialValue: transaction.date)
+        }
     }
+
     var body: some View {
         VStack(spacing: 0) {
             header
@@ -76,7 +101,23 @@ struct TransactionAddView: View {
     }
 }
 
-private extension TransactionAddView {
+private extension TransactionFormView {
+    
+    private var existingId: UUID {
+        if case .edit(let transaction) = purpose {
+            return transaction.id
+        }
+        return UUID()
+    }
+
+    
+    private var isCreateMode: Bool {
+        if case .create = purpose {
+            return true
+        }
+        return false
+    }
+
     
     var header: some View {
         HStack {
@@ -95,15 +136,16 @@ private extension TransactionAddView {
             Spacer()
             
             Button {
-                onAddTransactionPressed()
+                onSaveTransactionPressed()
             } label: {
-                Text("Add")
+                Text(isCreateMode ? "Add" : "Update")
                     .font(.headline)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                     .background(.green)
                     .clipShape(Capsule())
             }
+
         }
         .padding()
     }
@@ -254,42 +296,46 @@ private extension TransactionAddView {
     }
 
     
-    private func onAddTransactionPressed(){
-        //save the expense
+    private func onSaveTransactionPressed() {
         saveTransaction()
         dismiss()
-        
     }
+
     
     private func saveTransaction() {
         guard
             let amount = Double(amount),
-            let categoryId = selectedCategoryId,
-            let category = categoryStore.categories.first(where: { $0.id == categoryId })
+            let categoryId = selectedCategoryId
         else {
-            print("cant add without category")
+            print("Invalid transaction")
             return
         }
         
         let transaction = Transaction(
-            id: UUID(),
+            id: existingId,
             title: transactionName,
             amount: amount,
             date: selectedDate,
             isRecurring: false,
-            categoryId: category.id
+            categoryId: categoryId
         )
         
-        transactionStore.add(transaction)
-        dismiss()
+        switch purpose {
+        case .create:
+            transactionStore.add(transaction)
+            
+        case .edit:
+            transactionStore.update(transaction)
+        }
     }
+
 
    
     
 }
 
 #Preview {
-    TransactionAddView(amount: "100")
+    TransactionFormView(purpose: .create, amount: "100")
         .environmentObject(TransactionStore())
         .environmentObject(CategoryStore())
         .environmentObject(

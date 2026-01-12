@@ -129,7 +129,7 @@ struct AmountDialPadView: View {
         }
         .navigationBarHidden(true)
         .navigationDestination(isPresented: $navigateToExpenseAddView) {
-            TransactionAddView(amount: amount)
+            TransactionFormView(purpose: .create, amount: amount)
         }
     }
     

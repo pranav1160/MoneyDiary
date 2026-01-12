@@ -27,7 +27,7 @@ struct TransactionView: View {
             Section("Transactions") {
                 ForEach(transactionStore.transactions) { transaction in
                     NavigationLink {
-                        EditTransactionView(transaction: transaction)
+                        TransactionFormView(purpose: .edit(transaction))
                     } label: {
                         TransactionRow(transaction: transaction)
                     }
