@@ -10,6 +10,8 @@ import SwiftUI
 struct BudgetView: View {
     @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var categoryStore: CategoryStore
+    @EnvironmentObject private var currencyManager: CurrencyManager
+    
     
     @State private var editingBudget: Budget?
 
@@ -18,10 +20,14 @@ struct BudgetView: View {
             List {
                 Section("Budgets") {
                     ForEach(budgetManager.budgetStatuses, id: \.budget.id) { status in
-                        BudgetRow(
+                        BudgetCategoryRow(
+                            currencySymbol: currencyManager.selectedCurrency.symbol,
                             budget: status.budget,
-                            emoji: categoryStore.emoji(for: status.budget.categoryId),
-                            status: status
+                            emoji: categoryStore
+                                .emoji(for: status.budget.categoryId ),
+                            status: status,
+                            statusBarColor: categoryStore
+                                .color(for: status.budget.categoryId)
                         )
                         .contentShape(Rectangle())   // makes whole row tappable
                         .onTapGesture {

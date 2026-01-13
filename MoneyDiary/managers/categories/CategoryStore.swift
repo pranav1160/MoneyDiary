@@ -35,5 +35,12 @@ final class CategoryStore: ObservableObject {
         }
         return categories.first { $0.id == categoryId }?.emoji ?? "💰"
     }
+    
+    func color(for categoryId:UUID?) -> CategoryColor{
+        guard let categoryId else {
+            return .pink //fix for overall
+        }
+        return categories.first { $0.id == categoryId }?.categoryColor ?? .green
+    }
 
 }

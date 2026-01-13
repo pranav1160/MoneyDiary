@@ -28,7 +28,7 @@ struct TabBarView: View {
                 BudgetView()
             }
                 .tabItem {
-                    Label("Budget", systemImage: "person.fill")
+                    Label("Budget", systemImage: "tachometer")
                 }
             
             
