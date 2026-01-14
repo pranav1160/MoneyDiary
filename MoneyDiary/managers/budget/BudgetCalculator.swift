@@ -106,8 +106,7 @@ extension BudgetCalculator {
             transactions: relevantTransactions
         )
         
-        // 3️⃣ Remaining
-        let remaining = max(budget.amount - spent, 0)
+        
         
         // 4️⃣ Percentage used (0–100)
         let percentageUsed = budget.amount == 0
@@ -126,7 +125,6 @@ extension BudgetCalculator {
         return BudgetStatus(
             budget: budget,
             spent: spent,
-            remaining: remaining,
             percentageUsed: percentageUsed,
             isOverBudget: isOverBudget,
             daysRemaining: daysRemaining

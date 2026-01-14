@@ -13,51 +13,46 @@ struct BudgetCategoryRow: View {
     let emoji: String
     let status: BudgetStatus
     let statusBarColor:CategoryColor
+    
     var body: some View {
-        VStack(alignment:.leading){
-            
+        HStack{
             VStack(alignment:.leading){
-                HStack{
-                    Text(emoji)
-                    Text(budget.name)
-                    
-                }
-                .font(.title3)
-                .fontWeight(.medium)
                 
-                Text("\(status.daysRemaining) days left")
-                    .font(.default)
-                    .foregroundStyle(.appSecondary)
-            }
-            .padding(.bottom,10)
-            
-            Text("\(Int(status.percentageUsed))% SPENT")
+                VStack(alignment:.leading){
+                    HStack{
+                        Text(emoji)
+                        Text(budget.name)
+                    }
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    
+                    Text("\(status.daysRemaining) days left")
+                        .font(.default)
+                        .foregroundStyle(.appSecondary)
+                }
+                .padding(.bottom,10)
+                
+                VStack(alignment:.leading){
+                    Text("\(Int(status.percentageUsed))% SPENT")
+                    Text("this month")
+                        .foregroundStyle(.appSecondary)
+                }
                 .foregroundStyle(colorForStatus)
                 .font(.callout)
                 .fontWeight(.semibold)
-                .padding(.bottom,6)
-            
-            VStack{
-                HStack{
-                    Text(currencySymbol)
-                        .font(.title2)
-                        .foregroundStyle(.appSecondary)
-                    
-                    Text("\(amountLeft)")
-                        .font(.largeTitle)
-                }
-                
-                Text("left this month")
-                    .foregroundStyle(.appSecondary)
             }
             
-            BudgetProgressBar(
-                progress: progressValue,
-                barColor: statusBarColor.color,
-                height: 30
+            Spacer()
+            
+            AnimatedCircleProgress(
+                strokeColor: statusBarColor.color,
+                inputVal: status.spent,
+                totalVal: budget.amount,
+                size:100,
+                strokeWidth: 10
             )
-            .padding(.top, 6)
         }
+        
     }
     
     private var amountLeft:Int{
@@ -87,4 +82,6 @@ struct BudgetCategoryRow: View {
         status: .mockHealthy,
         statusBarColor: CategoryColor.green
     )
+//    .frame(maxWidth: .infinity,alignment: .leading)
+    .padding()
 }

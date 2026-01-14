@@ -1,29 +1,27 @@
 //
-//  AnimatedCircleProgress.swift
+//  SemiCircleProgressView.swift
 //  MoneyDiary
 //
-//  Created by Pranav on 07/01/26.
+//  Created by Pranav on 14/01/26.
 //
 
 import SwiftUI
 
-struct AnimatedCircleProgress: View {
+struct SemiCircleProgressView: View {
     
     // MARK: - Inputs
     let strokeColor: Color
     let inputVal: Double
     let totalVal: Double
+    let currencySymbol:String
+    let amountToShow: Double
     let size: CGFloat
     let strokeWidth: CGFloat
-
+    
     // MARK: - Derived progress
     private var progress: Double {
         guard totalVal > 0 else { return 0 }
         return min(max(inputVal / totalVal, 0), 1)
-    }
-    
-    private var remaining:Double{
-        return totalVal - inputVal
     }
     
     // MARK: - Animation state
@@ -32,17 +30,18 @@ struct AnimatedCircleProgress: View {
     
     var body: some View {
         ZStack {
-            // Background ring with subtle shadow
+            // Background semi-circle with subtle shadow
             Circle()
+                .trim(from: 0, to: 0.5)
                 .stroke(
                     strokeColor.opacity(0.12),
                     lineWidth: strokeWidth
                 )
                 .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
             
-            // Animated progress ring
+            // Animated progress semi-circle
             Circle()
-                .trim(from: 0, to: animatedProgress)
+                .trim(from: 0, to: animatedProgress * 0.5)
                 .stroke(
                     AngularGradient(
                         gradient: Gradient(colors: [
@@ -50,16 +49,15 @@ struct AnimatedCircleProgress: View {
                             strokeColor.opacity(hasAppeared ? 0.85 : 0),
                             strokeColor.opacity(hasAppeared ? 1.0 : 0)
                         ]),
-                        center: .zero,
+                        center: .center,
                         startAngle: .degrees(0),
-                        endAngle: .degrees(360)
+                        endAngle: .degrees(180)
                     ),
                     style: StrokeStyle(
                         lineWidth: strokeWidth,
                         lineCap: .round
                     )
                 )
-                .rotationEffect(.degrees(-90))
                 .shadow(
                     color: strokeColor.opacity(0.3),
                     radius: strokeWidth * 0.4,
@@ -73,6 +71,7 @@ struct AnimatedCircleProgress: View {
             
             // Inner shadow effect (gives depth)
             Circle()
+                .trim(from: 0, to: 0.5)
                 .stroke(
                     LinearGradient(
                         colors: [
@@ -88,8 +87,14 @@ struct AnimatedCircleProgress: View {
             
             // Center content with shadow
             VStack(spacing: 4) {
-                Text("\(Int(remaining))")
-                    .font(.system(size: size * 0.22, weight: .bold, design: .rounded))
+                HStack{
+                    Text(currencySymbol)
+                        .font(.title2)
+                        .foregroundStyle(.appSecondary)
+                    
+                    Text("\(Int(amountToShow))")
+                }
+                    .font(.system(size: size * 0.18, weight: .bold, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(
                             colors: [strokeColor, strokeColor.opacity(0.8)],
@@ -99,12 +104,16 @@ struct AnimatedCircleProgress: View {
                     )
                     .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
                 
-                Text("left")
-                    .font(.system(size: size * 0.15, weight: .medium, design: .rounded))
+                Text("left this month")
                     .foregroundStyle(.appSecondary)
+                    .font(.title3)
+              
             }
+            .rotationEffect(.degrees(-180))
+            .offset(y: size * 0.1)
         }
-        .frame(width: size, height: size)
+        .frame(width: size, height: size/2)
+        .rotationEffect(.degrees(180))
         .onAppear {
             withAnimation(.easeInOut(duration: 0.3)) {
                 hasAppeared = true
@@ -116,6 +125,8 @@ struct AnimatedCircleProgress: View {
         .onChange(of: inputVal) { oldValue, newValue in
             animatedProgress = progress
         }
+    
+        
     }
 }
 
@@ -129,27 +140,33 @@ struct AnimatedCircleProgress: View {
         .ignoresSafeArea()
         
         VStack(spacing: 50) {
-            AnimatedCircleProgress(
+            SemiCircleProgressView(
                 strokeColor: .green,
                 inputVal: 30,
                 totalVal: 100,
-                size: 90,
+                currencySymbol: "$",
+                amountToShow: 70,
+                size: 180,
                 strokeWidth: 10
             )
             
-            AnimatedCircleProgress(
+            SemiCircleProgressView(
                 strokeColor: .blue,
                 inputVal: 750,
                 totalVal: 1200,
-                size: 180,
+                currencySymbol: "$",
+                amountToShow: 450,
+                size: 260,
                 strokeWidth: 30
             )
             
-            AnimatedCircleProgress(
+            SemiCircleProgressView(
                 strokeColor: .purple,
                 inputVal: 450,
                 totalVal: 500,
-                size: 130,
+                currencySymbol: "$",
+                amountToShow: 50,
+                size: 220,
                 strokeWidth: 18
             )
         }

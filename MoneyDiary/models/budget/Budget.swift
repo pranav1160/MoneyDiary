@@ -70,7 +70,22 @@ extension Budget {
             amount: 25000,
             period: .monthly,
             categoryId: Category.rent.id
+        ),
+        Budget(
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000003")!,
+            name: "Electricity",
+            amount: 5000,
+            period: .monthly,
+            categoryId: Category.utilities.id
+        ),
+        Budget(
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000004")!,
+            name: "Overall",
+            amount: 50000,
+            period: .monthly,
+            categoryId: nil
         )
+        
     ]
     
     static let empty: [Budget] = []

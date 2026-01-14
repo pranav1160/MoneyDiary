@@ -11,10 +11,13 @@ import Foundation
 struct BudgetStatus {
     let budget: Budget
     let spent: Double
-    let remaining: Double
     let percentageUsed: Double
     let isOverBudget: Bool
     let daysRemaining: Int
+    
+    var remaining:Double{
+        return budget.amount - spent
+    }
     
     var status: Status {
         if isOverBudget { return .overBudget }
@@ -41,7 +44,6 @@ extension BudgetStatus {
             categoryId: UUID()
         ),
         spent: 120,
-        remaining: 380,
         percentageUsed: 24,
         isOverBudget: false,
         daysRemaining: 18
@@ -55,7 +57,6 @@ extension BudgetStatus {
             categoryId: UUID()
         ),
         spent: 160,
-        remaining: 40,
         percentageUsed: 80,
         isOverBudget: false,
         daysRemaining: 10
@@ -69,7 +70,6 @@ extension BudgetStatus {
             categoryId: UUID()
         ),
         spent: 280,
-        remaining: 20,
         percentageUsed: 93,
         isOverBudget: false,
         daysRemaining: 5
@@ -83,7 +83,6 @@ extension BudgetStatus {
             categoryId: UUID()
         ),
         spent: 520,
-        remaining: 0,
         percentageUsed: 130,
         isOverBudget: true,
         daysRemaining: 12

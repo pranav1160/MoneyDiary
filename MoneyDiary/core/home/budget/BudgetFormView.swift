@@ -8,10 +8,6 @@
 
 import SwiftUI
 
-
-
-
-
 struct BudgetFormView: View {
 
     @EnvironmentObject private var budgetStore: BudgetStore
@@ -39,9 +35,6 @@ struct BudgetFormView: View {
         case .edit: return "Update"
         }
     }
-
-
-
     
     init(
         mode: BudgetFormMode,
