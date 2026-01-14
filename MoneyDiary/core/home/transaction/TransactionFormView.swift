@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-
 struct TransactionFormView: View {
     let purpose: TransactionFormPurpose
     let onFinish: () -> Void
@@ -45,7 +43,11 @@ struct TransactionFormView: View {
             
         case .edit(let transaction):
             _transactionName = State(initialValue: transaction.title)
-            _amount = State(initialValue: String(abs(transaction.amount)))
+            _amount = State(
+                initialValue: amount.isEmpty
+                ? String(abs(transaction.amount))
+                : amount
+            )
             _selectedCategoryId = State(initialValue: transaction.categoryId)
             _selectedDate = State(initialValue: transaction.date)
         }

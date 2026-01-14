@@ -7,11 +7,13 @@
 
 import SwiftUI
 
-enum Route: Hashable {
+enum TransactionRoute: Hashable {
     case amount
     case create(amount: String)
-    case edit(transactionId: UUID)
+    case editAmount(transactionId: UUID)
+    case edit(transactionId: UUID, amount: String)
 }
+
 
 
 
@@ -24,28 +26,30 @@ struct TransactionView: View {
             List {
                 Section {
                     Button("Add Transaction") {
-                        path.append(Route.amount)
+                        path.append(TransactionRoute.amount)
                     }
                 }
                 
                 Section("Transactions") {
                     ForEach(transactionStore.transactions) { transaction in
                         Button {
-                            path.append(Route.edit(transactionId: transaction.id))
+                            path.append(TransactionRoute.editAmount(transactionId: transaction.id))
+
                         } label: {
                             TransactionRow(transaction: transaction)
                         }
 
+
                     }
                 }
             }
-            .navigationDestination(for: Route.self) { route in
+            .navigationDestination(for: TransactionRoute.self) { route in
                 switch route {
                     
                 case .amount:
                     AmountDialPadView(
                         onContinue: { amount in
-                            path.append(Route.create(amount: amount))
+                            path.append(TransactionRoute.create(amount: amount))
                         }
                     )
                     
@@ -59,15 +63,35 @@ struct TransactionView: View {
                         
                     )
                     
-                case .edit(let transactionId):
+              
+
+                case .editAmount(let transactionId):
+                    if let transaction = transactionStore.transactions.first(where: {
+                        $0.id == transactionId
+                    }) {
+                        AmountDialPadView(
+                            initialAmount: String(abs(transaction.amount)), // 👈 prefill
+                            onContinue: { newAmount in
+                                path.append(
+                                    TransactionRoute.edit(
+                                        transactionId: transactionId,
+                                        amount: newAmount
+                                    )
+                                )
+                            }
+                        )
+                    }
+                case .edit(let transactionId, let amount):
                     if let transaction = transactionStore.transactions.first(where: {
                         $0.id == transactionId
                     }) {
                         TransactionFormView(
                             purpose: .edit(transaction),
                             onFinish: {
-                                path.removeLast()
-                            }
+                                path.removeLast(path.count) // pop editAmount + edit
+                            },
+                            amount: amount
+                           
                         )
                     }
 

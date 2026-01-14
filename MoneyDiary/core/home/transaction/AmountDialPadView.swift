@@ -22,6 +22,14 @@ struct AmountDialPadView: View {
         [".", "0", "delete"]
     ]
     
+    init(
+        initialAmount: String = "",
+        onContinue: @escaping (String) -> Void
+    ) {
+        self.onContinue = onContinue
+        _amount = State(initialValue: initialAmount)
+    }
+    
     var body: some View {
         ZStack {
             // Background gradient
