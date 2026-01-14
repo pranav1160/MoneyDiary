@@ -11,15 +11,19 @@ struct CategoryFormView: View {
     @EnvironmentObject private var categoryStore: CategoryStore
     
     let mode: CategoryFormMode
+    let onCategorySaved: ((Category) -> Void)?
     
     @State private var selectedEmoji: String
     @State private var selectedColor: CategoryColor
     @State private var categoryName: String
     
     // MARK: - Init for Create & Edit
-    init(mode: CategoryFormMode) {
+    init(
+        mode: CategoryFormMode,
+        onCategorySaved: ((Category) -> Void)? = nil
+    ) {
         self.mode = mode
-        
+        self.onCategorySaved = onCategorySaved
         switch mode {
         case .create:
             _selectedEmoji = State(initialValue: "👽") //pick random emoji
@@ -31,6 +35,7 @@ struct CategoryFormView: View {
             _selectedColor = State(initialValue: category.categoryColor)
             _categoryName = State(initialValue: category.title)
         }
+        
     }
 
     
@@ -85,6 +90,7 @@ struct CategoryFormView: View {
             categoryColor: selectedColor
         )
         categoryStore.addCategory(category)
+        onCategorySaved?(category)
     }
 
     
@@ -148,6 +154,7 @@ struct CategoryFormView: View {
         )
         
         categoryStore.updateCategory(updated)
+        onCategorySaved?(category)
     }
 
     

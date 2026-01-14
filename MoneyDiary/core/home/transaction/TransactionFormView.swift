@@ -66,12 +66,19 @@ struct TransactionFormView: View {
         }
         .background(.background)
         .navigationDestination(
-            isPresented: $navigateToAddCategory,
-            destination: {
-                CategoryFormView(mode: .create)
-                    .presentationDetents([.medium])
-            }
-        )
+            isPresented: $navigateToAddCategory
+        ) {
+            CategoryFormView(
+                mode: .create,
+                onCategorySaved: { newCategory in
+                    withAnimation {
+                        selectedCategoryId = newCategory.id   //  auto-select
+                    }
+                }
+            )
+            .presentationDetents([.medium])
+        }
+
         .sheet(isPresented: $showDatePicker) {
             VStack(spacing: 16) {
                 Capsule()
@@ -335,13 +342,5 @@ private extension TransactionFormView {
         amount: "100"
         
     )
-        .environmentObject(TransactionStore())
-        .environmentObject(CategoryStore())
-        .environmentObject(
-            BudgetManager(
-                budgetStore: BudgetStore(),
-                transactionStore: TransactionStore()
-            )
-        )
-        .environmentObject(CurrencyManager())
+    .withPreviewEnvironment()
 }
