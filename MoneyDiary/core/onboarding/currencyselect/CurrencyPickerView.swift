@@ -47,5 +47,5 @@ struct CurrencyPickerView: View {
 
 #Preview {
     CurrencyPickerView()
-        .environmentObject(CurrencyManager())
+        .withPreviewEnvironment()
 }

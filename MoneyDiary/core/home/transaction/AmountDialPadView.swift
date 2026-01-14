@@ -247,5 +247,5 @@ struct DialButtonStyle: ButtonStyle {
 
 #Preview {
     AmountDialPadView(onContinue: {_ in })
-        .environmentObject(CurrencyManager())
+        .withPreviewEnvironment()
 }

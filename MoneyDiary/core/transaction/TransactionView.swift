@@ -7,15 +7,6 @@
 
 import SwiftUI
 
-enum TransactionRoute: Hashable {
-    case amount
-    case create(amount: String)
-    case editAmount(transactionId: UUID)
-    case edit(transactionId: UUID, amount: String)
-}
-
-
-
 
 struct TransactionView: View {
     @State private var path = NavigationPath()

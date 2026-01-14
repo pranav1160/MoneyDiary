@@ -7,35 +7,67 @@
 import SwiftUI
 
 struct TransactionRow: View {
-
     let transaction: Transaction
     @EnvironmentObject private var categoryStore: CategoryStore
-
+    
     private var category: Category? {
         categoryStore.categories.first {
             $0.id == transaction.categoryId
         }
     }
-
+    
     var body: some View {
         HStack(spacing: 12) {
-
+            // Category emoji in a compact circle
             Text(category?.emoji ?? "❓")
-                .font(.title2)
-
-            VStack(alignment: .leading) {
+                .font(.title3)
+                .frame(width: 36, height: 36)
+                .background(
+                    Circle()
+                        .fill(Color.gray.opacity(0.1))
+                )
+            
+            // Transaction details
+            VStack(alignment: .leading, spacing: 2) {
                 Text(transaction.title)
-                    .font(.headline)
-
-                Text(category?.title ?? "Unknown")
-                    .font(.caption)
-                    .foregroundStyle(.appSecondary)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+                    .foregroundStyle(.primary)
+                
+                HStack(spacing: 4) {
+                    Text(category?.title ?? "Unknown")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    
+                    if transaction.isRecurring {
+                        Text("•")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        
+                        Image(systemName: "repeat")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    
+                    Text("•")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    
+                    Text(transaction.date, style: .relative)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
-
-            Spacer()
-
+            
+            Spacer(minLength: 8)
+            
+            // Amount
             Text("₹\(transaction.amount, specifier: "%.0f")")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundStyle(.primary)
         }
-        .padding()
+        .contentShape(Rectangle())
     }
 }

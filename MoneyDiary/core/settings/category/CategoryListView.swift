@@ -48,6 +48,6 @@ struct CategoryListView: View {
 #Preview {
     NavigationStack{
         CategoryListView()
-            .environmentObject(CategoryStore())
+            .withPreviewEnvironment()
     }
 }
