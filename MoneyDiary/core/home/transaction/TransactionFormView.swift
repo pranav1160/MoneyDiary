@@ -11,12 +11,13 @@ import SwiftUI
 
 struct TransactionFormView: View {
     let purpose: TransactionFormPurpose
-    @Environment(\.dismiss) private var dismiss
+    let onFinish: () -> Void
+    
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var transactionStore: TransactionStore
     @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var currencyManager: CurrencyManager
-
+    @Environment(\.dismiss) private var dismiss
 
     
     @State private var navigateToAddCategory:Bool = false
@@ -29,10 +30,12 @@ struct TransactionFormView: View {
     
     init(
         purpose: TransactionFormPurpose,
+        onFinish: @escaping () -> Void,
         amount: String = ""
+        
     ) {
         self.purpose = purpose
-        
+        self.onFinish = onFinish
         switch purpose {
         case .create:
             _transactionName = State(initialValue: "")
@@ -62,8 +65,6 @@ struct TransactionFormView: View {
             }
         }
         .background(.background)
-
-
         .navigationDestination(
             isPresented: $navigateToAddCategory,
             destination: {
@@ -94,6 +95,8 @@ struct TransactionFormView: View {
             }
             .presentationDetents([.medium])
         }
+        .toolbar(.hidden, for: .tabBar)
+
     }
 }
 
@@ -117,12 +120,7 @@ private extension TransactionFormView {
     
     var header: some View {
         HStack {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 18, weight: .semibold))
-            }
+         
             
             Spacer()
             
@@ -294,7 +292,7 @@ private extension TransactionFormView {
     
     private func onSaveTransactionPressed() {
         saveTransaction()
-        dismiss()
+        onFinish()
     }
 
     
@@ -331,7 +329,12 @@ private extension TransactionFormView {
 }
 
 #Preview {
-    TransactionFormView(purpose: .create, amount: "100")
+    TransactionFormView(
+        purpose: .create,
+        onFinish: {},
+        amount: "100"
+        
+    )
         .environmentObject(TransactionStore())
         .environmentObject(CategoryStore())
         .environmentObject(
@@ -340,4 +343,5 @@ private extension TransactionFormView {
                 transactionStore: TransactionStore()
             )
         )
+        .environmentObject(CurrencyManager())
 }

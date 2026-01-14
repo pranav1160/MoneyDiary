@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AmountDialPadView: View {
     
+    let onContinue: (String) -> Void
     @State private var amount: String = ""
     @State private var navigateToExpenseAddView: Bool = false
     @Environment(\.dismiss) private var dismiss
@@ -91,7 +92,7 @@ struct AmountDialPadView: View {
                 // Continue button
                 Button {
                     if isValidAmount {
-                        navigateToExpenseAddView = true
+                        onContinue(amount)
                     }
                 } label: {
                     HStack(spacing: 8) {
@@ -128,9 +129,8 @@ struct AmountDialPadView: View {
             }
         }
         .navigationBarHidden(true)
-        .navigationDestination(isPresented: $navigateToExpenseAddView) {
-            TransactionFormView(purpose: .create, amount: amount)
-        }
+        .toolbar(.hidden, for: .tabBar)
+
     }
     
     // MARK: - Computed Properties
@@ -238,6 +238,6 @@ struct DialButtonStyle: ButtonStyle {
 
 
 #Preview {
-    AmountDialPadView()
+    AmountDialPadView(onContinue: {_ in })
         .environmentObject(CurrencyManager())
 }
