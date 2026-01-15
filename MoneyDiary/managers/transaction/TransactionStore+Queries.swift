@@ -75,6 +75,28 @@ extension TransactionStore {
     ) -> [Transaction] {
         Array(transactions.prefix(limit))
     }
+    
+    
+    /// Transactions grouped by start-of-day, sorted by date DESC
+    func transactionsGroupedByDay() -> [(date: Date, transactions: [Transaction])] {
+        
+        let calendar = Calendar.current
+        
+        let grouped = Dictionary(
+            grouping: transactions
+        ) { tx in
+            calendar.startOfDay(for: tx.date)
+        }
+        
+        return grouped
+            .map { date, txs in
+                (
+                    date,
+                    txs.sorted { $0.date > $1.date } // newest first inside day
+                )
+            }
+            .sorted { $0.date > $1.date } // latest day first
+    }
 
 }
 

@@ -12,6 +12,7 @@ struct HomeView: View {
     
     @State private var path = NavigationPath()
     @EnvironmentObject private var transactionStore: TransactionStore
+    @State private var showSettings = false
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -87,27 +88,58 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Home")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
+            .navigationDestination(isPresented: $showSettings) {
+                SettingsView()
+            }
         }
     }
     
-    private var recentTrancactionSection:some View{
+    private var recentTrancactionSection: some View {
         List {
-            
-            Section("Transactions") {
-                ForEach(transactionStore.transactions) { transaction in
-                    Button {
-                        path.append(TransactionRoute.editAmount(transactionId: transaction.id))
-                        
-                    } label: {
-                        TransactionRow(transaction: transaction)
+            ForEach(transactionStore.transactionsGroupedByDay(), id: \.date) { section in
+                Section(header: dateHeader(section.date)) {
+                    ForEach(section.transactions) { transaction in
+                        Button {
+                            path.append(
+                                TransactionRoute.editAmount(transactionId: transaction.id)
+                            )
+                        } label: {
+                            TransactionRow(transaction: transaction)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    
-                    
                 }
             }
-            
         }
     }
+    
+    private func dateHeader(_ date: Date) -> some View {
+        let calendar = Calendar.current
+        
+        let text: String
+        if calendar.isDateInToday(date) {
+            text = "Today"
+        } else if calendar.isDateInYesterday(date) {
+            text = "Yesterday"
+        } else {
+            text = date.formatted(.dateTime.day().month().year())
+        }
+        
+        return Text(text)
+            .font(.footnote)
+            .foregroundStyle(.appSecondary)
+    }
+
+
 }
 
 

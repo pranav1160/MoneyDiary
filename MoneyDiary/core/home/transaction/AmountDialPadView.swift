@@ -11,7 +11,6 @@ struct AmountDialPadView: View {
     
     let onContinue: (String) -> Void
     @State private var amount: String = ""
-    @State private var navigateToExpenseAddView: Bool = false
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var currencyManager: CurrencyManager
     
@@ -66,7 +65,7 @@ struct AmountDialPadView: View {
                 Spacer(minLength: 40)
                 
                 // Amount display with animation
-                VStack(spacing: 8) {
+                HStack(spacing: 8) {
                     Text(currencySymbol)
                         .font(.system(size: 24, weight: .medium))
                         .foregroundStyle(.white.opacity(0.6))
@@ -77,7 +76,8 @@ struct AmountDialPadView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                         .contentTransition(.numericText())
-                        .animation(.snappy, value: amount)
+                        .animation(.snappy(duration: 0.2), value: amount)
+
                 }
                 .padding(.horizontal, 32)
                 
@@ -98,39 +98,20 @@ struct AmountDialPadView: View {
                 Spacer(minLength: 40)
                 
                 // Continue button
-                Button {
-                    if isValidAmount {
+                CallToActionButton(
+                    title: "Continue",
+                    action: {
                         onContinue(amount)
-                    }
-                } label: {
-                    HStack(spacing: 8) {
-                        Text("Continue")
-                            .font(.system(size: 18, weight: .semibold))
-                        
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 16, weight: .semibold))
-                    }
-                    .foregroundStyle(.black)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 18)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(isValidAmount ? Color(hex: "4ade80") : Color.gray.opacity(0.3))
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .strokeBorder(
-                                isValidAmount ? Color.white.opacity(0.2) : Color.clear,
-                                lineWidth: 1
-                            )
-                    )
-                    .shadow(
-                        color: isValidAmount ? Color(hex: "4ade80").opacity(0.3) : Color.clear,
-                        radius: 20,
-                        y: 10
-                    )
-                }
-                .disabled(!isValidAmount)
+                    },
+                    isDisabled: !isValidAmount
+                )
+                .shadow(
+                    color: isValidAmount ? Color(hex: "4ade80").opacity(0.3) : Color.clear,
+                    radius: 20,
+                    y: 10
+                )
+                
+                
                 .animation(.easeInOut(duration: 0.2), value: isValidAmount)
                 .padding(.horizontal, 24)
                 .padding(.bottom, 32)
@@ -138,7 +119,7 @@ struct AmountDialPadView: View {
         }
         .navigationBarHidden(true)
         .toolbar(.hidden, for: .tabBar)
-
+        
     }
     
     // MARK: - Computed Properties
@@ -171,6 +152,8 @@ struct AmountDialPadView: View {
     
     @ViewBuilder
     private func dialButton(_ value: String) -> some View {
+        let isDotDisabled = value == "." && amount.contains(".")
+        
         Button {
             handleTap(value)
         } label: {
@@ -190,6 +173,11 @@ struct AmountDialPadView: View {
                     Image(systemName: "delete.left.fill")
                         .font(.system(size: 24, weight: .medium))
                         .foregroundStyle(.red.opacity(0.9))
+                        .onLongPressGesture(minimumDuration: 0.35) {
+                            withAnimation(.snappy) {
+                                amount = ""
+                            }
+                        }
                 } else {
                     Text(value)
                         .font(.system(size: 28, weight: .medium, design: .rounded))
@@ -197,9 +185,13 @@ struct AmountDialPadView: View {
                 }
             }
             .frame(width: 75, height: 75)
+            .opacity(isDotDisabled ? 0.4 : 1)
         }
+        .disabled(isDotDisabled)
         .buttonStyle(DialButtonStyle())
     }
+
+
     
     // MARK: - Logic
     
@@ -215,17 +207,25 @@ struct AmountDialPadView: View {
                 }
             case ".":
                 if !amount.contains(".") {
-                    if amount.isEmpty {
-                        amount = "0."
-                    } else {
-                        amount.append(".")
-                    }
+                    amount = amount.isEmpty ? "0." : amount + "."
                 }
+                
             default:
-                // Limit to reasonable length
+                if amount == "0" {
+                    amount = value
+                    return
+                }
+                
+                if let dotIndex = amount.firstIndex(of: ".") {
+                    let decimals = amount[amount.index(after: dotIndex)...]
+                    if decimals.count >= 2 { return }
+                }
+                
                 if amount.count < 12 {
                     amount.append(value)
                 }
+
+
             }
         }
     }

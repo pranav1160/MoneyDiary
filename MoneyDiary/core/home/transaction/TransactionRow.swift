@@ -16,6 +16,11 @@ struct TransactionRow: View {
         }
     }
     
+    private var categoryColor: CategoryColor {
+        categoryStore.color(for: transaction.categoryId)
+    }
+
+    
     var body: some View {
         HStack(spacing: 12) {
             // Category emoji in a compact circle
@@ -24,8 +29,9 @@ struct TransactionRow: View {
                 .frame(width: 36, height: 36)
                 .background(
                     Circle()
-                        .fill(Color.gray.opacity(0.1))
+                        .fill(categoryColor.color.opacity(0.25))
                 )
+
             
             // Transaction details
             VStack(alignment: .leading, spacing: 2) {
@@ -70,4 +76,10 @@ struct TransactionRow: View {
         }
         .contentShape(Rectangle())
     }
+}
+
+
+#Preview {
+    TransactionRow(transaction: Transaction.mocks[0])
+        .withPreviewEnvironment()
 }

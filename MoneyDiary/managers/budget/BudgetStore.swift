@@ -38,6 +38,11 @@ final class BudgetStore: ObservableObject {
         
         budgets[index] = updated
     }
+    
+    func deleteBudget(id: UUID) {
+        budgets.removeAll { $0.id == id }
+    }
+
 
 
     func budgets(for categoryId: UUID) -> [Budget] {

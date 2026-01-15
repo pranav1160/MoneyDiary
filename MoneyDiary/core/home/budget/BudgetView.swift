@@ -14,6 +14,32 @@ struct BudgetView: View {
     
     @State private var editingBudget: Budget?
 
+    var body: some View {
+        VStack {
+            overallBudgetSection
+            categoriesSection
+        }
+        .sheet(item: $editingBudget) { budget in
+            BudgetFormView(
+                mode: budget.categoryId == nil ? .overall : .category,
+                purpose: .edit(budget)
+            )
+        }
+        .navigationTitle("Budgets")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    BudgetFormView(mode: .category, purpose: .create)
+                } label: {
+                    Image(systemName: "plus.capsule.fill")
+                }
+            }
+          
+        }
+    }
+
+    
     private var glass:some View{
         RoundedRectangle(cornerRadius: 18, style: .continuous)
             .stroke(
@@ -28,7 +54,7 @@ struct BudgetView: View {
                 ),
                 lineWidth: 1
             )
-    
+        
     }
     
     private var overallBudgetSection:some View{
@@ -41,8 +67,47 @@ struct BudgetView: View {
                     status: overallStatus
                 )
                 .frame(maxWidth: .infinity,alignment: .center)
+                .overlay(alignment: .bottomTrailing) {
+                    NavigationLink {
+                        BudgetFormView(
+                            mode: .overall,
+                            purpose: .edit(overallStatus.budget)
+                        )
+                    } label: {
+                        Image(systemName: "pencil")
+                            .font(.caption)
+                            .foregroundStyle(.white)
+                            .padding(8)
+                            .background(Circle().fill(.black.opacity(0.6)))
+                            .shadow(radius: 4)
+                    }
+                    .padding(.trailing, 36)
+                    .padding(.bottom, 56)
+                }
+
                 
             }
+            else{
+                VStack{
+                    //urge the user to add an overall budget
+                    NavigationLink {
+                        BudgetFormView(
+                            mode: .overall,
+                            purpose: .create
+                        )
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.caption)
+                            .foregroundStyle(.white)
+                            .padding(8)
+                            .background(Circle().fill(.black.opacity(0.6)))
+                            .shadow(radius: 4)
+                    }
+                    
+                    Text("Please Add an overall Budget")
+                }
+            }
+            
         }
     }
     
@@ -77,50 +142,16 @@ struct BudgetView: View {
                 
             }
             .padding(.vertical, 8)
-            
         }
     }
     
-    var body: some View {
-        VStack{
-         
-            overallBudgetSection
-            categoriesSection
-            
-            .sheet(item: $editingBudget) { budget in
-                BudgetFormView(
-                    mode: budget.categoryId == nil ? .overall : .category,
-                    purpose: .edit(budget)
-                )
-            }
-            .navigationTitle("Budgets")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        BudgetFormView(
-                            mode: .category,
-                            purpose: .create
-                        )
 
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-                
-                ToolbarItem(placement: .topBarLeading) {
-                    NavigationLink {
-                        BudgetFormView(
-                            mode: .overall,
-                            purpose: .create
-                        )
-
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
-        }
-    }
 }
 
+
+#Preview {
+    NavigationStack{
+        BudgetView()
+            .withPreviewEnvironment()
+    }
+}

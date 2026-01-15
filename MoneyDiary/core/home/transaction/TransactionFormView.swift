@@ -138,16 +138,11 @@ private extension TransactionFormView {
             
             Spacer()
             
-            Button {
-                onSaveTransactionPressed()
-            } label: {
-                Text(isCreateMode ? "Add" : "Update")
-                    .font(.headline)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(.green)
-                    .clipShape(Capsule())
-            }
+            ToolBarCapsuleButton(
+                title: isCreateMode ? "Add" : "Update") {
+                    onSaveTransactionPressed()
+                }
+       
 
         }
         .padding()

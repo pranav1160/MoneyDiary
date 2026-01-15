@@ -12,6 +12,7 @@ struct BudgetOverallRow: View {
     let currencySymbol: String
     let status: BudgetStatus
     
+    
     var body: some View {
         VStack{
             SemiCircleProgressView(
@@ -53,15 +54,13 @@ struct BudgetOverallRow: View {
                 .foregroundStyle(.black)
             }
         }
+        
        
     }
     
     private var strokeColor: Color {
-        return Color.black.opacity(0.9)
+        return Color.primary.opacity(0.9)
     }
-    
-    
-
 }
 
 #Preview {

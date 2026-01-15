@@ -13,14 +13,27 @@ struct BudgetFormView: View {
     @EnvironmentObject private var budgetStore: BudgetStore
     @EnvironmentObject private var categoryStore: CategoryStore
     @Environment(\.dismiss) private var dismiss
+    @State private var isDeletePressed = false
 
     @State private var name: String = ""
     @State private var amount: String = ""
     @State private var selectedPeriod: BudgetPeriod = .monthly
     @State private var selectedCategoryId: UUID?
     @State private var isActive: Bool = true
+    @State private var showDeleteConfirmation = false
+
     let mode:BudgetFormMode
     let purpose: BudgetFormPurpose
+    
+    var navigationTitle: String {
+        switch purpose {
+        case .create:
+            return "Add Budget"
+        case .edit:
+            return "Edit Budget"
+        }
+    }
+
     
     var existingId: UUID {
         if case .edit(let budget) = purpose {
@@ -64,7 +77,6 @@ struct BudgetFormView: View {
     var body: some View {
         NavigationStack {
             Form {
-
                 // MARK: - Budget Info
                 Section("Budget Details") {
                     TextField("Budget name", text: $name)
@@ -97,28 +109,75 @@ struct BudgetFormView: View {
                 Section {
                     Toggle("Active", isOn: $isActive)
                 }
-            }
-            .navigationTitle("New Budget")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
+                
+                // MARK: - Delete the budget
+                if case .edit = purpose {
+                    Section {
+                        Button(role: .destructive) {
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                isDeletePressed = true
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                isDeletePressed = false
+                                showDeleteConfirmation = true
+                            }
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: "trash")
+                                
+                                Text("Delete Budget")
+                            }
+                            .font(.title3)
+                            .scaleEffect(isDeletePressed ? 0.96 : 1)
+                            .opacity(isDeletePressed ? 0.7 : 1)
+                            .animation(.easeOut(duration: 0.15), value: isDeletePressed)
+                        }
                     }
                 }
 
+            }
+            .navigationTitle(navigationTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+               
+
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(actionTitle) {
-                        saveBudget()
-                        dismiss()
-                    }
-                    .disabled(!isFormValid)
+                    ToolBarCapsuleButton(
+                        title: actionTitle) {
+                            saveBudget()
+                            dismiss()
+                        }
+                        .disabled(!isFormValid)
+                   
+                    
                 }
             }
+            .confirmationDialog(
+                "Delete this budget?",
+                isPresented: $showDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete Budget", role: .destructive) {
+                    deleteBudget()
+                    dismiss()
+                }
+                
+                Button("Cancel", role: .cancel) {}
+            }
+
         }
     }
 }
 
 private extension BudgetFormView {
+    
+    func deleteBudget() {
+        if case .edit(let budget) = purpose {
+            budgetStore.deleteBudget(id: budget.id)
+        }
+    }
+
     
     var isFormValid: Bool {
         !name.isEmpty &&
@@ -147,4 +206,11 @@ private extension BudgetFormView {
         }
     }
 
+}
+
+
+
+#Preview {
+    BudgetFormView(mode: .category, purpose: .edit(Budget.mockBudgets[0]))
+        .withPreviewEnvironment()
 }
