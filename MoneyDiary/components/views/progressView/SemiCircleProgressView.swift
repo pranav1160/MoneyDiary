@@ -28,6 +28,23 @@ struct SemiCircleProgressView: View {
     @State private var animatedProgress: Double = 0
     @State private var hasAppeared: Bool = false
     
+    
+    @ViewBuilder
+    private func amountText(fontSize: CGFloat) -> some View {
+        HStack(spacing: 4) {
+            Text(currencySymbol)
+                .font(.system(size: fontSize * 0.6, weight: .medium))
+                .foregroundStyle(.appSecondary)
+            
+            Text("\(Int(amountToShow))")
+                .font(.system(size: fontSize, weight: .bold, design: .rounded))
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+        .allowsTightening(true)
+    }
+
+    
     var body: some View {
         ZStack {
             // Background semi-circle with subtle shadow
@@ -87,30 +104,40 @@ struct SemiCircleProgressView: View {
             
             // Center content with shadow
             VStack(spacing: 4) {
-                HStack{
-                    Text(currencySymbol)
-                        .font(.title2)
-                        .foregroundStyle(.appSecondary)
-                    
-                    Text("\(Int(amountToShow))")
+                ViewThatFits(in: .horizontal) {
+                    amountText(fontSize: size * 0.18)
+                    amountText(fontSize: size * 0.15)
+                    amountText(fontSize: size * 0.12)
                 }
-                    .font(.system(size: size * 0.18, weight: .bold, design: .rounded))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [strokeColor, strokeColor.opacity(0.8)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                .frame(maxWidth: size * 0.7)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [strokeColor, strokeColor.opacity(0.8)],
+                        startPoint: .top,
+                        endPoint: .bottom
                     )
-                    .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-                
+                )
+                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [strokeColor, strokeColor.opacity(0.8)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+          
+
                 Text("left this month")
                     .foregroundStyle(.appSecondary)
                     .font(.title3)
               
             }
+            
             .rotationEffect(.degrees(-180))
             .offset(y: size * 0.1)
+            
         }
         .frame(width: size, height: size/2)
         .rotationEffect(.degrees(180))
@@ -166,6 +193,16 @@ struct SemiCircleProgressView: View {
                 totalVal: 500,
                 currencySymbol: "$",
                 amountToShow: 50,
+                size: 220,
+                strokeWidth: 18
+            )
+            
+            SemiCircleProgressView(
+                strokeColor: .purple,
+                inputVal: 450,
+                totalVal: 500,
+                currencySymbol: "$",
+                amountToShow: 500000000,
                 size: 220,
                 strokeWidth: 18
             )

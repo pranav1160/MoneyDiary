@@ -27,18 +27,18 @@ struct BudgetCategoryRow: View {
                     .fontWeight(.medium)
                     
                     Text("\(status.daysRemaining) days left")
-                        .font(.default)
+                        .font(.subheadline)
                         .foregroundStyle(.appSecondary)
                 }
-                .padding(.bottom,10)
+                .padding(.bottom,6)
                 
-                VStack(alignment:.leading){
+                HStack{
                     Text("\(Int(status.percentageUsed))% SPENT")
                     Text("this month")
                         .foregroundStyle(.appSecondary)
                 }
                 .foregroundStyle(colorForStatus)
-                .font(.callout)
+                .font(.subheadline)
                 .fontWeight(.semibold)
             }
             
@@ -48,8 +48,8 @@ struct BudgetCategoryRow: View {
                 strokeColor: statusBarColor.color,
                 inputVal: status.spent,
                 totalVal: budget.amount,
-                size:100,
-                strokeWidth: 10
+                size:80,
+                strokeWidth: 8
             )
         }
         
