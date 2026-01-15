@@ -17,6 +17,9 @@ struct CategoryFormView: View {
     @State private var selectedColor: CategoryColor
     @State private var categoryName: String
     
+    @State private var appAlert: AnyAppAlert?
+
+    
     // MARK: - Init for Create & Edit
     init(
         mode: CategoryFormMode,
@@ -36,6 +39,17 @@ struct CategoryFormView: View {
             _categoryName = State(initialValue: category.title)
         }
         
+    }
+
+    private func showInvalidNameAlert() {
+        appAlert = AnyAppAlert(
+            alertTitle: "Category Name Required",
+            alertSubtitle: "Please enter a category name to continue."
+        ) {
+            AnyView(
+                Button("OK", role: .cancel) { }
+            )
+        }
     }
 
     
@@ -66,6 +80,9 @@ struct CategoryFormView: View {
         }
         
     }
+    
+  
+
     
     private var colorPickerSection:some View{
         VStack{
@@ -102,6 +119,7 @@ struct CategoryFormView: View {
                     ToolBarCapsuleButton(title: "Save") {
                         onSaveClicked()
                     }
+                    
                 }
             
             ScrollView {
@@ -119,6 +137,11 @@ struct CategoryFormView: View {
             }
         }
         .hideSystemNavigation()
+        .showCustomAlert(
+            type: .alert,
+            alert: $appAlert
+        )
+
     }
     
     private func onCancelClicked(){
@@ -126,6 +149,15 @@ struct CategoryFormView: View {
     }
     
     private func onSaveClicked() {
+        let trimmedName = categoryName.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        guard !trimmedName.isEmpty else {
+            showInvalidNameAlert()
+            return
+        }
+        
+        categoryName = trimmedName   // normalize input
+        
         switch mode {
         case .create:
             createCategory()
@@ -133,8 +165,10 @@ struct CategoryFormView: View {
         case .edit(let category):
             updateCategory(existing: category)
         }
+        
         dismiss()
     }
+
     private func updateCategory(existing category: Category) {
         let updated = Category(
             id: category.id, // 👈 KEEP SAME ID (CRITICAL)

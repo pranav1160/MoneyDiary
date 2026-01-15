@@ -13,7 +13,7 @@ import Combine
 
 struct Budget: Identifiable, Codable {
     let id: UUID
-    let name: String
+    let name: String?
     let amount: Double
     let period: BudgetPeriod
     let categoryId: UUID?
@@ -22,7 +22,7 @@ struct Budget: Identifiable, Codable {
     
     init(
         id: UUID = UUID(),
-        name: String,
+        name: String? = nil,
         amount: Double,
         period: BudgetPeriod,
         categoryId: UUID? = nil,
@@ -38,6 +38,25 @@ struct Budget: Identifiable, Codable {
         self.isActive = isActive
     }
 }
+
+extension Budget {
+    func displayName(using categories: [Category]) -> String {
+        // 1️⃣ Explicit name wins
+        if let name, !name.trimmingCharacters(in: .whitespaces).isEmpty {
+            return name
+        }
+        
+        // 2️⃣ Category-based budget
+        if let categoryId,
+           let category = categories.first(where: { $0.id == categoryId }) {
+            return category.title
+        }
+        
+        // 3️⃣ No category → Overall
+        return "Overall"
+    }
+}
+
 
 
 

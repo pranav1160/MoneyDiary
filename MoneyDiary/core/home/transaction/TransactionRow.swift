@@ -35,30 +35,32 @@ struct TransactionRow: View {
             
             // Transaction details
             VStack(alignment: .leading, spacing: 2) {
-                Text(transaction.title)
+                Text(transaction.displayTitle(
+                    using: categoryStore.categories
+                ))
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .lineLimit(1)
                     .foregroundStyle(.primary)
                 
                 HStack(spacing: 4) {
-                    Text(category?.title ?? "Unknown")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                   
                     
                     if transaction.isRecurring {
                         Text("•")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
-                        
+                            .foregroundStyle(.appSecondary)
                         Image(systemName: "repeat")
                             .font(.caption2)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.appSecondary)
+                        Text("•")
+                            .font(.caption2)
+                            .foregroundStyle(.appSecondary)
                     }
+                       
+                       
                     
-                    Text("•")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                   
                     
                     Text(transaction.date, style: .relative)
                         .font(.caption)

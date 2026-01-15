@@ -124,7 +124,9 @@ struct BudgetView: View {
                     budget: status.budget,
                     emoji: categoryStore.emoji(for: status.budget.categoryId),
                     status: status,
-                    statusBarColor: categoryStore.color(for: status.budget.categoryId)
+                    statusBarColor: categoryStore
+                        .color(for: status.budget.categoryId),
+                    title: status.budget.displayName(using: categoryStore.categories)
                 )
                 .contentShape(Rectangle())
                 .padding()

@@ -8,15 +8,16 @@
 import SwiftUI
 
 struct LogoView: View {
+    let size:CGFloat
     var body: some View {
         Image(.mainlogo)
             .resizable()
-            .frame(width: 200,height: 200)
+            .frame(width: size,height: size)
             .scaledToFill()
             .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
 #Preview {
-    LogoView()
+    LogoView(size: 200)
 }

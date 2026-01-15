@@ -12,7 +12,7 @@ struct OnboardingPrivacyView: View {
     var body: some View {
         VStack(spacing: 32) {
             
-            LogoView()
+            LogoView(size: 200)
             
             // Icon
             Image(systemName: "lock.shield.fill")

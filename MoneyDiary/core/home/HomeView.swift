@@ -21,6 +21,10 @@ struct HomeView: View {
                         showSettings = true
                     }
                 }
+                .overlay(alignment: .leading) {
+                    LogoView(size: 50)
+                        .padding(.leading,8)
+                }
                 recentTrancactionSection
             }
             .overlay(alignment: .bottomTrailing) {

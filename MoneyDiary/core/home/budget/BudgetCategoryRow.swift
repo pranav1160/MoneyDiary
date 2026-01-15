@@ -13,6 +13,7 @@ struct BudgetCategoryRow: View {
     let emoji: String
     let status: BudgetStatus
     let statusBarColor:CategoryColor
+    let title:String
     
     var body: some View {
         HStack{
@@ -21,7 +22,7 @@ struct BudgetCategoryRow: View {
                 VStack(alignment:.leading){
                     HStack{
                         Text(emoji)
-                        Text(budget.name)
+                        Text(title)
                     }
                     .font(.subheadline)
                     .fontWeight(.medium)
@@ -80,7 +81,7 @@ struct BudgetCategoryRow: View {
         budget: BudgetStatus.mockHealthy.budget,
         emoji: "🛒",
         status: .mockHealthy,
-        statusBarColor: CategoryColor.green
+        statusBarColor: CategoryColor.green, title: "hello"
     )
 //    .frame(maxWidth: .infinity,alignment: .leading)
     .padding()

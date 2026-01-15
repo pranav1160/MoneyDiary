@@ -8,13 +8,23 @@ import Foundation
 
 struct Transaction: Identifiable {
     let id: UUID
-    let title: String
+    let title: String?
     let amount: Double
     let date: Date
     let isRecurring: Bool
     let categoryId: UUID
 }
 
+extension Transaction {
+    func displayTitle(using categories: [Category]) -> String {
+        if let title, !title.trimmingCharacters(in: .whitespaces).isEmpty {
+            return title
+        }
+        
+        return categories.first(where: { $0.id == categoryId })?.title
+        ?? "Transaction"
+    }
+}
 
 
 extension Transaction {

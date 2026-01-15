@@ -17,7 +17,7 @@ struct WelcomeView: View {
                 
                 Spacer()
                 
-                LogoView()
+                LogoView(size: 200)
                 
                 // App Name
                 Text("MoneyDiary")

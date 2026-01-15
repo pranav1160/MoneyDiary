@@ -42,7 +42,7 @@ struct BudgetFormView: View {
             _isActive = State(initialValue: true)
             
         case .edit(let budget):
-            _name = State(initialValue: budget.name)
+            _name = State(initialValue: budget.name ?? "")
             _amount = State(initialValue: String(budget.amount))
             _selectedPeriod = State(initialValue: budget.period)
             _selectedCategoryId = State(initialValue: budget.categoryId)
@@ -131,7 +131,9 @@ struct BudgetFormView: View {
   
     private var budgetInfoSection:some View{
         Section("Budget Details") {
-            TextField("Budget name", text: $name)
+            if mode == .category{
+                TextField("Budget name (optional)", text: $name)
+            }
             
             TextField("Amount", text: $amount)
                 .keyboardType(.decimalPad)
@@ -206,10 +208,10 @@ private extension BudgetFormView {
 
     
     var isFormValid: Bool {
-        !name.isEmpty &&
         Double(amount) != nil &&
         (mode == .overall || selectedCategoryId != nil)
     }
+
     
     private func onSavePressed() {
         // Category required but not selected
@@ -221,12 +223,6 @@ private extension BudgetFormView {
         // Amount invalid
         guard Double(amount) != nil else {
             showInvalidAmountAlert()
-            return
-        }
-        
-        // Name empty
-        guard !name.isEmpty else {
-            showNameRequiredAlert()
             return
         }
         
@@ -253,22 +249,17 @@ private extension BudgetFormView {
     }
 
     
-    private func showNameRequiredAlert() {
-        appAlert = AnyAppAlert(
-            alertTitle: "Budget Name Required",
-            alertSubtitle: "Please enter a name for this budget."
-        )
-    }
+   
 
     
     func saveBudget() {
         guard let amount = Double(amount) else { return }
         
-        
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
         
         let budget = Budget(
             id: existingId,
-            name: name,
+            name: trimmedName.isEmpty ? nil : trimmedName,
             amount: amount,
             period: selectedPeriod,
             categoryId: mode == .overall ? nil : selectedCategoryId,

@@ -45,7 +45,7 @@ struct TransactionFormView: View {
             _selectedDate = State(initialValue: .now)
             
         case .edit(let transaction):
-            _transactionName = State(initialValue: transaction.title)
+            _transactionName = State(initialValue: transaction.title ?? "")
             _amount = State(
                 initialValue: amount.isEmpty
                 ? String(abs(transaction.amount))
@@ -152,7 +152,7 @@ private extension TransactionFormView {
             row(
                 title: "For",
                 trailing: {
-                    TextField("What did you spend on?", text: $transactionName)
+                    TextField("Add a note?", text: $transactionName)
                         .multilineTextAlignment(.trailing)
                         .autocorrectionDisabled()
                     
@@ -325,14 +325,17 @@ private extension TransactionFormView {
             return
         }
         
+        let trimmedTitle = transactionName.trimmingCharacters(in: .whitespacesAndNewlines)
+        
         let transaction = Transaction(
             id: existingId,
-            title: transactionName,
+            title: trimmedTitle.isEmpty ? nil : trimmedTitle,
             amount: amount,
             date: selectedDate,
             isRecurring: false,
             categoryId: categoryId
         )
+
         
         switch purpose {
         case .create:

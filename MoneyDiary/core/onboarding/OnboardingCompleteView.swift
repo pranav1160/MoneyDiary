@@ -18,7 +18,7 @@ struct OnboardingCompleteView: View {
             
             Spacer()
             
-            LogoView()
+            LogoView(size: 200)
                 .scaleEffect(isProfileSetupFinishing ? 0.95 : 1)
                 .animation(.easeInOut(duration: 0.3), value: isProfileSetupFinishing)
             
