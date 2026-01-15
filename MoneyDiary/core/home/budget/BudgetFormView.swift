@@ -21,33 +21,10 @@ struct BudgetFormView: View {
     @State private var selectedCategoryId: UUID?
     @State private var isActive: Bool = true
     @State private var showDeleteConfirmation = false
+    @State private var appAlert: AnyAppAlert?
 
     let mode:BudgetFormMode
     let purpose: BudgetFormPurpose
-    
-    var navigationTitle: String {
-        switch purpose {
-        case .create:
-            return "Add Budget"
-        case .edit:
-            return "Edit Budget"
-        }
-    }
-
-    
-    var existingId: UUID {
-        if case .edit(let budget) = purpose {
-            return budget.id
-        }
-        return UUID()
-    }
-    
-    var actionTitle: String {
-        switch purpose {
-        case .create: return "Save"
-        case .edit: return "Update"
-        }
-    }
     
     init(
         mode: BudgetFormMode,
@@ -73,6 +50,85 @@ struct BudgetFormView: View {
         }
     }
     
+    
+    var body: some View {
+        NavigationStack {
+            VStack{
+                CustomNavigationHeader(
+                    title: navigationTitle,
+                    showsBackButton: true) {
+                        ToolBarCapsuleButton(
+                            title: actionTitle
+                        ) {
+                            onSavePressed()
+                        }
+
+                    }
+                Form {
+                    // MARK: - Budget Info
+                    budgetInfoSection
+                    
+                    if mode == .category{
+                        budgetCategorySection
+                    }
+                    
+                    // MARK: - Status
+                    budgetStatusSection
+                    
+                    // MARK: - Delete the budget
+                    if case .edit = purpose {
+                        budgetDeleteSection
+                    }
+                    
+                }
+            }
+            .hideSystemNavigation()
+            .showCustomAlert(
+                type: .alert,
+                alert: $appAlert
+            )
+
+            .confirmationDialog(
+                "Delete this budget?",
+                isPresented: $showDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete Budget", role: .destructive) {
+                    deleteBudget()
+                    dismiss()
+                }
+                
+                Button("Cancel", role: .cancel) {}
+            }
+            
+        }
+    }
+    
+    var navigationTitle: String {
+        switch purpose {
+        case .create:
+            return "Add Budget"
+        case .edit:
+            return "Edit Budget"
+        }
+    }
+
+    
+    var existingId: UUID {
+        if case .edit(let budget) = purpose {
+            return budget.id
+        }
+        return UUID()
+    }
+    
+    var actionTitle: String {
+        switch purpose {
+        case .create: return "Save"
+        case .edit: return "Update"
+        }
+    }
+    
+  
     private var budgetInfoSection:some View{
         Section("Budget Details") {
             TextField("Budget name", text: $name)
@@ -137,53 +193,7 @@ struct BudgetFormView: View {
     }
 
 
-    var body: some View {
-        NavigationStack {
-            VStack{
-                CustomNavigationHeader(
-                    title: navigationTitle,
-                    showsBackButton: true) {
-                        ToolBarCapsuleButton(
-                            title: actionTitle) {
-                                saveBudget()
-                                dismiss()
-                            }
-                            .disabled(!isFormValid)
-                    }
-                Form {
-                    // MARK: - Budget Info
-                    budgetInfoSection
-                    
-                    if mode == .category{
-                        budgetCategorySection
-                    }
-                    
-                    // MARK: - Status
-                    budgetStatusSection
-                    
-                    // MARK: - Delete the budget
-                    if case .edit = purpose {
-                        budgetDeleteSection
-                    }
-                    
-                }
-            }
-            .hideSystemNavigation()
-            .confirmationDialog(
-                "Delete this budget?",
-                isPresented: $showDeleteConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button("Delete Budget", role: .destructive) {
-                    deleteBudget()
-                    dismiss()
-                }
-                
-                Button("Cancel", role: .cancel) {}
-            }
-
-        }
-    }
+    
 }
 
 private extension BudgetFormView {
@@ -201,8 +211,60 @@ private extension BudgetFormView {
         (mode == .overall || selectedCategoryId != nil)
     }
     
+    private func onSavePressed() {
+        // Category required but not selected
+        if mode == .category && selectedCategoryId == nil {
+            showCategoryRequiredAlert()
+            return
+        }
+        
+        // Amount invalid
+        guard Double(amount) != nil else {
+            showInvalidAmountAlert()
+            return
+        }
+        
+        // Name empty
+        guard !name.isEmpty else {
+            showNameRequiredAlert()
+            return
+        }
+        
+        saveBudget()
+        dismiss()
+    }
+
+    private func showCategoryRequiredAlert() {
+        appAlert = AnyAppAlert(
+            alertTitle: "Category Required",
+            alertSubtitle: "Please select a category to continue."
+        ) {
+            AnyView(
+                Button("OK", role: .cancel) { }
+            )
+        }
+    }
+
+    private func showInvalidAmountAlert() {
+        appAlert = AnyAppAlert(
+            alertTitle: "Invalid Amount",
+            alertSubtitle: "Please enter a valid number."
+        )
+    }
+
+    
+    private func showNameRequiredAlert() {
+        appAlert = AnyAppAlert(
+            alertTitle: "Budget Name Required",
+            alertSubtitle: "Please enter a name for this budget."
+        )
+    }
+
+    
     func saveBudget() {
         guard let amount = Double(amount) else { return }
+        
+        
         
         let budget = Budget(
             id: existingId,

@@ -26,6 +26,9 @@ struct TransactionFormView: View {
     @State private var showDatePicker = false
     
     
+    @State private var appAlert: AnyAppAlert?
+
+    
     init(
         purpose: TransactionFormPurpose,
         onFinish: @escaping () -> Void,
@@ -105,6 +108,11 @@ struct TransactionFormView: View {
             .presentationDetents([.medium])
         }
         .hideSystemNavigation()
+        .showCustomAlert(
+            type: .alert,
+            alert: $appAlert
+        )
+
 
     }
 }
@@ -203,6 +211,7 @@ private extension TransactionFormView {
         RoundedRectangle(cornerRadius: 12)
             .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [6]))
             .frame(height: 52)
+            .contentShape(Rectangle())
             .overlay {
                 Text("Add new category")
                     .foregroundStyle(.appSecondary)
@@ -282,9 +291,26 @@ private extension TransactionFormView {
     private var currencySymbol:String{
         return currencyManager.selectedCurrency.symbol
     }
+    
+    private func showCategoryRequiredAlert() {
+        appAlert = AnyAppAlert(
+            alertTitle: "Category Required",
+            alertSubtitle: "Please select a category to continue."
+        ) {
+            AnyView(
+                Button("OK", role: .cancel) { }
+            )
+        }
+    }
+
 
     
     private func onSaveTransactionPressed() {
+        guard selectedCategoryId != nil else {
+            showCategoryRequiredAlert()
+            return
+        }
+        
         saveTransaction()
         onFinish()
     }
