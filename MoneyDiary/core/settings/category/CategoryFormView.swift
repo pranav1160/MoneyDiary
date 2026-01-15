@@ -95,40 +95,30 @@ struct CategoryFormView: View {
 
     
     var body: some View {
-        ScrollView {
-            VStack(spacing: 28) {
-                
-                emojiPickerSection
-                
-                categoryAttributesSection
-                
-                colorPickerSection
-           
-            }
-            .padding(.horizontal, 8)
-        }
-        .navigationTitle(navigationTitle)
-
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
-
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button{
-                    onCancelClicked()
-                }label: {
-                    Text("Cancel")
+        VStack{
+            CustomNavigationHeader(
+                title: navigationTitle,
+                showsBackButton: true) {
+                    ToolBarCapsuleButton(title: "Save") {
+                        onSaveClicked()
+                    }
                 }
-            }
             
-            ToolbarItem(placement: .topBarTrailing) {
-                Button{
-                    onSaveClicked()
-                }label: {
-                    Text("Save")
+            ScrollView {
+                
+                VStack(spacing: 28) {
+                    
+                    emojiPickerSection
+                    
+                    categoryAttributesSection
+                    
+                    colorPickerSection
+                    
                 }
+                .padding(.horizontal, 8)
             }
         }
+        .hideSystemNavigation()
     }
     
     private func onCancelClicked(){

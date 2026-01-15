@@ -9,8 +9,29 @@ import SwiftUI
 
 struct CategoryListView: View {
     @EnvironmentObject private var categoryStore: CategoryStore
-    
+   
     var body: some View {
+        VStack{
+            CustomNavigationHeader(
+                title: "Categories",
+                showsBackButton: true) {
+                    NavigationLink {
+                        CategoryFormView(mode: .create)
+                    } label: {
+                        Image(systemName: "plus.capsule.fill")
+                            .font(.title)
+                    }
+                }
+            
+            Spacer()
+            
+            categoryListSection
+            
+        }
+        .hideSystemNavigation()
+    }
+    
+    private var categoryListSection:some View{
         VStack(alignment: .leading, spacing: 12) {
             
             if categoryStore.categories.isEmpty {
@@ -29,19 +50,6 @@ struct CategoryListView: View {
                 }
             }
         }
-        .toolbar(content: {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    CategoryFormView(mode: .create)
-                } label: {
-                    Image(systemName: "plus.capsule.fill")
-                    
-                }
-                
-            }
-        })
-        .toolbar(.hidden, for: .tabBar)
-        .navigationTitle("Categories")
     }
 }
 

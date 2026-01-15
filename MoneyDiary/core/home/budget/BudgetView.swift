@@ -15,9 +15,21 @@ struct BudgetView: View {
     @State private var editingBudget: Budget?
 
     var body: some View {
-        VStack {
-            overallBudgetSection
-            categoriesSection
+        VStack{
+            CustomNavigationHeader(
+                title: "Budgets",
+                showsBackButton: false) {
+                    NavigationLink {
+                        BudgetFormView(mode: .category, purpose: .create)
+                    } label: {
+                        Image(systemName: "plus.capsule.fill")
+                            .font(.title)
+                    }
+                }
+            VStack {
+                overallBudgetSection
+                categoriesSection
+            }
         }
         .sheet(item: $editingBudget) { budget in
             BudgetFormView(
@@ -25,18 +37,9 @@ struct BudgetView: View {
                 purpose: .edit(budget)
             )
         }
-        .navigationTitle("Budgets")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    BudgetFormView(mode: .category, purpose: .create)
-                } label: {
-                    Image(systemName: "plus.capsule.fill")
-                }
-            }
-          
-        }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
+        
     }
 
     
@@ -84,8 +87,6 @@ struct BudgetView: View {
                     .padding(.trailing, 36)
                     .padding(.bottom, 56)
                 }
-
-                
             }
             else{
                 VStack{

@@ -13,23 +13,29 @@ struct SettingsView: View {
     @State private var navigateToCategoryList = false
     var body: some View {
        
-        
-        List{
-            SettingsLabel(
-                text: "Sign Out",
-                sfIcon: "arrow.backward",
-                color: Color.categoryPink,
-                indicatorText: nil,
-                onTapFunc: signOut
+        VStack{
+            CustomNavigationHeader(
+                title: "Settings",
+                showsBackButton: true
             )
             
-            SettingsLabel(
-                text: "Categories",
-                sfIcon: "square.grid.2x2.fill",
-                color: Color.categoryPurple2,
-                indicatorText: nil,
-                onTapFunc: {navigateToCategoryList = true}
-            )
+            List{
+                SettingsLabel(
+                    text: "Sign Out",
+                    sfIcon: "arrow.backward",
+                    color: Color.categoryPink,
+                    indicatorText: nil,
+                    onTapFunc: signOut
+                )
+                
+                SettingsLabel(
+                    text: "Categories",
+                    sfIcon: "square.grid.2x2.fill",
+                    color: Color.categoryPurple2,
+                    indicatorText: nil,
+                    onTapFunc: {navigateToCategoryList = true}
+                )
+            }
         }
         .navigationDestination(
             isPresented: $navigateToCategoryList,
@@ -37,8 +43,7 @@ struct SettingsView: View {
                 CategoryListView()
             }
         )
-        .toolbar(.hidden, for: .tabBar)
-        .navigationTitle("Settings")
+        .hideSystemNavigation()
     }
     
     private func signOut() {

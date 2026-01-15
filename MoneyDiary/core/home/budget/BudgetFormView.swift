@@ -72,87 +72,103 @@ struct BudgetFormView: View {
             _isActive = State(initialValue: budget.isActive)
         }
     }
+    
+    private var budgetInfoSection:some View{
+        Section("Budget Details") {
+            TextField("Budget name", text: $name)
+            
+            TextField("Amount", text: $amount)
+                .keyboardType(.decimalPad)
+            
+            Picker("Period", selection: $selectedPeriod) {
+                ForEach(BudgetPeriod.allCases, id: \.self) {
+                    Text($0.rawValue)
+                }
+            }
+        }
+    }
+    
+    private var budgetCategorySection:some View{
+            
+            Section("Category") {
+                Picker("Category", selection: $selectedCategoryId) {
+                    Text("Select category").tag(UUID?.none)
+                    
+                    ForEach(categoryStore.categories) { category in
+                        Text("\(category.emoji) \(category.title)")
+                            .tag(UUID?.some(category.id))
+                    }
+                }
+            }
+        
+    }
+    
+    private var budgetStatusSection:some View{
+        Section {
+            Toggle("Active", isOn: $isActive)
+        }
+    }
+    
+    private var budgetDeleteSection:some View{
+      
+            Section {
+                Button(role: .destructive) {
+                    withAnimation(.easeOut(duration: 0.15)) {
+                        isDeletePressed = true
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        isDeletePressed = false
+                        showDeleteConfirmation = true
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "trash")
+                        
+                        Text("Delete Budget")
+                    }
+                    .font(.title3)
+                    .scaleEffect(isDeletePressed ? 0.96 : 1)
+                    .opacity(isDeletePressed ? 0.7 : 1)
+                    .animation(.easeOut(duration: 0.15), value: isDeletePressed)
+                }
+            }
+        
+    }
 
 
     var body: some View {
         NavigationStack {
-            Form {
-                // MARK: - Budget Info
-                Section("Budget Details") {
-                    TextField("Budget name", text: $name)
-
-                    TextField("Amount", text: $amount)
-                        .keyboardType(.decimalPad)
-
-                    Picker("Period", selection: $selectedPeriod) {
-                        ForEach(BudgetPeriod.allCases, id: \.self) {
-                            Text($0.rawValue)
-                        }
+            VStack{
+                CustomNavigationHeader(
+                    title: navigationTitle,
+                    showsBackButton: true) {
+                        ToolBarCapsuleButton(
+                            title: actionTitle) {
+                                saveBudget()
+                                dismiss()
+                            }
+                            .disabled(!isFormValid)
                     }
-                }
-
-                if mode == .category{
-                    // MARK: - Category
-                    Section("Category") {
-                        Picker("Category", selection: $selectedCategoryId) {
-                            Text("Select category").tag(UUID?.none)
-                            
-                            ForEach(categoryStore.categories) { category in
-                                Text("\(category.emoji) \(category.title)")
-                                    .tag(UUID?.some(category.id))
-                            }
-                        }
+                Form {
+                    // MARK: - Budget Info
+                    budgetInfoSection
+                    
+                    if mode == .category{
+                        budgetCategorySection
                     }
-                }
-                
-                // MARK: - Status
-                Section {
-                    Toggle("Active", isOn: $isActive)
-                }
-                
-                // MARK: - Delete the budget
-                if case .edit = purpose {
-                    Section {
-                        Button(role: .destructive) {
-                            withAnimation(.easeOut(duration: 0.15)) {
-                                isDeletePressed = true
-                            }
-                            
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                                isDeletePressed = false
-                                showDeleteConfirmation = true
-                            }
-                        } label: {
-                            HStack(spacing: 10) {
-                                Image(systemName: "trash")
-                                
-                                Text("Delete Budget")
-                            }
-                            .font(.title3)
-                            .scaleEffect(isDeletePressed ? 0.96 : 1)
-                            .opacity(isDeletePressed ? 0.7 : 1)
-                            .animation(.easeOut(duration: 0.15), value: isDeletePressed)
-                        }
+                    
+                    // MARK: - Status
+                    budgetStatusSection
+                    
+                    // MARK: - Delete the budget
+                    if case .edit = purpose {
+                        budgetDeleteSection
                     }
-                }
-
-            }
-            .navigationTitle(navigationTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-               
-
-                ToolbarItem(placement: .topBarTrailing) {
-                    ToolBarCapsuleButton(
-                        title: actionTitle) {
-                            saveBudget()
-                            dismiss()
-                        }
-                        .disabled(!isFormValid)
-                   
                     
                 }
             }
+            .hideSystemNavigation()
             .confirmationDialog(
                 "Delete this budget?",
                 isPresented: $showDeleteConfirmation,

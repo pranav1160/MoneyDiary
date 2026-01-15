@@ -104,7 +104,7 @@ struct TransactionFormView: View {
             }
             .presentationDetents([.medium])
         }
-        .toolbar(.hidden, for: .tabBar)
+        .hideSystemNavigation()
 
     }
 }
@@ -128,24 +128,14 @@ private extension TransactionFormView {
 
     
     var header: some View {
-        HStack {
-         
-            
-            Spacer()
-            
-            Text("\(currencyManager.selectedCurrency.symbol)\(amount)")
-                .font(.system(size: 28, weight: .bold))
-            
-            Spacer()
-            
-            ToolBarCapsuleButton(
-                title: isCreateMode ? "Add" : "Update") {
-                    onSaveTransactionPressed()
-                }
-       
-
-        }
-        .padding()
+        CustomNavigationHeader(
+            title: "\(currencyManager.selectedCurrency.symbol)\(amount)",
+            showsBackButton: true) {
+                ToolBarCapsuleButton(
+                    title: isCreateMode ? "Add" : "Update") {
+                        onSaveTransactionPressed()
+                    }
+            }
     }
     
     var formSection: some View {

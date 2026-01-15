@@ -28,7 +28,7 @@ struct ToolBarCircleButton: View {
             Image(systemName: systemImage)
                 .font(.title2)
                 .foregroundStyle(.white)
-                .frame(width: 45, height: 45)
+                .frame(width: 40, height: 40)
                 .background(
                     Circle()
                         .fill(Color.accentColor)
