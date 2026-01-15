@@ -9,30 +9,35 @@ import SwiftUI
 
 
 struct HomeView: View {
-    
     @State private var path = NavigationPath()
     @EnvironmentObject private var transactionStore: TransactionStore
     @State private var showSettings = false
     
     var body: some View {
         NavigationStack(path: $path) {
-     
-            recentTrancactionSection
-            
-                .overlay(alignment: .bottomTrailing) {
-                    Button {
-                        path.append(TransactionRoute.amount)
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                            .padding()
-                            .background(Circle().fill(Color.accentColor))
-                            .shadow(radius: 5)
+            VStack{
+                CustomNavigationHeader(title: "Home",showsBackButton: false) {
+                    ToolBarCircleButton(systemImage: "gearshape") {
+                        showSettings = true
                     }
-                    .padding()
                 }
-            
+                recentTrancactionSection
+            }
+            .overlay(alignment: .bottomTrailing) {
+                Button {
+                    path.append(TransactionRoute.amount)
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.title2)
+                        .foregroundStyle(.white)
+                        .padding()
+                        .background(Circle().fill(Color.accentColor))
+                        .shadow(radius: 5)
+                }
+                .padding()
+            }
+            .navigationBarBackButtonHidden(true)
+            .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: TransactionRoute.self) { route in
                 switch route {
                     
@@ -53,8 +58,6 @@ struct HomeView: View {
                         
                     )
                     
-              
-
                 case .editAmount(let transactionId):
                     if let transaction = transactionStore.transactions.first(where: {
                         $0.id == transactionId
@@ -81,22 +84,12 @@ struct HomeView: View {
                                 path.removeLast(path.count) // pop editAmount + edit
                             },
                             amount: amount
-                           
+                            
                         )
                     }
-
                 }
             }
-            .navigationTitle("Home")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        showSettings = true
-                    } label: {
-                        Image(systemName: "gearshape")
-                    }
-                }
-            }
+            
             .navigationDestination(isPresented: $showSettings) {
                 SettingsView()
             }
@@ -138,8 +131,8 @@ struct HomeView: View {
             .font(.footnote)
             .foregroundStyle(.appSecondary)
     }
-
-
+    
+    
 }
 
 
