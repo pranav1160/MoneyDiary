@@ -8,32 +8,30 @@
 import SwiftUI
 
 
-struct TransactionView: View {
+struct HomeView: View {
+    
     @State private var path = NavigationPath()
     @EnvironmentObject private var transactionStore: TransactionStore
     
     var body: some View {
         NavigationStack(path: $path) {
-            List {
-                Section {
-                    Button("Add Transaction") {
+     
+            recentTrancactionSection
+            
+                .overlay(alignment: .bottomTrailing) {
+                    Button {
                         path.append(TransactionRoute.amount)
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.title2)
+                            .foregroundStyle(.white)
+                            .padding()
+                            .background(Circle().fill(Color.accentColor))
+                            .shadow(radius: 5)
                     }
+                    .padding()
                 }
-                
-                Section("Transactions") {
-                    ForEach(transactionStore.transactions) { transaction in
-                        Button {
-                            path.append(TransactionRoute.editAmount(transactionId: transaction.id))
-
-                        } label: {
-                            TransactionRow(transaction: transaction)
-                        }
-
-
-                    }
-                }
-            }
+            
             .navigationDestination(for: TransactionRoute.self) { route in
                 switch route {
                     
@@ -88,13 +86,32 @@ struct TransactionView: View {
 
                 }
             }
-            .navigationTitle("Transactions")
+            .navigationTitle("Home")
+        }
+    }
+    
+    private var recentTrancactionSection:some View{
+        List {
+            
+            Section("Transactions") {
+                ForEach(transactionStore.transactions) { transaction in
+                    Button {
+                        path.append(TransactionRoute.editAmount(transactionId: transaction.id))
+                        
+                    } label: {
+                        TransactionRow(transaction: transaction)
+                    }
+                    
+                    
+                }
+            }
+            
         }
     }
 }
 
 
 #Preview {
-    TransactionView()
-        .environmentObject(TransactionStore())
+    HomeView()
+        .withPreviewEnvironment()
 }
