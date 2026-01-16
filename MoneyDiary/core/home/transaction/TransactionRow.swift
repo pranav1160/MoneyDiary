@@ -43,29 +43,11 @@ struct TransactionRow: View {
                     .lineLimit(1)
                     .foregroundStyle(.primary)
                 
-                HStack(spacing: 4) {
-                   
-                    
-                    if transaction.isRecurring {
-                        Text("•")
-                            .font(.caption2)
-                            .foregroundStyle(.appSecondary)
-                        Image(systemName: "repeat")
-                            .font(.caption2)
-                            .foregroundStyle(.appSecondary)
-                        Text("•")
-                            .font(.caption2)
-                            .foregroundStyle(.appSecondary)
-                    }
-                       
-                       
-                    
-                   
-                    
+               
                     Text(transaction.date, style: .relative)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                }
+              
             }
             
             Spacer(minLength: 8)

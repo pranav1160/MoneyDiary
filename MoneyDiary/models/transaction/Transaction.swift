@@ -11,8 +11,24 @@ struct Transaction: Identifiable {
     let title: String?
     let amount: Double
     let date: Date
-    let isRecurring: Bool
     let categoryId: UUID
+    let recurrenceInfo: RecurrenceInfo?
+    
+    init(
+        id: UUID,
+        title: String?,
+        amount: Double,
+        date: Date,
+        categoryId: UUID,
+        recurrenceInfo: RecurrenceInfo? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.amount = amount
+        self.date = date
+        self.categoryId = categoryId
+        self.recurrenceInfo = recurrenceInfo
+    }
 }
 
 extension Transaction {
@@ -34,7 +50,7 @@ extension Transaction {
         title: String,
         amount: Double,
         daysAgo: Int,
-        recurring: Bool,
+       
         category: Category
     ) -> Transaction {
         Transaction(
@@ -42,7 +58,6 @@ extension Transaction {
             title: title,
             amount: amount,
             date: .daysAgo(daysAgo),
-            isRecurring: recurring,
             categoryId: category.id
         )
     }
@@ -55,9 +70,8 @@ extension Transaction {
             .mock(
                 id: UUID(uuidString: "20000000-0000-0000-0000-000000000001")!,
                 title: "Eggs Purchase",
-                amount: 120,
+                amount: 100,
                 daysAgo: 3,
-                recurring: false,
                 category: .eggs
             ),
             
@@ -68,16 +82,14 @@ extension Transaction {
                 title: "House Rent",
                 amount: 24000,
                 daysAgo: 1,
-                recurring: true,
                 category: .rent
             ),
         
             .mock(
                 id: UUID(uuidString: "20000000-0000-0000-0000-000000000003")!,
                 title: "Electricity Bill",
-                amount: 1800,
+                amount: 2000,
                 daysAgo: 5,
-                recurring: true,
                 category: .utilities
             ),
             
@@ -86,7 +98,6 @@ extension Transaction {
                 title: "Robo car",
                 amount: 2000,
                 daysAgo: 1,
-                recurring: true,
                 category: .toys
             ),
             
@@ -95,7 +106,6 @@ extension Transaction {
                 title: "Ande liye",
                 amount: 220,
                 daysAgo: 1,
-                recurring: false,
                 category: .eggs
             )
         

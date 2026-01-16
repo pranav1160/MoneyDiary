@@ -27,7 +27,8 @@ struct TransactionFormView: View {
     
     
     @State private var appAlert: AnyAppAlert?
-
+    @State var recurrencePattern: RecurrencePattern?
+    @State private var showRecurrencePicker = false
     
     init(
         purpose: TransactionFormPurpose,
@@ -43,6 +44,7 @@ struct TransactionFormView: View {
             _amount = State(initialValue: amount)
             _selectedCategoryId = State(initialValue: nil)
             _selectedDate = State(initialValue: .now)
+            _recurrencePattern = State(initialValue: nil)
             
         case .edit(let transaction):
             _transactionName = State(initialValue: transaction.title ?? "")
@@ -53,6 +55,9 @@ struct TransactionFormView: View {
             )
             _selectedCategoryId = State(initialValue: transaction.categoryId)
             _selectedDate = State(initialValue: transaction.date)
+            _recurrencePattern = State(
+                initialValue: transaction.recurrenceInfo?.pattern
+            )
         }
     }
 
@@ -83,7 +88,12 @@ struct TransactionFormView: View {
             )
             .presentationDetents([.medium])
         }
-
+        .sheet(isPresented: $showRecurrencePicker) {
+            RecurrencePickerView(
+                selectedPattern: $recurrencePattern
+            )
+            .presentationDetents([.medium])
+        }
         .sheet(isPresented: $showDatePicker) {
             VStack(spacing: 16) {
                 Capsule()
@@ -182,10 +192,15 @@ private extension TransactionFormView {
                 trailing: {
                     HStack(spacing: 6) {
                         Image(systemName: "arrow.triangle.2.circlepath")
-                        Text("Never")
+                        Text(recurrencePattern?.description ?? "Never")
+                            .foregroundStyle(.primary)
                     }
                 }
             )
+            .contentShape(Rectangle())
+            .onTapGesture {
+                showRecurrencePicker = true
+            }
         }
         .padding(.horizontal)
     }
@@ -332,7 +347,6 @@ private extension TransactionFormView {
             title: trimmedTitle.isEmpty ? nil : trimmedTitle,
             amount: amount,
             date: selectedDate,
-            isRecurring: false,
             categoryId: categoryId
         )
 

@@ -6,10 +6,6 @@
 //
 
 import Foundation
-
-
-
-
 //QUERIES
 extension TransactionStore {
     
