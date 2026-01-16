@@ -28,7 +28,7 @@ struct TransactionRow: View {
                 .font(.title3)
                 .frame(width: 36, height: 36)
                 .background(
-                    Circle()
+                  RoundedRectangle(cornerRadius: 14)
                         .fill(categoryColor.color.opacity(0.25))
                 )
 

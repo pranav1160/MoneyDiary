@@ -60,6 +60,8 @@ extension Transaction {
                 recurring: false,
                 category: .eggs
             ),
+            
+            
 
             .mock(
                 id: UUID(uuidString: "20000000-0000-0000-0000-000000000002")!,
@@ -77,6 +79,24 @@ extension Transaction {
                 daysAgo: 5,
                 recurring: true,
                 category: .utilities
+            ),
+            
+            .mock(
+                id: UUID(uuidString: "20000000-0000-0000-0000-000000000004")!,
+                title: "Robo car",
+                amount: 2000,
+                daysAgo: 1,
+                recurring: true,
+                category: .toys
+            ),
+            
+            .mock(
+                id: UUID(uuidString: "20000000-0000-0000-0000-000000000005")!,
+                title: "Ande liye",
+                amount: 220,
+                daysAgo: 1,
+                recurring: false,
+                category: .eggs
             )
         
     ]

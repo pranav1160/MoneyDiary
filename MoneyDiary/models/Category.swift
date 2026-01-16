@@ -53,6 +53,7 @@ enum CategoryColor: String, CaseIterable, Identifiable,ShapeStyle {
 extension Category {
     
     enum MockID {
+        static let toys = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
         static let eggs = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         static let rent = UUID(uuidString: "00000000-0000-0000-0000-000000000002")!
         static let utilities = UUID(uuidString: "00000000-0000-0000-0000-000000000003")!
@@ -62,6 +63,13 @@ extension Category {
         static let investments = UUID(uuidString: "00000000-0000-0000-0000-000000000007")!
         static let salary = UUID(uuidString: "00000000-0000-0000-0000-000000000008")!
     }
+    
+    static let toys = Category(
+        id: MockID.toys,
+        title: "Toys",
+        emoji: "🚂",
+        categoryColor: .blue4
+    )
     
     static let eggs = Category(
         id: MockID.eggs,
@@ -99,6 +107,6 @@ extension Category {
     )
     
     static let mockCategories: [Category] = [
-        eggs, rent, utilities, phoneBill, internet
+        eggs, rent, utilities, phoneBill, internet,toys
     ]
 }

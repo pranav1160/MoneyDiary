@@ -16,25 +16,23 @@ struct ColorPickerView: View {
     ]
     
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 16) {
+        LazyVGrid(columns: columns, spacing: 12) {
             ForEach(CategoryColor.allCases) { item in
-                Circle()
-                    .fill(item.color)
-                    .frame(width: 60, height: 60)
-                    .overlay(
-                        Circle()
-                            .stroke(.white, lineWidth: selectedColor == item ? 4 : 0)
-                    )
-                    .onTapGesture {
+                ColorCircleButton(
+                    color: item,
+                    isSelected: selectedColor == item
+                ) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         selectedColor = item
                     }
-                    .animation(.easeInOut(duration: 0.15), value: selectedColor)
+                }
             }
         }
         .padding()
     }
 }
 
+
 #Preview {
-    ColorPickerView(selectedColor: .constant(.black))
+    ColorPickerView(selectedColor: .constant(.blue))
 }

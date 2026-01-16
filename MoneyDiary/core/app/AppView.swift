@@ -27,4 +27,5 @@ struct AppView: View {
 
 #Preview {
     AppView()
+        .withPreviewEnvironment()
 }

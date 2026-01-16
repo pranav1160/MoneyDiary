@@ -20,6 +20,7 @@ struct CategoryFormView: View {
     @State private var appAlert: AnyAppAlert?
 
     
+    
     // MARK: - Init for Create & Edit
     init(
         mode: CategoryFormMode,
@@ -29,7 +30,9 @@ struct CategoryFormView: View {
         self.onCategorySaved = onCategorySaved
         switch mode {
         case .create:
-            _selectedEmoji = State(initialValue: "👽") //pick random emoji
+            _selectedEmoji = State(
+                initialValue: randomEmojis
+                    .randomElement() ?? "😃") //pick random emoji
             _selectedColor = State(initialValue: .blue)
             _categoryName = State(initialValue: "")
             
@@ -168,6 +171,19 @@ struct CategoryFormView: View {
         
         dismiss()
     }
+    
+    let randomEmojis:[String] = [
+        "😀", "😅", "😂", "🤣", "😊",
+        "😍", "😎", "🤓", "🥳", "😇",
+        "🤔", "😴", "😈", "👻", "🤖",
+        "👽", "🎃", "💀", "👑", "🔥",
+        "💎", "⚡️", "🌈", "☀️", "🌙",
+        "⭐️", "🌍", "🍎", "🍕", "🍔",
+        "🍣", "🍩", "🎂", "☕️", "🍺",
+        "⚽️", "🏀", "🎮", "🎧", "🎸",
+        "🚗", "✈️", "🚀", "🏠", "🗿",
+        "📱", "💻", "🧠", "🦾", "🪐"
+    ]
 
     private func updateCategory(existing category: Category) {
         let updated = Category(
