@@ -9,9 +9,14 @@ import Foundation
 //QUERIES
 extension TransactionStore {
     
+    var realTransactions: [Transaction] {
+        transactions.filter { $0.recurrenceInfo == nil }
+    }
+
+    
     //returns total expense
     func total() -> Double {
-        transactions
+        realTransactions
             .reduce(0) { sum, tx in
                 sum + abs(tx.amount)
             }
@@ -22,7 +27,7 @@ extension TransactionStore {
         from startDate: Date,
         to endDate: Date = .now
     ) -> Double {
-        transactions
+        realTransactions
             .filter {
                 $0.date >= startDate &&
                 $0.date <= endDate
@@ -34,7 +39,7 @@ extension TransactionStore {
     func total(
         for categoryId: UUID,
     ) -> Double {
-        transactions
+        realTransactions
             .filter {
                 $0.categoryId == categoryId
             }
@@ -69,7 +74,7 @@ extension TransactionStore {
     func recent(
         limit: Int = 5
     ) -> [Transaction] {
-        Array(transactions.prefix(limit))
+        Array(realTransactions.prefix(limit))
     }
     
     
@@ -79,7 +84,7 @@ extension TransactionStore {
         let calendar = Calendar.current
         
         let grouped = Dictionary(
-            grouping: transactions
+            grouping: realTransactions
         ) { tx in
             calendar.startOfDay(for: tx.date)
         }

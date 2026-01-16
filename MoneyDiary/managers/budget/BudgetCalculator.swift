@@ -23,14 +23,17 @@ struct BudgetCalculator {
             referenceDate: now
         )
 
-        return transactions.filter { transaction in
-            if budget.categoryId == nil {
-                transaction.date >= startDate
-            } else {
-                transaction.categoryId == budget.categoryId &&
-                transaction.date >= startDate
+        return transactions
+            .filter { $0.recurrenceInfo == nil }
+            .filter { transaction in
+                if budget.categoryId == nil {
+                    transaction.date >= startDate
+                } else {
+                    transaction.categoryId == budget.categoryId &&
+                    transaction.date >= startDate
+                }
             }
-        }
+
     }
 
     func spentAmount(

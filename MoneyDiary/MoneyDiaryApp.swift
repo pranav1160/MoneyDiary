@@ -11,7 +11,8 @@ import SwiftData
 @main
 struct MoneyDiaryApp: App {
     
-    
+    @Environment(\.scenePhase) private var scenePhase
+
     @StateObject private var categoryStore = CategoryStore()
     @StateObject private var transactionStore = TransactionStore()
     @StateObject private var currencyManager = CurrencyManager()
@@ -31,6 +32,11 @@ struct MoneyDiaryApp: App {
                 .environmentObject(currencyManager)
                 .environmentObject(budgetStore)
                 .environmentObject(budgetManager)
+                .onChange(of: scenePhase) {
+                    if scenePhase == .active {
+                        transactionStore.processRecurringTransactions()
+                    }
+                }
         }
     }
 }

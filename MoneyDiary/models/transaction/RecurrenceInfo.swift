@@ -29,37 +29,42 @@ struct RecurrenceInfo: Codable, Equatable {
     let nextOccurrence: Date
     let lastProcessed: Date?
     
-    init(pattern: RecurrencePattern, startDate: Date = Date()) {
-        self.pattern = pattern
-        self.nextOccurrence = startDate
-        self.lastProcessed = nil
-    }
-    
-    init(pattern: RecurrencePattern, nextOccurrence: Date, lastProcessed: Date?) {
+    init(
+        pattern: RecurrencePattern,
+        nextOccurrence: Date,
+        lastProcessed: Date? = nil
+    ) {
         self.pattern = pattern
         self.nextOccurrence = nextOccurrence
         self.lastProcessed = lastProcessed
     }
     
     func updatingNextOccurrence() -> RecurrenceInfo {
-        let calendar = Calendar.current
-        let newNext: Date
-        
-        switch pattern {
-        case .daily:
-            newNext = calendar.date(byAdding: .day, value: 1, to: nextOccurrence) ?? nextOccurrence
-        case .weekly:
-            newNext = calendar.date(byAdding: .day, value: 7, to: nextOccurrence) ?? nextOccurrence
-        case .monthly:
-            newNext = calendar.date(byAdding: .month, value: 1, to: nextOccurrence) ?? nextOccurrence
-        case .customDays(let days):
-            newNext = calendar.date(byAdding: .day, value: days, to: nextOccurrence) ?? nextOccurrence
-        }
+        let newNext = pattern.nextDate(after: nextOccurrence)
         
         return RecurrenceInfo(
             pattern: pattern,
             nextOccurrence: newNext,
             lastProcessed: Date()
         )
+    }
+}
+
+
+
+extension RecurrencePattern {
+    func nextDate(after date: Date) -> Date {
+        let calendar = Calendar.current
+        
+        switch self {
+        case .daily:
+            return calendar.date(byAdding: .day, value: 1, to: date)!
+        case .weekly:
+            return calendar.date(byAdding: .day, value: 7, to: date)!
+        case .monthly:
+            return calendar.date(byAdding: .month, value: 1, to: date)!
+        case .customDays(let days):
+            return calendar.date(byAdding: .day, value: days, to: date)!
+        }
     }
 }

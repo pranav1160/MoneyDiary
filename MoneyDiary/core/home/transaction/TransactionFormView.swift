@@ -342,14 +342,16 @@ private extension TransactionFormView {
         
         let trimmedTitle = transactionName.trimmingCharacters(in: .whitespacesAndNewlines)
         
+        let recurrenceInfo = makeRecurrenceInfo()
+        
         let transaction = Transaction(
             id: existingId,
             title: trimmedTitle.isEmpty ? nil : trimmedTitle,
             amount: amount,
             date: selectedDate,
-            categoryId: categoryId
+            categoryId: categoryId,
+            recurrenceInfo: recurrenceInfo
         )
-
         
         switch purpose {
         case .create:
@@ -360,9 +362,28 @@ private extension TransactionFormView {
         }
     }
 
+    
+    private func makeRecurrenceInfo() -> RecurrenceInfo? {
+        guard let pattern = recurrencePattern else {
+            return nil
+        }
+        
+        let now = Date()
+        
+        // First occurrence should be generated immediately if date <= now
+        let firstOccurrence =
+        selectedDate <= now ? selectedDate : selectedDate
+        
+        return RecurrenceInfo(
+            pattern: pattern,
+            nextOccurrence: firstOccurrence
+        )
+    }
+
 
    
-    
+
+
 }
 
 #Preview {
