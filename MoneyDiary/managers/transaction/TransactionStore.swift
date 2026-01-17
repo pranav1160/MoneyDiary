@@ -6,6 +6,7 @@
 //
 import Foundation
 import Combine
+import SwiftUI
 
 private func debug(_ message: String) {
 #if DEBUG
@@ -48,8 +49,9 @@ final class TransactionStore: ObservableObject {
     }
     
     func delete(at offsets: IndexSet) {
-        offsets.map { transactions[$0].id }.forEach(delete)
+        transactions.remove(atOffsets: offsets)
     }
+
 
     
     // MARK: - Mocks (internal write access)

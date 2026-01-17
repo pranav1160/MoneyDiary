@@ -114,6 +114,15 @@ struct HomeView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    .onDelete { offsets in
+                        let idsToDelete = offsets.map {
+                            section.transactions[$0].id
+                        }
+                        
+                        idsToDelete.forEach { id in
+                            transactionStore.delete(id: id)
+                        }
+                    }
                 }
             }
         }

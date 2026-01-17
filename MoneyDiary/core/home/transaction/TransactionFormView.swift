@@ -69,8 +69,11 @@ struct TransactionFormView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     formSection
-                    Divider().opacity(0.3)
+                    Divider().opacity(0.5)
+                    deleteSection
+                    Divider().opacity(0.5)
                     categorySection
+                    
                 }
             }
         }
@@ -221,6 +224,26 @@ private extension TransactionFormView {
         .padding()
     }
     
+    
+    @ViewBuilder
+    var deleteSection: some View {
+        if case .edit(let transaction) = purpose {
+            Button(role: .destructive) {
+                confirmDelete(transaction)
+            } label: {
+                HStack{
+                    Image(systemName: "trash")
+                    Text("Delete Transaction")
+                    Spacer()
+                }
+                .padding()
+                .contentShape(Rectangle())
+            }
+            
+        }
+    }
+
+    
     var addCategoryButton: some View {
         
         RoundedRectangle(cornerRadius: 12)
@@ -317,6 +340,31 @@ private extension TransactionFormView {
             )
         }
     }
+    
+    
+    private func confirmDelete(_ transaction: Transaction) {
+        appAlert = AnyAppAlert(
+            alertTitle: "Delete Transaction?",
+            alertSubtitle: "This action cannot be undone."
+        ) {
+            AnyView(
+                HStack {
+                    Button("Cancel", role: .cancel) {}
+                    
+                    Button("Delete", role: .destructive) {
+                        transactionStore.delete(id: transaction.id)
+                        
+                        // 🔑 CRITICAL FIX
+                        appAlert = nil
+                        DispatchQueue.main.async {
+                            onFinish()
+                        }
+                    }
+                }
+            )
+        }
+    }
+
 
 
     
@@ -388,7 +436,7 @@ private extension TransactionFormView {
 
 #Preview {
     TransactionFormView(
-        purpose: .create,
+        purpose: .edit(Transaction.mocks[0]),
         onFinish: {},
         amount: "100"
         
