@@ -78,7 +78,8 @@ extension TransactionStore{
         var transactionsToAdd: [Transaction] = []
         var transactionsToUpdate: [Transaction] = []
         
-        for transaction in transactions where transaction.recurrenceInfo != nil {
+        for transaction in transactions where transaction.source == .recurringTemplate {
+
             
             debug("TEMPLATE FOUND → id=\(transaction.id) date=\(transaction.date)")
             
@@ -93,15 +94,17 @@ extension TransactionStore{
                     amount: transaction.amount,
                     date: recurrence.nextOccurrence,
                     categoryId: transaction.categoryId,
-                    recurrenceInfo: nil
+                    recurrenceInfo: nil,
+                    source: .recurringGenerated
                 )
                 
                 let exists = transactions.contains {
                     $0.date == recurrence.nextOccurrence &&
                     $0.amount == transaction.amount &&
                     $0.categoryId == transaction.categoryId &&
-                    $0.recurrenceInfo == nil
+                    $0.source == .recurringGenerated
                 }
+
                 
                 if exists {
                     debug("  SKIP (duplicate) → date=\(recurrence.nextOccurrence)")
@@ -123,9 +126,10 @@ extension TransactionStore{
                     amount: transaction.amount,
                     date: transaction.date,
                     categoryId: transaction.categoryId,
-                    recurrenceInfo: recurrence
+                    recurrenceInfo: recurrence,
+                    source: .recurringTemplate
                 )
-                
+
                 transactionsToUpdate.append(updatedTransaction)
             }
         }

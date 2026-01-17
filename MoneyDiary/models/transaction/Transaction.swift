@@ -13,6 +13,7 @@ struct Transaction: Identifiable {
     let date: Date
     let categoryId: UUID
     let recurrenceInfo: RecurrenceInfo?
+    let source: TransactionSource
     
     init(
         id: UUID,
@@ -20,7 +21,8 @@ struct Transaction: Identifiable {
         amount: Double,
         date: Date,
         categoryId: UUID,
-        recurrenceInfo: RecurrenceInfo? = nil
+        recurrenceInfo: RecurrenceInfo? = nil,
+        source:TransactionSource
     ) {
         self.id = id
         self.title = title
@@ -28,6 +30,7 @@ struct Transaction: Identifiable {
         self.date = date
         self.categoryId = categoryId
         self.recurrenceInfo = recurrenceInfo
+        self.source = source
     }
 }
 
@@ -51,14 +54,16 @@ extension Transaction {
         amount: Double,
         daysAgo: Int,
        
-        category: Category
+        category: Category,
+        source:TransactionSource
     ) -> Transaction {
         Transaction(
             id: id,
             title: title,
             amount: amount,
             date: .daysAgo(daysAgo),
-            categoryId: category.id
+            categoryId: category.id,
+            source: source
         )
     }
 }
@@ -72,7 +77,8 @@ extension Transaction {
                 title: "Eggs Purchase",
                 amount: 100,
                 daysAgo: 3,
-                category: .eggs
+                category: .eggs,
+                source: .manual
             ),
             
             
@@ -82,7 +88,8 @@ extension Transaction {
                 title: "House Rent",
                 amount: 24000,
                 daysAgo: 1,
-                category: .rent
+                category: .rent,
+                source: .manual
             ),
         
             .mock(
@@ -90,7 +97,8 @@ extension Transaction {
                 title: "Electricity Bill",
                 amount: 2000,
                 daysAgo: 5,
-                category: .utilities
+                category: .utilities,
+                source: .manual
             ),
             
             .mock(
@@ -98,7 +106,8 @@ extension Transaction {
                 title: "Robo car",
                 amount: 2000,
                 daysAgo: 1,
-                category: .toys
+                category: .toys,
+                source: .manual
             ),
             
             .mock(
@@ -106,7 +115,8 @@ extension Transaction {
                 title: "Ande liye",
                 amount: 220,
                 daysAgo: 1,
-                category: .eggs
+                category: .eggs,
+                source: .manual
             )
         
     ]

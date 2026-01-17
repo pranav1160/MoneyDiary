@@ -30,6 +30,12 @@ struct TransactionRow: View {
                 .background(
                   RoundedRectangle(cornerRadius: 14)
                         .fill(categoryColor.color.opacity(0.25))
+                
+                        .overlay(alignment: .bottomTrailing) {
+                            indicatorIcon
+                        }
+
+                  
                 )
 
             
@@ -60,6 +66,27 @@ struct TransactionRow: View {
         }
         .contentShape(Rectangle())
     }
+    
+    @ViewBuilder
+    private var indicatorIcon: some View {
+        switch transaction.source {
+        case .manual:
+            Image(systemName: "inset.filled.circle")
+                .font(.caption2)
+                .foregroundStyle(.categoryBlue4)
+                .offset(x: 6, y: 6)
+            
+        case .recurringTemplate:
+            EmptyView()
+            
+        case .recurringGenerated:
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .font(.caption2)
+                .foregroundStyle(.categoryBlue4)
+                .offset(x: 6, y: 6)
+        }
+    }
+
 }
 
 

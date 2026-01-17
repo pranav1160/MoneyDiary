@@ -189,21 +189,23 @@ private extension TransactionFormView {
                 showDatePicker = true
             }
 
-            
-            row(
-                title: "Repeat",
-                trailing: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                        Text(recurrencePattern?.description ?? "Never")
-                            .foregroundStyle(.primary)
+            if isCreateMode{
+                row(
+                    title: "Repeat",
+                    trailing: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                            Text(recurrencePattern?.description ?? "Never")
+                                .foregroundStyle(.primary)
+                        }
                     }
+                )
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    showRecurrencePicker = true
                 }
-            )
-            .contentShape(Rectangle())
-            .onTapGesture {
-                showRecurrencePicker = true
             }
+            
         }
         .padding(.horizontal)
     }
@@ -390,7 +392,30 @@ private extension TransactionFormView {
         
         let trimmedTitle = transactionName.trimmingCharacters(in: .whitespacesAndNewlines)
         
-        let recurrenceInfo = makeRecurrenceInfo()
+        let recurrenceInfo: RecurrenceInfo? = {
+            switch purpose {
+            case .create:
+                return makeRecurrenceInfo()
+                
+            case .edit(let existing):
+                //  recurrenceInfo is IMMUTABLE in edit mode
+                return existing.recurrenceInfo
+            }
+        }()
+
+        
+        let source: TransactionSource = {
+            switch purpose {
+            case .create:
+                return recurrenceInfo != nil ? .recurringTemplate : .manual
+                
+            case .edit(let existing):
+                // NEVER recompute source on edit
+                return existing.source
+            }
+        }()
+
+
         
         let transaction = Transaction(
             id: existingId,
@@ -398,8 +423,10 @@ private extension TransactionFormView {
             amount: amount,
             date: selectedDate,
             categoryId: categoryId,
-            recurrenceInfo: recurrenceInfo
+            recurrenceInfo: recurrenceInfo,
+            source: source
         )
+
         
         switch purpose {
         case .create:
