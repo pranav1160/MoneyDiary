@@ -57,7 +57,6 @@ struct BudgetView: View {
                 ),
                 lineWidth: 1
             )
-        
     }
     
     private var overallBudgetSection:some View{
