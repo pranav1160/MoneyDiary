@@ -93,8 +93,13 @@ final class TransactionStore: ObservableObject {
         )
         
         debug("REPEAT → original=\(transaction.id) new=\(repeatedTransaction.id)")
+        
+        // Add without animation wrapper
+        addWithoutProcessing(repeatedTransaction)
+        
+        // Apply animation only to the list update
         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-            addWithoutProcessing(repeatedTransaction)
+            objectWillChange.send()
         }
     }
 

@@ -31,6 +31,5 @@ struct OnboardingNavigationButton<Destination: View>: View {
 
 #Preview {
     OnboardingNavigationButton(title: "hello") {
-        
     }
 }
