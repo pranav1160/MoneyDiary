@@ -11,6 +11,7 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppState.self) private var appstate
     @State private var navigateToCategoryList = false
+    @State private var navigateToRecurringTransaction = false
     var body: some View {
        
         VStack{
@@ -35,12 +36,26 @@ struct SettingsView: View {
                     indicatorText: nil,
                     onTapFunc: {navigateToCategoryList = true}
                 )
+                
+                SettingsLabel(
+                    text: "Recurring Transactions",
+                    sfIcon: "arrow.trianglehead.clockwise",
+                    color: Color.categoryBrown,
+                    indicatorText: nil,
+                    onTapFunc: {navigateToRecurringTransaction = true}
+                )
             }
         }
         .navigationDestination(
             isPresented: $navigateToCategoryList,
             destination: {
                 CategoryListView()
+            }
+        )
+        .navigationDestination(
+            isPresented: $navigateToRecurringTransaction,
+            destination: {
+                RecurringTransactionsView()
             }
         )
         .hideSystemNavigation()

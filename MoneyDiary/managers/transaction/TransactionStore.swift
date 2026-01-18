@@ -20,6 +20,102 @@ final class TransactionStore: ObservableObject {
     @Published private(set) var transactions: [Transaction] = []
    
     
+    
+    // MARK: - Computed Properties
+    
+    /// Returns all recurring template transactions
+    var recurringTransactions: [Transaction] {
+        transactions
+            .filter {
+                $0.source == .recurringTemplate ||
+                $0.source == .recurringPaused
+            }
+            .sorted { $0.date > $1.date }
+    }
+
+    
+    // MARK: - Recurring Management
+    
+    /// Stops a recurring transaction by converting it to manual
+    func stopRecurrence(id: UUID) {
+        guard let index = transactions.firstIndex(where: { $0.id == id }),
+              transactions[index].source == .recurringTemplate else {
+            debug("STOP FAILED → id=\(id)")
+            return
+        }
+        
+        let template = transactions[index]
+        
+        let paused = Transaction(
+            id: template.id,
+            title: template.title,
+            amount: template.amount,
+            date: template.date,
+            categoryId: template.categoryId,
+            recurrenceInfo: template.recurrenceInfo, // keep it!
+            source: .recurringPaused
+        )
+        
+        transactions[index] = paused
+        debug("STOP → id=\(id) paused")
+    }
+
+
+    
+    /// Deletes a recurring template and optionally all generated instances
+    func deleteRecurringTemplate(id: UUID, deleteAllInstances: Bool = false) {
+        guard let template = transactions.first(where: { $0.id == id }),
+              template.source == .recurringTemplate else {
+            debug("DELETE TEMPLATE FAILED → id=\(id) not found or not a template")
+            return
+        }
+        
+        // Delete the template
+        transactions.removeAll { $0.id == id }
+        debug("DELETE TEMPLATE → id=\(id)")
+        
+        // Optionally delete all generated instances
+        if deleteAllInstances {
+            let beforeCount = transactions.count
+            transactions.removeAll {
+                $0.source == .recurringGenerated &&
+                $0.title == template.title &&
+                $0.amount == template.amount &&
+                $0.categoryId == template.categoryId
+            }
+            let deletedCount = beforeCount - transactions.count
+            debug("DELETE INSTANCES → count=\(deletedCount)")
+        }
+    }
+    
+    /// Resume a stopped recurring transaction
+    func resumeRecurrence(id: UUID) {
+        guard let index = transactions.firstIndex(where: { $0.id == id }),
+              transactions[index].source == .recurringPaused,
+              let recurrence = transactions[index].recurrenceInfo else {
+            debug("RESUME FAILED → id=\(id)")
+            return
+        }
+        
+        let paused = transactions[index]
+        
+        let resumed = Transaction(
+            id: paused.id,
+            title: paused.title,
+            amount: paused.amount,
+            date: paused.date,
+            categoryId: paused.categoryId,
+            recurrenceInfo: recurrence,
+            source: .recurringTemplate
+        )
+        
+        transactions[index] = resumed
+        debug("RESUME → id=\(id)")
+        
+        processRecurringTransactions()
+    }
+
+    
     init(){
         loadMockTransactions()
         processRecurringTransactions()

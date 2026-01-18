@@ -87,6 +87,8 @@ struct TransactionRow: View {
                 .font(.caption2)
                 .foregroundStyle(.categoryBlue4)
                 .offset(x: 6, y: 6)
+        case .recurringPaused:
+            EmptyView()
         }
     }
 
