@@ -104,6 +104,7 @@ struct HomeView: View {
         List {
             ForEach(transactionStore.transactionsGroupedByDay(), id: \.date) { section in
                 Section(header: dateHeader(section.date)) {
+                    
                     ForEach(section.transactions) { transaction in
                         Button {
                             path.append(
@@ -113,6 +114,14 @@ struct HomeView: View {
                             TransactionRow(transaction: transaction)
                         }
                         .buttonStyle(.plain)
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            Button {
+                                transactionStore.repeatTransaction(from: transaction)
+                            } label: {
+                                Label("Repeat", systemImage: "arrow.clockwise")
+                            }
+                            .tint(.blue)
+                        }
                     }
                     .onDelete { offsets in
                         let idsToDelete = offsets.map {
@@ -127,6 +136,7 @@ struct HomeView: View {
             }
         }
     }
+
     
     private func dateHeader(_ date: Date) -> some View {
         let calendar = Calendar.current

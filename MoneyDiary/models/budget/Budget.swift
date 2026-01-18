@@ -81,7 +81,7 @@ extension Budget {
             name: "Monthly Groceries",
             amount: 5000,
             period: .monthly,
-            categoryId: Category.eggs.id
+            categoryId: Category.internet.id
         ),
         Budget(
             id: UUID(uuidString: "10000000-0000-0000-0000-000000000002")!,
@@ -103,6 +103,13 @@ extension Budget {
             amount: 50000,
             period: .monthly,
             categoryId: nil
+        ),
+        Budget(
+            id: UUID(uuidString: "10000000-0000-0000-0000-000000000005")!,
+            name: "Overall",
+            amount: 5000,
+            period: .monthly,
+            categoryId: Category.eggs.id
         )
         
     ]

@@ -19,50 +19,57 @@ struct TransactionRow: View {
     private var categoryColor: CategoryColor {
         categoryStore.color(for: transaction.categoryId)
     }
-
     
+    private var emojiSection:some View{
+        // Category emoji in a compact circle
+        Text(category?.emoji ?? "❓")
+            .font(.title3)
+            .frame(width: 36, height: 36)
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(categoryColor.color.opacity(0.25))
+                
+                    .overlay(alignment: .bottomTrailing) {
+                        indicatorIcon
+                    }
+            )
+
+    }
+    private var transactionDetails:some View{
+        // Transaction details
+        VStack(alignment: .leading, spacing: 2) {
+            Text(transaction.displayTitle(
+                using: categoryStore.categories
+            ))
+            .font(.subheadline)
+            .fontWeight(.medium)
+            .lineLimit(1)
+            .foregroundStyle(.primary)
+            
+            
+            Text(transaction.date, style: .relative)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            
+        }
+    }
+    private var transactionAmount:some View{
+        // Amount
+        Text("₹\(transaction.amount, specifier: "%.0f")")
+            .font(.subheadline)
+            .fontWeight(.semibold)
+            .foregroundStyle(.primary)
+    }
     var body: some View {
         HStack(spacing: 12) {
-            // Category emoji in a compact circle
-            Text(category?.emoji ?? "❓")
-                .font(.title3)
-                .frame(width: 36, height: 36)
-                .background(
-                  RoundedRectangle(cornerRadius: 14)
-                        .fill(categoryColor.color.opacity(0.25))
-                
-                        .overlay(alignment: .bottomTrailing) {
-                            indicatorIcon
-                        }
-
-                  
-                )
-
             
-            // Transaction details
-            VStack(alignment: .leading, spacing: 2) {
-                Text(transaction.displayTitle(
-                    using: categoryStore.categories
-                ))
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .lineLimit(1)
-                    .foregroundStyle(.primary)
-                
-               
-                    Text(transaction.date, style: .relative)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-              
-            }
+            emojiSection
             
-            Spacer(minLength: 8)
+            transactionDetails
             
-            // Amount
-            Text("₹\(transaction.amount, specifier: "%.0f")")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-                .foregroundStyle(.primary)
+            Spacer()
+            
+            transactionAmount
         }
         .contentShape(Rectangle())
     }
@@ -71,11 +78,7 @@ struct TransactionRow: View {
     private var indicatorIcon: some View {
         switch transaction.source {
         case .manual:
-            Image(systemName: "inset.filled.circle")
-                .font(.caption2)
-                .foregroundStyle(.categoryBlue4)
-                .offset(x: 6, y: 6)
-            
+            EmptyView()
         case .recurringTemplate:
             EmptyView()
             

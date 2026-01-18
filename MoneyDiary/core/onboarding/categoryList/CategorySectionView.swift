@@ -48,3 +48,5 @@ struct CategorySectionView: View {
         }
     }
 }
+
+

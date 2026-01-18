@@ -53,7 +53,7 @@ extension Transaction {
         title: String,
         amount: Double,
         daysAgo: Int,
-       
+        
         category: Category,
         source:TransactionSource
     ) -> Transaction {
@@ -76,7 +76,7 @@ extension Transaction {
                 id: UUID(uuidString: "20000000-0000-0000-0000-000000000001")!,
                 title: "Eggs Purchase",
                 amount: 100,
-                daysAgo: 3,
+                daysAgo: 5,
                 category: .eggs,
                 source: .manual
             ),

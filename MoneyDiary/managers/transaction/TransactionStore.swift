@@ -44,9 +44,25 @@ final class TransactionStore: ObservableObject {
             debug("UPDATE FAILED → id=\(updated.id) not found")
             return
         }
-        debug("UPDATE → id=\(updated.id) recurrence=\(updated.recurrenceInfo != nil)")
-        transactions[index] = updated
+        
+        var finalTransaction = updated
+        
+        if transactions[index].source == .recurringGenerated {
+            finalTransaction = Transaction(
+                id: updated.id,
+                title: updated.title,
+                amount: updated.amount,
+                date: updated.date,
+                categoryId: updated.categoryId,
+                recurrenceInfo: nil,
+                source: .manual
+            )
+            debug("CONVERT → recurringGenerated → manual")
+        }
+        
+        transactions[index] = finalTransaction
     }
+
     
     func delete(at offsets: IndexSet) {
         transactions.remove(atOffsets: offsets)
@@ -63,6 +79,23 @@ final class TransactionStore: ObservableObject {
         debug("ADD (internal) → id=\(transaction.id) date=\(transaction.date)")
         transactions.insert(transaction, at: 0)
         transactions.sort { $0.date > $1.date }
+    }
+    
+    func repeatTransaction(from transaction: Transaction) {
+        let repeatedTransaction = Transaction(
+            id: UUID(),
+            title: transaction.title,
+            amount: transaction.amount,
+            date: Date(),                 // now
+            categoryId: transaction.categoryId,
+            recurrenceInfo: nil,           // manual
+            source: .manual                // important
+        )
+        
+        debug("REPEAT → original=\(transaction.id) new=\(repeatedTransaction.id)")
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+            addWithoutProcessing(repeatedTransaction)
+        }
     }
 
     
