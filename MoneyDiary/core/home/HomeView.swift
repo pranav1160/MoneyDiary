@@ -31,6 +31,7 @@ struct HomeView: View {
             .overlay(alignment: .bottomTrailing) {
                 Button {
                     path.append(TransactionRoute.amount)
+                    HapticManager.instance.tap()
                 } label: {
                     Image(systemName: "plus")
                         .font(.title2)
@@ -61,6 +62,7 @@ struct HomeView: View {
                             
                             switch result {
                             case .created:
+                                HapticManager.instance.notification(type: .success)
                                 showToast(.success("Transaction added"))
                             case .updated:
                                 break
@@ -99,8 +101,10 @@ struct HomeView: View {
                                 
                                 switch result {
                                 case .updated:
+                                    HapticManager.instance.notification(type: .success)
                                     showToast(.success("Transaction updated"))
                                 case .deleted:
+                                    HapticManager.instance.notification(type: .success)
                                     showToast(.success("Transaction deleted"))
                                 case .created:
                                     break
@@ -126,6 +130,7 @@ struct HomeView: View {
                     
                     ForEach(section.transactions) { transaction in
                         Button {
+                            HapticManager.instance.tap()
                             path.append(
                                 TransactionRoute.editAmount(transactionId: transaction.id)
                             )
@@ -135,6 +140,7 @@ struct HomeView: View {
                         .buttonStyle(.plain)
                         .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             Button {
+                                HapticManager.instance.impact(style: .medium)
                                 transactionStore.repeatTransaction(from: transaction)
                             } label: {
                                 Label("Repeat", systemImage: "arrow.clockwise")
@@ -143,6 +149,8 @@ struct HomeView: View {
                         }
                     }
                     .onDelete { offsets in
+                        HapticManager.instance.notification(type: .warning)
+                        showToast(.success("Transaction deleted"))
                         let idsToDelete = offsets.map {
                             section.transactions[$0].id
                         }

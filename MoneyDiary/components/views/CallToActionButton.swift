@@ -69,6 +69,5 @@ struct CallToActionButton: View {
         CallToActionButton(title: "Ok", action: {
             print("ok")
         }, isDisabled: true)
-
     }
 }

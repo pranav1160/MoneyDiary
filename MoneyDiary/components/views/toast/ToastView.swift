@@ -7,22 +7,25 @@
 import SwiftUI
 
 struct ToastView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let toast: Toast
 
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.headline)
+                .foregroundColor(.accent)
                 
 
             Text(toast.message)
+                .foregroundColor(.accent)
                 .font(.subheadline)
                 .multilineTextAlignment(.leading)
             
         }
         .padding()
-        .background(.accent)
-        .foregroundColor(.white)
+        .background(.darkPurple)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(radius: 8)
         .padding(.horizontal, 16)

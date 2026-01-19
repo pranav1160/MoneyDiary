@@ -101,6 +101,7 @@ struct AmountDialPadView: View {
                 CallToActionButton(
                     title: "Continue",
                     action: {
+                        HapticManager.instance.success()
                         onContinue(amount)
                     },
                     isDisabled: !isValidAmount
@@ -174,10 +175,12 @@ struct AmountDialPadView: View {
                         .font(.system(size: 24, weight: .medium))
                         .foregroundStyle(.red.opacity(0.9))
                         .onLongPressGesture(minimumDuration: 0.35) {
+                            HapticManager.instance.warning()
                             withAnimation(.snappy) {
                                 amount = ""
                             }
                         }
+
                 } else {
                     Text(value)
                         .font(.system(size: 28, weight: .medium, design: .rounded))
@@ -196,15 +199,17 @@ struct AmountDialPadView: View {
     // MARK: - Logic
     
     private func handleTap(_ value: String) {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
+        HapticManager.instance.tap()
+
         
         withAnimation(.snappy(duration: 0.2)) {
             switch value {
             case "delete":
+                HapticManager.instance.delete()
                 if !amount.isEmpty {
                     amount.removeLast()
                 }
+
             case ".":
                 if !amount.contains(".") {
                     amount = amount.isEmpty ? "0." : amount + "."

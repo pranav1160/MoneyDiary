@@ -95,7 +95,7 @@ struct TransactionFormView: View {
             RecurrencePickerView(
                 selectedPattern: $recurrencePattern
             )
-            .presentationDetents([.medium])
+            .presentationDetents([.fraction(0.7)])
         }
         .sheet(isPresented: $showDatePicker) {
             VStack(spacing: 16) {
@@ -168,6 +168,9 @@ private extension TransactionFormView {
                     TextField("Add a note?", text: $transactionName)
                         .multilineTextAlignment(.trailing)
                         .autocorrectionDisabled()
+                        .onTapGesture {
+                            HapticManager.instance.tap()
+                        }
                     
                 }
             )
@@ -186,6 +189,7 @@ private extension TransactionFormView {
             )
             .contentShape(Rectangle())
             .onTapGesture {
+                HapticManager.instance.tap()
                 showDatePicker = true
             }
 
@@ -202,6 +206,7 @@ private extension TransactionFormView {
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
+                    HapticManager.instance.tap()
                     showRecurrencePicker = true
                 }
             }
@@ -258,6 +263,7 @@ private extension TransactionFormView {
             }
             .onTapGesture {
                 //navigate to add category
+                HapticManager.instance.tap()
                 navigateToAddCategory = true
             }
     }
@@ -302,6 +308,7 @@ private extension TransactionFormView {
         }
         .contentShape(Rectangle())
         .onTapGesture {
+            HapticManager.instance.impact(style: .soft)
             selectedCategoryId = category.id
         }
     }
@@ -333,6 +340,7 @@ private extension TransactionFormView {
     }
     
     private func showCategoryRequiredAlert() {
+        HapticManager.instance.warning()
         appAlert = AnyAppAlert(
             alertTitle: "Category Required",
             alertSubtitle: "Please select a category to continue."
@@ -345,6 +353,7 @@ private extension TransactionFormView {
     
     
     private func confirmDelete(_ transaction: Transaction) {
+        HapticManager.instance.warning()
         appAlert = AnyAppAlert(
             alertTitle: "Delete Transaction?",
             alertSubtitle: "This action cannot be undone."
@@ -474,4 +483,19 @@ private extension TransactionFormView {
         
     )
     .withPreviewEnvironment()
+    
+  
 }
+
+#Preview {
+    TransactionFormView(
+        purpose: .create,
+        onFinish: {_ in },
+        amount: "500"
+        
+    )
+    .withPreviewEnvironment()
+    
+    
+}
+

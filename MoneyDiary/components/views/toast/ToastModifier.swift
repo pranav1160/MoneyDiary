@@ -8,17 +8,14 @@ import SwiftUI
 
 struct ToastModifier: ViewModifier {
     @Binding var toast: Toast?
-
+    
     func body(content: Content) -> some View {
-        ZStack {
-            content
-
-            if let toast {
-                VStack {
-                    Spacer()
-
+        content
+            .safeAreaInset(edge: .top) {
+                if let toast {
                     ToastView(toast: toast)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                        .padding(.top, 20)
+                        .transition(.move(edge: .top).combined(with: .opacity))
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + toast.duration) {
                                 withAnimation {
@@ -27,9 +24,7 @@ struct ToastModifier: ViewModifier {
                             }
                         }
                 }
-                .padding(.bottom, 40)
             }
-        }
-        .animation(.spring(), value: toast)
+            .animation(.spring(), value: toast)
     }
 }
