@@ -176,12 +176,22 @@ extension TransactionStore{
     func resumeRecurrence(id: UUID) {
         guard let index = transactions.firstIndex(where: { $0.id == id }),
               transactions[index].source == .recurringPaused,
-              let recurrence = transactions[index].recurrenceInfo else {
+              var recurrence = transactions[index].recurrenceInfo else {
             debug("RESUME FAILED → id=\(id)")
             return
         }
         
         let paused = transactions[index]
+        let now = Date()
+        
+        // CRITICAL FIX: Calculate the next occurrence from NOW, not from the old nextOccurrence
+        // This prevents generating all the "missed" transactions during the pause
+        while recurrence.nextOccurrence <= now {
+            recurrence = recurrence.updatingNextOccurrence()
+            debug("RESUME SKIP → skipping past occurrence: \(recurrence.nextOccurrence)")
+        }
+        
+        debug("RESUME → new next occurrence will be: \(recurrence.nextOccurrence)")
         
         let resumed = Transaction(
             id: paused.id,
@@ -189,7 +199,7 @@ extension TransactionStore{
             amount: paused.amount,
             date: paused.date,
             categoryId: paused.categoryId,
-            recurrenceInfo: recurrence,
+            recurrenceInfo: recurrence, // updated recurrence with future nextOccurrence
             source: .recurringTemplate
         )
         
