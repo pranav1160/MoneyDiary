@@ -9,11 +9,14 @@ import SwiftUI
 
 struct AppView: View {
     @State private var appState = AppState()
+    @State private var toast: Toast?
     var body: some View {
         AppViewBuilder(
             showTabBar: appState.showTabBar,
             tabBarView: {
-                TabBarView()
+                TabBarView(
+                    showToast: { toast = $0 }
+                )
             },
             onBoardingView: {
                 NavigationStack{
@@ -22,6 +25,7 @@ struct AppView: View {
             }
         )
         .environment(appState)
+        .toast($toast)
     }
 }
 

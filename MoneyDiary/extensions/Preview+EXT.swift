@@ -32,3 +32,10 @@ extension View {
     }
 }
 #endif
+
+
+extension View {
+    func toast(_ toast: Binding<Toast?>) -> some View {
+        modifier(ToastModifier(toast: toast))
+    }
+}

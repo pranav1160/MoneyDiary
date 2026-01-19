@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var path = NavigationPath()
     @EnvironmentObject private var transactionStore: TransactionStore
     @State private var showSettings = false
+    let showToast: (Toast) -> Void
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -55,12 +56,21 @@ struct HomeView: View {
                 case .create(let amount):
                     TransactionFormView(
                         purpose: .create,
-                        onFinish: {
-                            path.removeLast(path.count) // 🔥 POP BOTH
+                        onFinish: { result in
+                            path.removeLast(path.count)
+                            
+                            switch result {
+                            case .created:
+                                showToast(.success("Transaction added"))
+                            case .updated:
+                                break
+                            case .deleted:
+                                break
+                            }
                         },
                         amount: amount
-                        
                     )
+
                     
                 case .editAmount(let transactionId):
                     if let transaction = transactionStore.transactions.first(where: {
@@ -84,12 +94,21 @@ struct HomeView: View {
                     }) {
                         TransactionFormView(
                             purpose: .edit(transaction),
-                            onFinish: {
-                                path.removeLast(path.count) // pop editAmount + edit
+                            onFinish: { result in
+                                path.removeLast(path.count)
+                                
+                                switch result {
+                                case .updated:
+                                    showToast(.success("Transaction updated"))
+                                case .deleted:
+                                    showToast(.success("Transaction deleted"))
+                                case .created:
+                                    break
+                                }
                             },
                             amount: amount
-                            
                         )
+
                     }
                 }
             }
@@ -160,6 +179,10 @@ struct HomeView: View {
 
 
 #Preview {
-    HomeView()
-        .withPreviewEnvironment()
+    HomeView(
+        showToast: { toast in
+            print("🍞 Toast shown:", toast)
+        }
+    )
+    .withPreviewEnvironment()
 }

@@ -9,7 +9,8 @@ import SwiftUI
 
 struct TransactionFormView: View {
     let purpose: TransactionFormPurpose
-    let onFinish: () -> Void
+    let onFinish: (TransactionFormResult) -> Void
+
     
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var transactionStore: TransactionStore
@@ -32,9 +33,8 @@ struct TransactionFormView: View {
     
     init(
         purpose: TransactionFormPurpose,
-        onFinish: @escaping () -> Void,
+        onFinish: @escaping (TransactionFormResult) -> Void,
         amount: String = ""
-        
     ) {
         self.purpose = purpose
         self.onFinish = onFinish
@@ -359,7 +359,7 @@ private extension TransactionFormView {
                         // 🔑 CRITICAL FIX
                         appAlert = nil
                         DispatchQueue.main.async {
-                            onFinish()
+                            onFinish(.deleted)
                         }
                     }
                 }
@@ -377,7 +377,12 @@ private extension TransactionFormView {
         }
         
         saveTransaction()
-        onFinish()
+        switch purpose {
+        case .create:
+            onFinish(.created)
+        case .edit:
+            onFinish(.updated)
+        }
     }
 
     
@@ -464,7 +469,7 @@ private extension TransactionFormView {
 #Preview {
     TransactionFormView(
         purpose: .edit(Transaction.mocks[0]),
-        onFinish: {},
+        onFinish: {_ in },
         amount: "100"
         
     )

@@ -8,12 +8,11 @@
 import SwiftUI
 
 struct TabBarView: View {
+    let showToast: (Toast) -> Void
     var body: some View {
         TabView {
-           
-            
             NavigationStack{
-                HomeView()
+                HomeView(showToast: showToast)
             }
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
@@ -26,7 +25,6 @@ struct TabBarView: View {
                     Label("Budget", systemImage: "tachometer")
                 }
             
-            
             NavigationStack{
                 SearchView()
             }
@@ -38,6 +36,8 @@ struct TabBarView: View {
 }
 
 #Preview {
-    TabBarView()
+    TabBarView { Toast in
+        
+    }
 }
 

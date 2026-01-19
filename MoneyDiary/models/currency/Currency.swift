@@ -1,5 +1,5 @@
 //
-//  UICurrency.swift
+//  Currency.swift
 //  MoneyDiary
 //
 //  Created by Pranav on 05/01/26.
@@ -13,7 +13,6 @@ struct Currency: Identifiable, Hashable , Equatable, Codable {
     let symbol: String
     let flag: String
 }
-
 
 extension Currency {
     static let mockCurrencies: [Currency] = [
