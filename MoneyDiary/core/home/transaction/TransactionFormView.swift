@@ -16,6 +16,7 @@ struct TransactionFormView: View {
     @EnvironmentObject private var transactionStore: TransactionStore
     @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var currencyManager: CurrencyManager
+    @EnvironmentObject private var toastManager: ToastManager
     @Environment(\.dismiss) private var dismiss
 
     
@@ -82,7 +83,16 @@ struct TransactionFormView: View {
             isPresented: $navigateToAddCategory
         ) {
             CategoryFormView(
-                mode: .create,
+                mode: .create, onFinish: {result in
+                    switch result {
+                    case .created:
+                        toastManager.show(.success("Category Added"))
+                    case .updated:
+                        break
+                    case .deleted:
+                        break
+                    }
+                },
                 onCategorySaved: { newCategory in
                     withAnimation {
                         selectedCategoryId = newCategory.id   //  auto-select

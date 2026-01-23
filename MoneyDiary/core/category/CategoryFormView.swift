@@ -12,21 +12,22 @@ struct CategoryFormView: View {
     
     let mode: CategoryFormMode
     let onCategorySaved: ((Category) -> Void)?
-    
+    let onFinish: (CategoryFormResult) -> Void
+
     @State private var selectedEmoji: String
     @State private var selectedColor: CategoryColor
     @State private var categoryName: String
     
     @State private var appAlert: AnyAppAlert?
 
-    
-    
     // MARK: - Init for Create & Edit
     init(
         mode: CategoryFormMode,
+        onFinish: @escaping (CategoryFormResult) -> Void,
         onCategorySaved: ((Category) -> Void)? = nil
     ) {
         self.mode = mode
+        self.onFinish = onFinish
         self.onCategorySaved = onCategorySaved
         switch mode {
         case .create:
@@ -126,7 +127,6 @@ struct CategoryFormView: View {
                 }
             
             ScrollView {
-                
                 VStack(spacing: 28) {
                     
                     emojiPickerSection
@@ -164,9 +164,11 @@ struct CategoryFormView: View {
         switch mode {
         case .create:
             createCategory()
+            onFinish(.created)
             
         case .edit(let category):
             updateCategory(existing: category)
+            onFinish(.updated)
         }
         
         dismiss()
@@ -204,7 +206,7 @@ struct CategoryFormView: View {
 
 #Preview {
     NavigationStack{
-        CategoryFormView(mode: .create)
+        CategoryFormView(mode: .create, onFinish: {_ in})
     }
 }
 
