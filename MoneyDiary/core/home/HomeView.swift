@@ -12,7 +12,7 @@ struct HomeView: View {
     @State private var path = NavigationPath()
     @EnvironmentObject private var transactionStore: TransactionStore
     @State private var showSettings = false
-    let showToast: (Toast) -> Void
+    @EnvironmentObject private var toastManager: ToastManager
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -63,7 +63,7 @@ struct HomeView: View {
                             switch result {
                             case .created:
                                 HapticManager.instance.notification(type: .success)
-                                showToast(.success("Transaction added"))
+                                toastManager.show(.success("Transaction added"))
                             case .updated:
                                 break
                             case .deleted:
@@ -102,10 +102,10 @@ struct HomeView: View {
                                 switch result {
                                 case .updated:
                                     HapticManager.instance.notification(type: .success)
-                                    showToast(.success("Transaction updated"))
+                                    toastManager.show(.success("Transaction updated"))
                                 case .deleted:
                                     HapticManager.instance.notification(type: .success)
-                                    showToast(.success("Transaction deleted"))
+                                    toastManager.show(.success("Transaction deleted"))
                                 case .created:
                                     break
                                 }
@@ -141,7 +141,7 @@ struct HomeView: View {
                         .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             Button {
                                 HapticManager.instance.impact(style: .medium)
-                                showToast(.success("Transaction repeated"))
+                                toastManager.show(.success("Transaction repeated"))
                                 transactionStore.repeatTransaction(from: transaction)
                             } label: {
                                 Label("Repeat", systemImage: "arrow.clockwise")
@@ -151,7 +151,7 @@ struct HomeView: View {
                     }
                     .onDelete { offsets in
                         HapticManager.instance.notification(type: .warning)
-                        showToast(.success("Transaction deleted"))
+                        toastManager.show(.success("Transaction deleted"))
                         let idsToDelete = offsets.map {
                             section.transactions[$0].id
                         }
@@ -188,10 +188,6 @@ struct HomeView: View {
 
 
 #Preview {
-    HomeView(
-        showToast: { toast in
-            print("🍞 Toast shown:", toast)
-        }
-    )
+    HomeView()
     .withPreviewEnvironment()
 }

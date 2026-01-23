@@ -8,18 +8,18 @@
 import SwiftUI
 
 struct TabBarView: View {
-    let showToast: (Toast) -> Void
+    @EnvironmentObject private var toastManager: ToastManager
     var body: some View {
         TabView {
             NavigationStack{
-                HomeView(showToast: showToast)
+                HomeView()
             }
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
             
             NavigationStack{
-                BudgetView(showToast: showToast)
+                BudgetView()
             }
                 .tabItem {
                     Label("Budget", systemImage: "tachometer")
@@ -32,12 +32,13 @@ struct TabBarView: View {
                     Label("Search", systemImage: "magnifyingglass")
                 }
         }
+        .showToast($toastManager.toast)
+       
+        
     }
 }
 
 #Preview {
-    TabBarView { Toast in
-        
-    }
+    TabBarView()
 }
 

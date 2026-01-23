@@ -17,7 +17,7 @@ extension View {
         let transactionStore = TransactionStore()
         let currencyManager = CurrencyManager()
         let budgetStore = BudgetStore()
-        
+        let toastManager = ToastManager()
         let budgetManager = BudgetManager(
             budgetStore: budgetStore,
             transactionStore: transactionStore
@@ -29,13 +29,9 @@ extension View {
             .environmentObject(currencyManager)
             .environmentObject(budgetStore)
             .environmentObject(budgetManager)
+            .environmentObject(toastManager)
     }
 }
 #endif
 
 
-extension View {
-    func toast(_ toast: Binding<Toast?>) -> some View {
-        modifier(ToastModifier(toast: toast))
-    }
-}

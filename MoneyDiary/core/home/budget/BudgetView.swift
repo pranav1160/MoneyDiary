@@ -11,8 +11,7 @@ struct BudgetView: View {
     @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var currencyManager: CurrencyManager
-    
-    let showToast: (Toast) -> Void
+    @EnvironmentObject private var toastManager: ToastManager
     
     @State private var editingBudget: Budget?
 
@@ -28,7 +27,7 @@ struct BudgetView: View {
                             onFinish: {result in
                                 switch result {
                                 case .created:
-                                    showToast(.success("Budget Added"))
+                                    toastManager.show(.success("Budget Added"))
                                 case .updated:
                                     break
                                 case .deleted:
@@ -55,9 +54,9 @@ struct BudgetView: View {
                     case .created:
                         break
                     case .updated:
-                        showToast(.success("Toast Updated"))
+                        toastManager.show(.success("Toast Updated"))
                     case .deleted:
-                        showToast(.success("Toast Deleted"))
+                        toastManager.show(.success("Toast Deleted"))
                     }
                 }
             )
@@ -105,9 +104,9 @@ struct BudgetView: View {
                                 case .created:
                                     break
                                 case .updated:
-                                    showToast(.success("Overall Budget updated"))
+                                    toastManager.show(.success("Overall Budget updated"))
                                 case .deleted:
-                                    showToast(.success("Overall Budget Deleted"))
+                                    toastManager.show(.success("Overall Budget Deleted"))
                                 }
                             }
                         )
@@ -132,7 +131,7 @@ struct BudgetView: View {
                             purpose: .create, onFinish: {result in
                                 switch result {
                                 case .created:
-                                    showToast(.success("Overall Budget Added"))
+                                    toastManager.show(.success("Overall Budget Added"))
                                 case .updated:
                                     break
                                 case .deleted:
@@ -198,9 +197,7 @@ struct BudgetView: View {
 
 #Preview {
     NavigationStack{
-        BudgetView(showToast: { toast in
-            print("🍞 Toast shown:", toast)
-        })
+        BudgetView()
             .withPreviewEnvironment()
     }
 }

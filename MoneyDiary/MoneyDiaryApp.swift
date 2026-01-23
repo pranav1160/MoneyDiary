@@ -17,7 +17,7 @@ struct MoneyDiaryApp: App {
     @StateObject private var transactionStore = TransactionStore()
     @StateObject private var currencyManager = CurrencyManager()
     @StateObject private var budgetStore = BudgetStore()
-    
+    @StateObject private var toastManager = ToastManager()
     var body: some Scene {
         WindowGroup {
             let budgetManager = BudgetManager(
@@ -32,6 +32,7 @@ struct MoneyDiaryApp: App {
                 .environmentObject(currencyManager)
                 .environmentObject(budgetStore)
                 .environmentObject(budgetManager)
+                .environmentObject(toastManager)
                 .onChange(of: scenePhase) {
                     if scenePhase == .active {
                         transactionStore.processRecurringTransactions()

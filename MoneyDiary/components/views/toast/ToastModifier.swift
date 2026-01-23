@@ -28,3 +28,10 @@ struct ToastModifier: ViewModifier {
             .animation(.spring(), value: toast)
     }
 }
+
+
+extension View {
+    func showToast(_ toast: Binding<Toast?>) -> some View {
+        modifier(ToastModifier(toast: toast))
+    }
+}
