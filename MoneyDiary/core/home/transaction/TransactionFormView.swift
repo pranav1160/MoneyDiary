@@ -468,11 +468,6 @@ private extension TransactionFormView {
             nextOccurrence: firstOccurrence
         )
     }
-
-
-   
-
-
 }
 
 #Preview {

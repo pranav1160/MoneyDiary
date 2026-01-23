@@ -12,6 +12,8 @@ struct BudgetView: View {
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var currencyManager: CurrencyManager
     
+    let showToast: (Toast) -> Void
+    
     @State private var editingBudget: Budget?
 
     var body: some View {
@@ -20,7 +22,20 @@ struct BudgetView: View {
                 title: "Budgets",
                 showsBackButton: false) {
                     NavigationLink {
-                        BudgetFormView(mode: .category, purpose: .create)
+                        BudgetFormView(
+                            mode: .category,
+                            purpose: .create,
+                            onFinish: {result in
+                                switch result {
+                                case .created:
+                                    showToast(.success("Budget Added"))
+                                case .updated:
+                                    break
+                                case .deleted:
+                                    break
+                                }
+                            }
+                        )
                     } label: {
                         Image(systemName: "plus.capsule.fill")
                             .font(.title)
@@ -34,12 +49,21 @@ struct BudgetView: View {
         .sheet(item: $editingBudget) { budget in
             BudgetFormView(
                 mode: budget.categoryId == nil ? .overall : .category,
-                purpose: .edit(budget)
+                purpose: .edit(budget),
+                onFinish: { result in
+                    switch result {
+                    case .created:
+                        break
+                    case .updated:
+                        showToast(.success("Toast Updated"))
+                    case .deleted:
+                        showToast(.success("Toast Deleted"))
+                    }
+                }
             )
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
-        
     }
 
     
@@ -73,7 +97,19 @@ struct BudgetView: View {
                     NavigationLink {
                         BudgetFormView(
                             mode: .overall,
-                            purpose: .edit(overallStatus.budget)
+                            purpose:
+                                    .edit(overallStatus.budget),
+                            onFinish: {
+                                result in
+                                switch result {
+                                case .created:
+                                    break
+                                case .updated:
+                                    showToast(.success("Overall Budget updated"))
+                                case .deleted:
+                                    showToast(.success("Overall Budget Deleted"))
+                                }
+                            }
                         )
                     } label: {
                         Image(systemName: "pencil")
@@ -93,7 +129,16 @@ struct BudgetView: View {
                     NavigationLink {
                         BudgetFormView(
                             mode: .overall,
-                            purpose: .create
+                            purpose: .create, onFinish: {result in
+                                switch result {
+                                case .created:
+                                    showToast(.success("Overall Budget Added"))
+                                case .updated:
+                                    break
+                                case .deleted:
+                                    break
+                                }
+                            }
                         )
                     } label: {
                         Image(systemName: "plus")
@@ -153,7 +198,9 @@ struct BudgetView: View {
 
 #Preview {
     NavigationStack{
-        BudgetView()
+        BudgetView(showToast: { toast in
+            print("🍞 Toast shown:", toast)
+        })
             .withPreviewEnvironment()
     }
 }

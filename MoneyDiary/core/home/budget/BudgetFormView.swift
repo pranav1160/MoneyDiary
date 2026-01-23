@@ -14,6 +14,7 @@ struct BudgetFormView: View {
     @EnvironmentObject private var categoryStore: CategoryStore
     @Environment(\.dismiss) private var dismiss
     @State private var isDeletePressed = false
+    let onFinish: (BudgetFormResult) -> Void
 
     @State private var name: String = ""
     @State private var amount: String = ""
@@ -28,11 +29,12 @@ struct BudgetFormView: View {
     
     init(
         mode: BudgetFormMode,
-        purpose: BudgetFormPurpose
+        purpose: BudgetFormPurpose,
+        onFinish: @escaping (BudgetFormResult) -> Void
     ) {
         self.mode = mode
         self.purpose = purpose
-        
+        self.onFinish = onFinish
         switch purpose {
         case .create:
             _name = State(initialValue: "")
@@ -203,6 +205,7 @@ private extension BudgetFormView {
     func deleteBudget() {
         if case .edit(let budget) = purpose {
             budgetStore.deleteBudget(id: budget.id)
+            onFinish(.deleted)
         }
     }
 
@@ -269,9 +272,11 @@ private extension BudgetFormView {
         switch purpose {
         case .create:
             budgetStore.addBudget(budget)
+            onFinish(.created)
             
         case .edit:
             budgetStore.updateBudget(budget)
+            onFinish(.updated)
         }
     }
 
@@ -280,6 +285,10 @@ private extension BudgetFormView {
 
 
 #Preview {
-    BudgetFormView(mode: .category, purpose: .edit(Budget.mockBudgets[0]))
+    BudgetFormView(
+        mode: .category,
+        purpose: .edit(Budget.mockBudgets[0]),
+        onFinish: {_ in}
+    )
         .withPreviewEnvironment()
 }

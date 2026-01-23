@@ -19,7 +19,7 @@ struct TabBarView: View {
                 }
             
             NavigationStack{
-                BudgetView()
+                BudgetView(showToast: showToast)
             }
                 .tabItem {
                     Label("Budget", systemImage: "tachometer")

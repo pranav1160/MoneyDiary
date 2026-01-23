@@ -141,6 +141,7 @@ struct HomeView: View {
                         .swipeActions(edge: .leading, allowsFullSwipe: true) {
                             Button {
                                 HapticManager.instance.impact(style: .medium)
+                                showToast(.success("Transaction repeated"))
                                 transactionStore.repeatTransaction(from: transaction)
                             } label: {
                                 Label("Repeat", systemImage: "arrow.clockwise")
