@@ -19,6 +19,8 @@ struct CategoryFormView: View {
     @State private var categoryName: String
     
     @State private var appAlert: AnyAppAlert?
+    @State private var showDeleteConfirmation = false
+
 
     // MARK: - Init for Create & Edit
     init(
@@ -85,6 +87,45 @@ struct CategoryFormView: View {
         
     }
     
+    @ViewBuilder
+    private var deleteCategorySection: some View {
+        if case .edit = mode {
+            Button(role: .destructive) {
+                showDeleteCategoryAlert()
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "trash")
+                    Text("Delete Category")
+                }
+                .font(.headline)
+                .foregroundStyle(.red)
+                .frame(maxWidth: .infinity)
+                .padding()
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private func showDeleteCategoryAlert() {
+        HapticManager.instance.warning()
+        
+        appAlert = AnyAppAlert(
+            alertTitle: "Delete Category?",
+            alertSubtitle: "This action cannot be undone."
+        ) {
+            AnyView(
+                HStack {
+                    Button("Cancel", role: .cancel) {}
+                    
+                    Button("Delete", role: .destructive) {
+                        deleteCategory()
+                    }
+                }
+            )
+        }
+    }
+
+    
   
 
     
@@ -133,6 +174,8 @@ struct CategoryFormView: View {
                     
                     categoryAttributesSection
                     
+                    deleteCategorySection
+                    
                     colorPickerSection
                     
                 }
@@ -144,6 +187,11 @@ struct CategoryFormView: View {
             type: .alert,
             alert: $appAlert
         )
+        .showCustomAlert(
+            type: .confirmationDialog,
+            alert: $appAlert
+        )
+
 
     }
     
@@ -173,6 +221,15 @@ struct CategoryFormView: View {
         
         dismiss()
     }
+    
+    private func deleteCategory() {
+        if case .edit(let category) = mode {
+            categoryStore.deleteCategory(category)
+            onFinish(.deleted)
+            dismiss()
+        }
+    }
+
     
     let randomEmojis:[String] = [
         "😀", "😅", "😂", "🤣", "😊",

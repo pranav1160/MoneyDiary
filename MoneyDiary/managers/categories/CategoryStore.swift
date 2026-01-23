@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 @MainActor
 final class CategoryStore: ObservableObject {
@@ -42,5 +43,18 @@ final class CategoryStore: ObservableObject {
         }
         return categories.first { $0.id == categoryId }?.categoryColor ?? .green
     }
+    
+    func deleteCategory(id: UUID) {
+        categories.removeAll { $0.id == id }
+    }
+    
+    func deleteCategory(_ category: Category) {
+        deleteCategory(id: category.id)
+    }
+
+    func deleteCategory(at offsets: IndexSet) {
+        categories.remove(atOffsets: offsets)
+    }
+
 
 }

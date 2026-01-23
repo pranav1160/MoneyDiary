@@ -25,6 +25,7 @@ struct CategoryListView: View {
                             case .deleted:
                                 break
                             }
+                            
                         })
                     } label: {
                         Image(systemName: "plus.capsule.fill")
@@ -59,13 +60,17 @@ struct CategoryListView: View {
                                 case .updated:
                                     toastManager.show(.success("Cateorgy Updated"))
                                 case .deleted:
-                                    break
+                                    toastManager.show(.success("Category Deleted"))
                                 }
                             })
                         } label: {
                             CategoryRow(category: category)
                         }
                         .buttonStyle(.plain)
+                    }
+                    .onDelete { offsets in
+                        categoryStore.deleteCategory(at: offsets)
+                        toastManager.show(.success("Category Deleted"))
                     }
                 }
             }
