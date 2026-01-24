@@ -9,7 +9,6 @@ import SwiftUI
 
 #if DEBUG
 extension View {
-    
     /// Injects all EnvironmentObjects needed for MoneyDiary previews
     func withPreviewEnvironment() -> some View {
         
@@ -22,6 +21,9 @@ extension View {
             budgetStore: budgetStore,
             transactionStore: transactionStore
         )
+        let timeSeriesViewModel = TimeSeriesViewModel(
+            transactionStore: transactionStore
+        )
         
         return self
             .environmentObject(categoryStore)
@@ -30,8 +32,7 @@ extension View {
             .environmentObject(budgetStore)
             .environmentObject(budgetManager)
             .environmentObject(toastManager)
+            .environmentObject(timeSeriesViewModel)
     }
 }
 #endif
-
-

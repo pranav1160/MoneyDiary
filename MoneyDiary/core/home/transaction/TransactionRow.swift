@@ -33,8 +33,8 @@ struct TransactionRow: View {
                         indicatorIcon
                     }
             )
-
     }
+    
     private var transactionDetails:some View{
         // Transaction details
         VStack(alignment: .leading, spacing: 2) {

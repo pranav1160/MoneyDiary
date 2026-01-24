@@ -21,11 +21,7 @@ struct ReportView: View {
     }
 }
 
-//
-//
-//#Preview {
-//    ReportView()
-//        .withPreviewEnvironment()
-//}
-//
-
+#Preview {
+    ReportView()
+        .withPreviewEnvironment()
+}

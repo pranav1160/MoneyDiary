@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct RecurrencePickerView: View {
     
     @Binding var selectedPattern: RecurrencePattern?

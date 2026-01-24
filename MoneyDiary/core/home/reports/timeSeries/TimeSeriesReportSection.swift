@@ -4,7 +4,7 @@ import Charts
 struct TimeSeriesReportSection: View {
     
     @EnvironmentObject private var tvm: TimeSeriesViewModel
-    @State private var selectedPeriod: TimePeriod = .monthly
+    @State private var selectedPeriod: TimePeriod = .daily
     
     enum TimePeriod: String, CaseIterable {
         case daily = "Daily"
@@ -96,6 +96,8 @@ struct TimeSeriesReportSection: View {
                 if let date = value.as(Date.self) {
                     AxisValueLabel {
                         Text(date, format: .dateTime.month(.abbreviated).day())
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                     AxisGridLine()
                     AxisTick()
@@ -131,6 +133,8 @@ struct TimeSeriesReportSection: View {
                 if let date = value.as(Date.self) {
                     AxisValueLabel {
                         Text(date, format: .dateTime.month(.abbreviated).day())
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                     AxisGridLine()
                 }
@@ -173,13 +177,14 @@ struct TimeSeriesReportSection: View {
                 if let date = value.as(Date.self) {
                     AxisValueLabel {
                         Text(date, format: .dateTime.month(.abbreviated))
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
                     AxisGridLine()
                     AxisTick()
                 }
             }
         }
-
         .chartYAxis {
             AxisMarks(position: .leading) { value in
                 if let amount = value.as(Double.self) {
