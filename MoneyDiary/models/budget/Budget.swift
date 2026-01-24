@@ -78,7 +78,7 @@ extension Budget {
     static let mockBudgets: [Budget] = [
         Budget(
             id: UUID(uuidString: "10000000-0000-0000-0000-000000000001")!,
-            name: "Monthly Groceries",
+            name: "Wifi",
             amount: 5000,
             period: .monthly,
             categoryId: Category.internet.id
@@ -106,7 +106,7 @@ extension Budget {
         ),
         Budget(
             id: UUID(uuidString: "10000000-0000-0000-0000-000000000005")!,
-            name: "Overall",
+            name: "Eggs",
             amount: 5000,
             period: .monthly,
             categoryId: Category.eggs.id

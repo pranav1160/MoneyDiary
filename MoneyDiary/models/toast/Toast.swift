@@ -22,15 +22,15 @@ struct Toast: Identifiable, Equatable {
 }
 
 extension Toast {
-    static func success(_ message: String, duration: Double = 2.0) -> Toast {
+    static func success(_ message: String, duration: Double = 1.5) -> Toast {
         Toast(style: .success, message: message, duration: duration)
     }
     
-    static func error(_ message: String, duration: Double = 2.5) -> Toast {
+    static func error(_ message: String, duration: Double = 1.5) -> Toast {
         Toast(style: .error, message: message, duration: duration)
     }
     
-    static func info(_ message: String, duration: Double = 2.0) -> Toast {
+    static func info(_ message: String, duration: Double = 1.5) -> Toast {
         Toast(style: .info, message: message, duration: duration)
     }
 }

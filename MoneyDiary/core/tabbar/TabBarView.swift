@@ -26,15 +26,13 @@ struct TabBarView: View {
                 }
             
             NavigationStack{
-                SearchView()
+                ReportView()
             }
                 .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
+                    Label("Reports", systemImage: "chart.line.uptrend.xyaxis")
                 }
         }
         .showToast($toastManager.toast)
-       
-        
     }
 }
 

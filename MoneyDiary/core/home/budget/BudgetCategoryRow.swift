@@ -24,11 +24,11 @@ struct BudgetCategoryRow: View {
                         Text(title)
                         
                     }
-                    .font(.title2)
+                    .font(.title3)
                     .fontWeight(.medium)
                     
                     Text("\(status.daysRemaining) days left")
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundStyle(.appSecondary)
                     
                     
@@ -41,9 +41,9 @@ struct BudgetCategoryRow: View {
                 strokeColor: statusBarColor.color,
                 inputVal: status.spent,
                 totalVal: budget.amount,
-                size: CGSize(width: 100, height: 70),
-                strokeWidth: 10,
-                cornerRadius: 20,
+                size: CGSize(width: 80, height: 50),
+                strokeWidth: 8,
+                cornerRadius: 15,
                 symbol: currencySymbol
             )
            
@@ -83,7 +83,7 @@ struct BudgetStatusCapsules: View {
             ForEach(0..<totalCapsules, id: \.self) { index in
                 Capsule()
                     .fill(capsuleColor(at: index))
-                    .frame(width: 16, height: 6)
+                    .frame(width: 16, height: 3)
             }
         }
     }
@@ -123,7 +123,7 @@ struct BudgetStatusCapsules: View {
 
 
 #Preview {
-    VStack{
+    List{
         BudgetCategoryRow(
             currencySymbol: "₹",
             budget: BudgetStatus.mockHealthy.budget,

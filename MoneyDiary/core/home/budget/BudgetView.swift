@@ -17,33 +17,10 @@ struct BudgetView: View {
 
     var body: some View {
         VStack{
-            CustomNavigationHeader(
-                title: "Budgets",
-                showsBackButton: false) {
-                    NavigationLink {
-                        BudgetFormView(
-                            mode: .category,
-                            purpose: .create,
-                            onFinish: {result in
-                                switch result {
-                                case .created:
-                                    toastManager.show(.success("Budget Added"))
-                                case .updated:
-                                    break
-                                case .deleted:
-                                    break
-                                }
-                            }
-                        )
-                    } label: {
-                        Image(systemName: "plus.capsule.fill")
-                            .font(.title)
-                    }
-                }
-            VStack {
-                overallBudgetSection
-                categoriesSection
-            }
+            header
+            overallBudgetSection
+            categoriesSection
+            
         }
         .sheet(item: $editingBudget) { budget in
             BudgetFormView(
@@ -65,6 +42,31 @@ struct BudgetView: View {
         .toolbar(.hidden, for: .navigationBar)
     }
 
+    private var header: some View{
+        CustomNavigationHeader(
+            title: "Budgets",
+            showsBackButton: false) {
+                NavigationLink {
+                    BudgetFormView(
+                        mode: .category,
+                        purpose: .create,
+                        onFinish: {result in
+                            switch result {
+                            case .created:
+                                toastManager.show(.success("Budget Added"))
+                            case .updated:
+                                break
+                            case .deleted:
+                                break
+                            }
+                        }
+                    )
+                } label: {
+                    Image(systemName: "plus.capsule.fill")
+                        .font(.title)
+                }
+            }
+    }
     
     private var glass:some View{
         RoundedRectangle(cornerRadius: 18, style: .continuous)
@@ -82,6 +84,7 @@ struct BudgetView: View {
             )
     }
     
+ 
     private var overallBudgetSection:some View{
         VStack{
             if let overallStatus = budgetManager.budgetStatuses
@@ -172,7 +175,7 @@ struct BudgetView: View {
                     title: status.budget.displayName(using: categoryStore.categories)
                 )
                 .contentShape(Rectangle())
-                .padding()
+                .padding(10)
                 .background {
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
                         .fill(.ultraThinMaterial)

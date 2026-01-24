@@ -14,33 +14,15 @@ struct HomeView: View {
     @State private var showSettings = false
     @EnvironmentObject private var toastManager: ToastManager
     
+   
     var body: some View {
         NavigationStack(path: $path) {
             VStack{
-                CustomNavigationHeader(title: "Home",showsBackButton: false) {
-                    ToolBarCircleButton(systemImage: "gearshape") {
-                        showSettings = true
-                    }
-                }
-                .overlay(alignment: .leading) {
-                    LogoView(size: 50)
-                        .padding(.leading,8)
-                }
+                header
                 recentTrancactionSection
             }
             .overlay(alignment: .bottomTrailing) {
-                Button {
-                    path.append(TransactionRoute.amount)
-                    HapticManager.instance.tap()
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.title2)
-                        .foregroundStyle(.white)
-                        .padding()
-                        .background(Circle().fill(Color.accentColor))
-                        .shadow(radius: 5)
-                }
-                .padding()
+                transactionAddButton
             }
             .navigationBarBackButtonHidden(true)
             .toolbar(.hidden, for: .navigationBar)
@@ -122,6 +104,34 @@ struct HomeView: View {
             }
         }
     }
+    
+    private var header: some View{
+        CustomNavigationHeader(title: "Home",showsBackButton: false) {
+            ToolBarCircleButton(systemImage: "gearshape") {
+                showSettings = true
+            }
+        }
+        .overlay(alignment: .leading) {
+            LogoView(size: 50)
+                .padding(.leading,8)
+        }
+    }
+    
+    private var transactionAddButton: some View{
+        Button {
+            path.append(TransactionRoute.amount)
+            HapticManager.instance.tap()
+        } label: {
+            Image(systemName: "plus")
+                .font(.title2)
+                .foregroundStyle(.white)
+                .padding()
+                .background(Circle().fill(Color.accentColor))
+                .shadow(radius: 5)
+        }
+        .padding()
+    }
+    
     
     private var recentTrancactionSection: some View {
         List {
