@@ -17,6 +17,10 @@ struct ReportView: View {
                 .environmentObject(tvm)
                 .navigationTitle("Reports")
                 .navigationBarTitleDisplayMode(.inline)
+            
+            Divider()
+            
+            CategoryReportSection()
         }
     }
 }

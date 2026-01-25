@@ -5,6 +5,7 @@ struct TimeSeriesReportSection: View {
     
     @EnvironmentObject private var tvm: TimeSeriesViewModel
     @State private var selectedPeriod: TimePeriod = .daily
+    @State private var animateChart: CGFloat = 0
     
     enum TimePeriod: String, CaseIterable {
         case daily = "Daily"
@@ -38,6 +39,17 @@ struct TimeSeriesReportSection: View {
             }
         }
         .padding()
+        .onChange(of: selectedPeriod) { _, _ in
+            animateChart = 0
+            withAnimation(.easeOut(duration: 1.2)) {
+                animateChart = 1
+            }
+        }
+        .onAppear {
+            withAnimation(.easeOut(duration: 1.2)) {
+                animateChart = 1
+            }
+        }
     }
     
     // MARK: - Computed Properties
@@ -52,7 +64,7 @@ struct TimeSeriesReportSection: View {
     
     private var chartTitle: String {
         switch selectedPeriod {
-        case .daily: return "Daily Spending (Last 30 Days)"
+        case .daily: return "Daily Spending (Last 7 Days)"
         case .weekly: return "Weekly Spending (Last 4 Weeks)"
         case .monthly: return "Monthly Spending (Last 6 Months)"
         }
@@ -74,30 +86,30 @@ struct TimeSeriesReportSection: View {
     
     // MARK: - Daily Chart
     
+    
     private var dailyChart: some View {
-        Chart(tvm.daily) { point in
+        Chart(currentData) { point in
             LineMark(
                 x: .value("Date", point.date),
-                y: .value("Amount", point.amount)
+                y: .value("Amount", point.amount * animateChart)
             )
             .interpolationMethod(.catmullRom)
-            .foregroundStyle(.blue)
+            .foregroundStyle(.categoryPink2)
             .lineStyle(StrokeStyle(lineWidth: 2))
             
             AreaMark(
                 x: .value("Date", point.date),
-                y: .value("Amount", point.amount)
+                y: .value("Amount", point.amount * animateChart)
             )
             .interpolationMethod(.catmullRom)
             .foregroundStyle(.blue.opacity(0.1))
         }
         .chartXAxis {
-            AxisMarks(values: .stride(by: .day, count: 5)) { value in
+            AxisMarks(values: .stride(by: .day, count: 1)) { value in
                 if let date = value.as(Date.self) {
                     AxisValueLabel {
-                        Text(date, format: .dateTime.month(.abbreviated).day())
-                            .lineLimit(1)
-                            .fixedSize(horizontal: true, vertical: false)
+                        Text(date, format: .dateTime.day().month(.abbreviated))
+                            .font(.caption2)
                     }
                     AxisGridLine()
                     AxisTick()
@@ -109,23 +121,25 @@ struct TimeSeriesReportSection: View {
                 if let amount = value.as(Double.self) {
                     AxisValueLabel {
                         Text(formatCurrency(amount))
+                            .font(.caption2)
                     }
                     AxisGridLine()
                 }
             }
         }
-        .chartYScale(domain: 0...(maxValue(from: tvm.daily) * 1.1))
+        .chartYScale(domain: 0...(maxValue(from: currentData) * 1.2))
         .frame(height: 280)
     }
     
     // MARK: - Weekly Chart
+    
     private var weeklyChart: some View {
         Chart(tvm.weekly) { point in
             BarMark(
                 x: .value("Week", point.date, unit: .weekOfYear),
-                y: .value("Amount", point.amount)
+                y: .value("Amount", point.amount * animateChart)
             )
-            .foregroundStyle(.green.gradient)
+            .foregroundStyle(.categoryPink2.gradient)
             .cornerRadius(6)
         }
         .chartXAxis {
@@ -156,19 +170,21 @@ struct TimeSeriesReportSection: View {
     
     // MARK: - Monthly Chart
     
+    
     private var monthlyChart: some View {
         Chart(tvm.monthly) { point in
             BarMark(
                 x: .value("Month", point.date),
-                y: .value("Amount", point.amount)
+                y: .value("Amount", point.amount * animateChart)
             )
-            .foregroundStyle(.orange.gradient)
+            .foregroundStyle(.categoryPink2.gradient)
             .cornerRadius(6)
             .annotation(position: .top) {
                 if point.amount > 0 {
                     Text(formatCurrency(point.amount))
                         .font(.caption2)
                         .foregroundStyle(.secondary)
+                        .opacity(animateChart)
                 }
             }
         }
@@ -198,7 +214,6 @@ struct TimeSeriesReportSection: View {
         .chartYScale(domain: 0...(maxValue(from: tvm.monthly) * 1.1))
         .frame(height: 280)
     }
-    
     // MARK: - Empty State
     
     private var emptyStateView: some View {

@@ -28,6 +28,10 @@ struct MoneyDiaryApp: App {
             let timeSeriesViewModel = TimeSeriesViewModel(
                 transactionStore: transactionStore
             )
+            
+            let categoryViewModel = CategoryReportViewModel(
+                transactionStore: transactionStore,
+            )
 
             
             AppView()
@@ -38,6 +42,7 @@ struct MoneyDiaryApp: App {
                 .environmentObject(budgetManager)
                 .environmentObject(toastManager)
                 .environmentObject(timeSeriesViewModel)
+                .environmentObject(categoryViewModel)
                 .onChange(of: scenePhase) {
                     if scenePhase == .active {
                         transactionStore.processRecurringTransactions()

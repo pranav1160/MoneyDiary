@@ -20,9 +20,7 @@ struct WelcomeView: View {
                 Text("MoneyDiary")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                
-                
-                
+
                 Text("Welcome")
                     .font(.title2)
                     .foregroundStyle(.accent)
@@ -38,9 +36,7 @@ struct WelcomeView: View {
                 OnboardingNavigationButton(title: "Get Started") {
                     OnboardingPrivacyView()
                 }
-
             }
-            
         }
     }
 }

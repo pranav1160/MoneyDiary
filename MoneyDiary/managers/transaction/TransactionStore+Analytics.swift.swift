@@ -19,23 +19,35 @@ extension TransactionStore {
         
         let calendar = Calendar.current
         
-        let filtered = realTransactions.filter {
-            $0.date >= startDate && $0.date <= endDate
-        }
+        let start = calendar.startOfDay(for: startDate)
+        let end = endDate   // 🔥 DO NOT truncate
         
-        let grouped = Dictionary(grouping: filtered) {
+        let grouped = Dictionary(grouping: realTransactions.filter {
+            $0.date >= start && $0.date <= end
+        }) {
             calendar.startOfDay(for: $0.date)
         }
         
-        return grouped
-            .map { date, txs in
-                TimeSeriesPoint(
-                    date: date,
-                    amount: txs.reduce(0) { $0 + abs($1.amount) }
-                )
-            }
-            .sorted { $0.date < $1.date }
+        var result: [TimeSeriesPoint] = []
+        var current = start
+        let lastDay = calendar.startOfDay(for: end)
+        
+        while current <= lastDay {
+            let amount = grouped[current]?.reduce(0) {
+                $0 + abs($1.amount)
+            } ?? 0
+            
+            result.append(
+                TimeSeriesPoint(date: current, amount: amount)
+            )
+            
+            current = calendar.date(byAdding: .day, value: 1, to: current)!
+        }
+        
+        return result
     }
+
+
     
     /// Monthly totals for the past N months
     func monthlyTotals(months: Int = 6) -> [TimeSeriesPoint] {
@@ -65,7 +77,7 @@ extension TransactionStore {
             return TimeSeriesPoint(date: monthDate, amount: amount)
         }
     }
-
+    
     
     /// Weekly totals for the past N weeks
     func weeklyTotals(weeks: Int = 4) -> [TimeSeriesPoint] {
@@ -101,221 +113,76 @@ extension TransactionStore {
             return TimeSeriesPoint(date: weekDate, amount: amount)
         }
     }
-
     
-    // MARK: - Category Breakdowns
     
-    /// Total spending per category (for pie charts)
-    func totalsByCategory() -> [(categoryId: UUID, amount: Double)] {
-        let grouped = Dictionary(grouping: realTransactions) { $0.categoryId }
-        
-        let mapped = grouped.map { categoryId, txs -> (UUID, Double) in
-            let sum = txs.reduce(0) { $0 + abs($1.amount) }
-            return (categoryId, sum)
-        }
-        
-        let sorted = mapped.sorted { $0.1 > $1.1 }
-        return sorted
-    }
+    //MARK: - categories
     
-    /// Category breakdown for a specific time period
-    func totalsByCategory(
+    private func topCategories(
         from startDate: Date,
         to endDate: Date = .now
-    ) -> [(categoryId: UUID, amount: Double)] {
+    ) -> [CategoryAggregate] {
+        
         let filtered = realTransactions.filter {
             $0.date >= startDate && $0.date <= endDate
         }
         
-        let grouped = Dictionary(grouping: filtered) { $0.categoryId }
+        let grouped = Dictionary(grouping: filtered, by: \.categoryId)
         
-        let mapped = grouped.map { categoryId, txs -> (UUID, Double) in
-            let sum = txs.reduce(0) { $0 + abs($1.amount) }
-            return (categoryId, sum)
-        }
-        
-        let sorted = mapped.sorted { $0.1 > $1.1 }
-        return sorted
+        return grouped
+            .map { categoryId, txs in
+                CategoryAggregate(
+                    id: categoryId,
+                    total: txs.reduce(0) { $0 + abs($1.amount) }
+                )
+            }
+            .sorted { $0.total > $1.total }
     }
     
-    /// Top N categories by spending
-    func topCategories(
-        limit: Int = 5,
-        from startDate: Date? = nil,
-        to endDate: Date = .now
-    ) -> [(categoryId: UUID, amount: Double)] {
-        let breakdown: [(UUID, Double)]
-        
-        if let start = startDate {
-            breakdown = totalsByCategory(from: start, to: endDate)
-        } else {
-            breakdown = totalsByCategory()
-        }
-        
-        return Array(breakdown.prefix(limit))
-    }
-    
-    // MARK: - Trends & Comparisons
-    
-    /// Average daily spending for a period
-    func averageDailySpending(
-        from startDate: Date,
-        to endDate: Date = .now
-    ) -> Double {
+    func topCategoriesLast7Days() -> [CategoryAggregate] {
         let calendar = Calendar.current
-        let components = calendar.dateComponents([.day], from: startDate, to: endDate)
-        let dayCount = components.day ?? 1
-        
-        guard dayCount > 0 else { return 0 }
-        
-        let totalAmount = total(from: startDate, to: endDate)
-        let divisor = Double(max(dayCount, 1))
-        return totalAmount / divisor
+        let start = calendar.date(byAdding: .day, value: -6, to: .now)!
+        return topCategories(from: start)
     }
     
-    /// Compare this month vs last month
-    func monthOverMonthChange() -> (current: Double, previous: Double, percentChange: Double) {
+    func topCategoriesLast4Weeks() -> [[CategoryAggregate]] {
         let calendar = Calendar.current
         let now = Date()
         
-        let components = calendar.dateComponents([.year, .month], from: now)
-        let thisMonthStart = calendar.date(from: components)!
-        let lastMonthStart = calendar.date(byAdding: .month, value: -1, to: thisMonthStart)!
-        
-        let currentTotal = total(from: thisMonthStart, to: now)
-        let previousTotal = total(from: lastMonthStart, to: thisMonthStart)
-        
-        let percentChange: Double
-        if previousTotal > 0 {
-            let difference = currentTotal - previousTotal
-            percentChange = (difference / previousTotal) * 100
-        } else {
-            percentChange = 0
+        return (0..<4).reversed().compactMap { offset in
+            guard
+                let weekStart = calendar.date(
+                    byAdding: .weekOfYear,
+                    value: -offset,
+                    to: now
+                ),
+                let start = calendar.date(
+                    from: calendar.dateComponents(
+                        [.yearForWeekOfYear, .weekOfYear],
+                        from: weekStart
+                    )
+                ),
+                let end = calendar.date(byAdding: .day, value: 7, to: start)
+            else { return nil }
+            
+            return topCategories(from: start, to: end)
         }
-        
-        return (currentTotal, previousTotal, percentChange)
     }
     
-    /// Compare this week vs last week
-    func weekOverWeekChange() -> (current: Double, previous: Double, percentChange: Double) {
+    func topCategoriesLast6Months() -> [[CategoryAggregate]] {
         let calendar = Calendar.current
         let now = Date()
         
-        let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now)
-        let thisWeekStart = calendar.date(from: components)!
-        let lastWeekStart = calendar.date(byAdding: .weekOfYear, value: -1, to: thisWeekStart)!
-        
-        let currentTotal = total(from: thisWeekStart, to: now)
-        let previousTotal = total(from: lastWeekStart, to: thisWeekStart)
-        
-        let percentChange: Double
-        if previousTotal > 0 {
-            let difference = currentTotal - previousTotal
-            percentChange = (difference / previousTotal) * 100
-        } else {
-            percentChange = 0
+        return (0..<6).reversed().compactMap { offset in
+            guard
+                let monthDate = calendar.date(byAdding: .month, value: -offset, to: now),
+                let start = calendar.date(
+                    from: calendar.dateComponents([.year, .month], from: monthDate)
+                ),
+                let end = calendar.date(byAdding: .month, value: 1, to: start)
+            else { return nil }
+            
+            return topCategories(from: start, to: end)
         }
-        
-        return (currentTotal, previousTotal, percentChange)
     }
     
-    // MARK: - Statistics
-    
-    /// Transaction count for a period
-    func transactionCount(
-        from startDate: Date? = nil,
-        to endDate: Date = .now
-    ) -> Int {
-        if let start = startDate {
-            let filtered = realTransactions.filter {
-                $0.date >= start && $0.date <= endDate
-            }
-            return filtered.count
-        }
-        return realTransactions.count
-    }
-    
-    /// Average transaction amount
-    func averageTransactionAmount(
-        from startDate: Date? = nil,
-        to endDate: Date = .now
-    ) -> Double {
-        let filtered: [Transaction]
-        
-        if let start = startDate {
-            filtered = realTransactions.filter {
-                $0.date >= start && $0.date <= endDate
-            }
-        } else {
-            filtered = realTransactions
-        }
-        
-        guard !filtered.isEmpty else { return 0 }
-        
-        let total = filtered.reduce(0) { $0 + abs($1.amount) }
-        let count = Double(filtered.count)
-        return total / count
-    }
-    
-    /// Largest transaction in a period
-    func largestTransaction(
-        from startDate: Date? = nil,
-        to endDate: Date = .now
-    ) -> Transaction? {
-        let filtered: [Transaction]
-        
-        if let start = startDate {
-            filtered = realTransactions.filter {
-                $0.date >= start && $0.date <= endDate
-            }
-        } else {
-            filtered = realTransactions
-        }
-        
-        return filtered.max { abs($0.amount) < abs($1.amount) }
-    }
-    
-    // MARK: - Spending Patterns
-    
-    /// Day of week spending pattern (0 = Sunday, 6 = Saturday)
-    func spendingByDayOfWeek() -> [(dayOfWeek: Int, amount: Double)] {
-        let calendar = Calendar.current
-        
-        let grouped = Dictionary(grouping: realTransactions) { tx -> Int in
-            let weekday = calendar.component(.weekday, from: tx.date)
-            return weekday - 1
-        }
-        
-        let result = (0...6).map { day -> (Int, Double) in
-            let txs = grouped[day] ?? []
-            let amount = txs.reduce(0) { $0 + abs($1.amount) }
-            return (day, amount)
-        }
-        
-        return result
-    }
-    
-    /// Category spending trend over months
-    func categoryTrendMonthly(
-        categoryId: UUID,
-        months: Int = 6
-    ) -> [(month: Date, amount: Double)] {
-        let calendar = Calendar.current
-        
-        let categoryTxs = realTransactions.filter { $0.categoryId == categoryId }
-        
-        let grouped = Dictionary(grouping: categoryTxs) { tx -> Date in
-            let components = calendar.dateComponents([.year, .month], from: tx.date)
-            return calendar.date(from: components)!
-        }
-        
-        let mapped = grouped.map { month, txs -> (Date, Double) in
-            let sum = txs.reduce(0) { $0 + abs($1.amount) }
-            return (month, sum)
-        }
-        
-        let sorted = mapped.sorted { $0.0 < $1.0 }
-        let recent = Array(sorted.suffix(months))
-        return recent
-    }
 }

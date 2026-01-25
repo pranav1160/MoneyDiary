@@ -24,6 +24,9 @@ extension View {
         let timeSeriesViewModel = TimeSeriesViewModel(
             transactionStore: transactionStore
         )
+        let categoryreportViewModel = CategoryReportViewModel(
+            transactionStore: transactionStore
+        )
         
         return self
             .environmentObject(categoryStore)
@@ -33,6 +36,7 @@ extension View {
             .environmentObject(budgetManager)
             .environmentObject(toastManager)
             .environmentObject(timeSeriesViewModel)
+            .environmentObject(categoryreportViewModel)
     }
 }
 #endif

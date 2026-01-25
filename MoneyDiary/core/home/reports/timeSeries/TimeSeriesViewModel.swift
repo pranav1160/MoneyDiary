@@ -41,9 +41,9 @@ final class TimeSeriesViewModel: ObservableObject {
 
         
         daily = transactionStore.dailyTotals(
-            from: calendar.date(byAdding: .day, value: -30, to: .now)!
+            from: calendar.date(byAdding: .day, value: -6, to: .now)!
         )
-        
+
         weekly = transactionStore.weeklyTotals(weeks: 4)
         monthly = transactionStore.monthlyTotals(months: 6)
     }
