@@ -9,8 +9,6 @@ import SwiftUI
 
 struct OnboardingListCategoryView: View {
     
-    
-    
     var body: some View {
         ZStack {
             

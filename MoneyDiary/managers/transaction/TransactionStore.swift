@@ -30,7 +30,7 @@ final class TransactionStore: ObservableObject {
         
         addWithoutProcessing(transaction)
         processRecurringTransactions()
-//        transactions = transactions
+        
     }
 
     

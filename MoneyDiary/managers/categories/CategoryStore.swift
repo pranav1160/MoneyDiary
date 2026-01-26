@@ -44,6 +44,12 @@ final class CategoryStore: ObservableObject {
         return categories.first { $0.id == categoryId }?.categoryColor ?? .green
     }
     
+    func title(for categoryId: UUID?) -> String {
+        guard let categoryId else { return "Uncategorized" }
+        return categories.first { $0.id == categoryId }?.title ?? "Uncategorized"
+    }
+
+    
     func deleteCategory(id: UUID) {
         categories.removeAll { $0.id == id }
     }

@@ -98,6 +98,82 @@ extension TransactionStore {
             }
             .sorted { $0.date > $1.date } // latest day first
     }
+    
+    /// Transactions grouped by start-of-week, sorted DESC
+    func transactionsGroupedByWeek()
+    -> [(weekStart: Date, transactions: [Transaction])] {
+        
+        let calendar = Calendar.current
+        
+        let grouped = Dictionary(
+            grouping: realTransactions
+        ) { tx in
+            calendar.date(
+                from: calendar.dateComponents(
+                    [.yearForWeekOfYear, .weekOfYear],
+                    from: tx.date
+                )
+            )!
+        }
+        
+        return grouped
+            .map { weekStart, txs in
+                (
+                    weekStart,
+                    txs.sorted { $0.date > $1.date }
+                )
+            }
+            .sorted { $0.weekStart > $1.weekStart }
+    }
+
+    /// Transactions grouped by start-of-month, sorted DESC
+    func transactionsGroupedByMonth()
+    -> [(monthStart: Date, transactions: [Transaction])] {
+        
+        let calendar = Calendar.current
+        
+        let grouped = Dictionary(
+            grouping: realTransactions
+        ) { tx in
+            calendar.date(
+                from: calendar.dateComponents([.year, .month], from: tx.date)
+            )!
+        }
+        
+        return grouped
+            .map { monthStart, txs in
+                (
+                    monthStart,
+                    txs.sorted { $0.date > $1.date }
+                )
+            }
+            .sorted { $0.monthStart > $1.monthStart }
+    }
+
+    /// Transactions grouped by category
+    func transactionsGroupedByCategory()
+    -> [(categoryId: UUID?, transactions: [Transaction])] {
+        
+        let grouped = Dictionary(
+            grouping: realTransactions
+        ) { tx in
+            tx.categoryId
+        }
+        
+        return grouped
+            .map { categoryId, txs in
+                (
+                    categoryId,
+                    txs.sorted { $0.date > $1.date }
+                )
+            }
+            .sorted {
+                ($0.transactions.reduce(0) { $0 + abs($1.amount) }) >
+                ($1.transactions.reduce(0) { $0 + abs($1.amount) })
+            }
+    }
+    
+   
 
 }
 
