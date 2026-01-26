@@ -230,7 +230,9 @@ private extension BudgetFormView {
         }
         
         saveBudget()
-        dismiss()
+        DispatchQueue.main.async {
+            dismiss()
+        }
     }
 
     private func showCategoryRequiredAlert() {

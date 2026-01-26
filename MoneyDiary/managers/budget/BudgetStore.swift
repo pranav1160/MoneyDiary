@@ -11,6 +11,7 @@ import Foundation
 @MainActor
 final class BudgetStore: ObservableObject {
     @Published private(set) var budgets: [Budget] = []
+    
     var overallBudget: Budget? {
         budgets.first { $0.categoryId == nil }
     }
@@ -29,14 +30,17 @@ final class BudgetStore: ObservableObject {
     }
     
     func updateBudget(_ updated: Budget) {
-        guard let index = budgets.firstIndex(where: { $0.id == updated.id }) else { return }
-        
         // If editing overall budget, ensure uniqueness
         if updated.categoryId == nil {
             budgets.removeAll { $0.categoryId == nil && $0.id != updated.id }
         }
         
-        budgets[index] = updated
+        // Single update operation
+        if let index = budgets.firstIndex(where: { $0.id == updated.id }) {
+            budgets[index] = updated
+        } else {
+            budgets.append(updated)
+        }
     }
     
     func deleteBudget(id: UUID) {

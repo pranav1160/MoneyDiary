@@ -24,6 +24,7 @@ final class BudgetManager: ObservableObject {
         budgetStore: BudgetStore,
         transactionStore: TransactionStore
     ) {
+        
         self.budgetStore = budgetStore
         self.transactionStore = transactionStore
         bind()
@@ -35,8 +36,9 @@ final class BudgetManager: ObservableObject {
                 budgetStore.$budgets,
                 transactionStore.$transactions
             )
+           
             .map { budgets, transactions in
-                budgets.map { budget in
+                return budgets.map { budget in
                     self.calculator.status(
                         for: budget,
                         allTransactions: transactions
