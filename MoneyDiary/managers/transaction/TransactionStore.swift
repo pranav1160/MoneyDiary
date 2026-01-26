@@ -148,30 +148,35 @@ extension TransactionStore{
     
     
     /// Deletes a recurring template and optionally all generated instances
-    func deleteRecurringTemplate(id: UUID, deleteAllInstances: Bool = false) {
-        guard let template = transactions.first(where: { $0.id == id }),
-              template.source == .recurringTemplate else {
-            debug("DELETE TEMPLATE FAILED → id=\(id) not found or not a template")
+    func deleteRecurring(id: UUID, deleteAllInstances: Bool = false) {
+        guard let index = transactions.firstIndex(where: { $0.id == id }) else {
+            debug("DELETE FAILED → id=\(id) not found")
             return
         }
         
-        // Delete the template
-        transactions.removeAll { $0.id == id }
-        debug("DELETE TEMPLATE → id=\(id)")
+        let transaction = transactions[index]
         
-        // Optionally delete all generated instances
+        guard transaction.source == .recurringTemplate ||
+                transaction.source == .recurringPaused else {
+            debug("DELETE FAILED → id=\(id) not recurring")
+            return
+        }
+        
+        transactions.remove(at: index)
+        debug("DELETE RECURRING → id=\(id), source=\(transaction.source)")
+        
         if deleteAllInstances {
             let beforeCount = transactions.count
             transactions.removeAll {
                 $0.source == .recurringGenerated &&
-                $0.title == template.title &&
-                $0.amount == template.amount &&
-                $0.categoryId == template.categoryId
+                $0.title == transaction.title &&
+                $0.amount == transaction.amount &&
+                $0.categoryId == transaction.categoryId
             }
-            let deletedCount = beforeCount - transactions.count
-            debug("DELETE INSTANCES → count=\(deletedCount)")
+            debug("DELETE INSTANCES → count=\(beforeCount - transactions.count)")
         }
     }
+
     
     /// Resume a stopped recurring transaction
     func resumeRecurrence(id: UUID) {

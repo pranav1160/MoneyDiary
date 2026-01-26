@@ -10,28 +10,10 @@ import SwiftUI
 struct CategoryListView: View {
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var toastManager: ToastManager
+    
     var body: some View {
         VStack{
-            CustomNavigationHeader(
-                title: "Categories",
-                showsBackButton: true) {
-                    NavigationLink {
-                        CategoryFormView(mode: .create, onFinish: {result in
-                            switch result {
-                            case .created:
-                                toastManager.show(.success("Catgeory Added"))
-                            case .updated:
-                                break
-                            case .deleted:
-                                break
-                            }
-                            
-                        })
-                    } label: {
-                        Image(systemName: "plus.capsule.fill")
-                            .font(.title)
-                    }
-                }
+            header
             
             Spacer()
             
@@ -39,6 +21,29 @@ struct CategoryListView: View {
             
         }
         .hideSystemNavigation()
+    }
+    
+    private var header: some View{
+        CustomNavigationHeader(
+            title: "Categories",
+            showsBackButton: true) {
+                NavigationLink {
+                    CategoryFormView(mode: .create, onFinish: {result in
+                        switch result {
+                        case .created:
+                            toastManager.show(.success("Catgeory Added"))
+                        case .updated:
+                            break
+                        case .deleted:
+                            break
+                        }
+                        
+                    })
+                } label: {
+                    Image(systemName: "plus.capsule.fill")
+                        .font(.title)
+                }
+            }
     }
     
     private var categoryListSection:some View{

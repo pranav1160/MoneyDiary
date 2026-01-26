@@ -9,7 +9,8 @@ import SwiftUI
 
 struct RecurringTransactionsView: View {
     @EnvironmentObject private var transactionStore: TransactionStore
-    @Environment(\.dismiss) private var dismiss
+    @State private var isEditing:Bool = false
+    
     
     var body: some View {
         VStack(spacing: 0) {
@@ -17,13 +18,14 @@ struct RecurringTransactionsView: View {
                 title: "Recurring Transactions",
                 showsBackButton: true
             ) {
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(Color.primary)
+                
+                ToolBarCircleButton(systemImage: isEditing ? "checkmark" : "pencil") {
+                    withAnimation {
+                        isEditing.toggle()
+                    }
+                   
                 }
+                
             }
             
             if transactionStore.recurringTransactions.isEmpty {
@@ -59,118 +61,31 @@ struct RecurringTransactionsView: View {
     
     // MARK: - List
     
+    
+    
+    
     private var recurringList: some View {
         List {
             ForEach(transactionStore.recurringTransactions) { transaction in
-                RecurringTransactionRow(transaction: transaction)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                        
-                        // DELETE (always available)
-                        Button(role: .destructive) {
-                            withAnimation {
-                                transactionStore.deleteRecurringTemplate(id: transaction.id)
-                            }
-                        } label: {
-                            Label("Delete", systemImage: "trash")
-                        }
-                        
-                        // STOP / RESUME
-                        if transaction.source == .recurringTemplate {
-                            Button {
-                                withAnimation {
-                                    transactionStore.stopRecurrence(id: transaction.id)
-                                }
-                            } label: {
-                                Label("Stop", systemImage: "stop.circle")
-                            }
-                            .tint(.orange)
-                        }
-                        
-                        if transaction.source == .recurringPaused {
-                            Button {
-                                withAnimation {
-                                    transactionStore.resumeRecurrence(id: transaction.id)
-                                }
-                            } label: {
-                                Label("Resume", systemImage: "play.circle")
-                            }
-                            .tint(.green)
-                        }
-                    }
+                RecurringTransactionRow(
+                    transaction: transaction,
+                    isEditing: $isEditing
+                )
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    RecurringTransactionSwipeActions(
+                        transaction: transaction,
+                        store: transactionStore
+                    )
+                }
             }
         }
         .listStyle(.plain)
     }
 }
 
-// MARK: - Row
 
-struct RecurringTransactionRow: View {
-    let transaction: Transaction
-    @EnvironmentObject private var categoryStore: CategoryStore
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            
-            // Category Icon
-            if let category = categoryStore.categories.first(
-                where: { $0.id == transaction.categoryId }
-            ) {
-                Text(category.emoji)
-                    .font(.title3)
-                    .frame(width: 36, height: 36)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14)
-                            .fill(category.categoryColor.color.opacity(0.25))
-                    )
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(transaction.displayTitle(using: categoryStore.categories))
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Color.primary)
 
-                
-                if let recurrence = transaction.recurrenceInfo {
-                    HStack(spacing: 4) {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.caption2)
-                        
-                        Text(recurrence.pattern.description)
-                            .font(.caption)
-                        
-                        Text("•")
-                            .font(.caption2)
-                        
-                        let nextDateText = recurrence.nextOccurrence.formatted(
-                            .dateTime.month(.abbreviated).day()
-                        )
-                        
-                        Text("Next: \(nextDateText)")
-                            .font(.caption)
 
-                        .font(.caption)
-                    }
-                    .foregroundStyle(.appSecondary)
-                }
-                
-                // PAUSED BADGE
-                if transaction.source == .recurringPaused {
-                    Text("Paused")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.orange)
-                }
-            }
-            
-            Spacer()
-            
-            Text(transaction.amount, format: .currency(code: "INR"))
-                .font(.body.weight(.semibold))
-                .foregroundStyle(transaction.amount >= 0 ? .green : .red)
-        }
-        .padding(.vertical, 4)
-    }
-}
 
 // MARK: - Preview
 

@@ -14,7 +14,6 @@ struct HomeView: View {
     @State private var showSettings = false
     @EnvironmentObject private var toastManager: ToastManager
     
-   
     var body: some View {
         NavigationStack(path: $path) {
             VStack{
@@ -27,80 +26,84 @@ struct HomeView: View {
             .navigationBarBackButtonHidden(true)
             .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: TransactionRoute.self) { route in
-                switch route {
-                    
-                case .amount:
-                    AmountDialPadView(
-                        onContinue: { amount in
-                            path.append(TransactionRoute.create(amount: amount))
-                        }
-                    )
-                    
-                case .create(let amount):
-                    TransactionFormView(
-                        purpose: .create,
-                        onFinish: { result in
-                            path.removeLast(path.count)
-                            
-                            switch result {
-                            case .created:
-                                HapticManager.instance.notification(type: .success)
-                                toastManager.show(.success("Transaction added"))
-                            case .updated:
-                                break
-                            case .deleted:
-                                break
-                            }
-                        },
-                        amount: amount
-                    )
-
-                    
-                case .editAmount(let transactionId):
-                    if let transaction = transactionStore.transactions.first(where: {
-                        $0.id == transactionId
-                    }) {
-                        AmountDialPadView(
-                            initialAmount: String(abs(transaction.amount)), // 👈 prefill
-                            onContinue: { newAmount in
-                                path.append(
-                                    TransactionRoute.edit(
-                                        transactionId: transactionId,
-                                        amount: newAmount
-                                    )
-                                )
-                            }
-                        )
-                    }
-                case .edit(let transactionId, let amount):
-                    if let transaction = transactionStore.transactions.first(where: {
-                        $0.id == transactionId
-                    }) {
-                        TransactionFormView(
-                            purpose: .edit(transaction),
-                            onFinish: { result in
-                                path.removeLast(path.count)
-                                
-                                switch result {
-                                case .updated:
-                                    HapticManager.instance.notification(type: .success)
-                                    toastManager.show(.success("Transaction updated"))
-                                case .deleted:
-                                    HapticManager.instance.notification(type: .success)
-                                    toastManager.show(.success("Transaction deleted"))
-                                case .created:
-                                    break
-                                }
-                            },
-                            amount: amount
-                        )
-
-                    }
-                }
+                transactionDestination(for : route)
             }
-            
             .navigationDestination(isPresented: $showSettings) {
                 SettingsView()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func transactionDestination(for route : TransactionRoute) -> some View{
+        switch route {
+            
+        case .amount:
+            AmountDialPadView(
+                onContinue: { amount in
+                    path.append(TransactionRoute.create(amount: amount))
+                }
+            )
+            
+        case .create(let amount):
+            TransactionFormView(
+                purpose: .create,
+                onFinish: { result in
+                    path.removeLast(path.count)
+                    
+                    switch result {
+                    case .created:
+                        HapticManager.instance.notification(type: .success)
+                        toastManager.show(.success("Transaction added"))
+                    case .updated:
+                        break
+                    case .deleted:
+                        break
+                    }
+                },
+                amount: amount
+            )
+            
+            
+        case .editAmount(let transactionId):
+            if let transaction = transactionStore.transactions.first(where: {
+                $0.id == transactionId
+            }) {
+                AmountDialPadView(
+                    initialAmount: String(abs(transaction.amount)), // 👈 prefill
+                    onContinue: { newAmount in
+                        path.append(
+                            TransactionRoute.edit(
+                                transactionId: transactionId,
+                                amount: newAmount
+                            )
+                        )
+                    }
+                )
+            }
+        case .edit(let transactionId, let amount):
+            if let transaction = transactionStore.transactions.first(where: {
+                $0.id == transactionId
+            }) {
+                TransactionFormView(
+                    purpose: .edit(transaction),
+                    onFinish: { result in
+                        path.removeLast(path.count)
+                        
+                        switch result {
+                        case .updated:
+                            HapticManager.instance.notification(type: .success)
+                            toastManager.show(.success("Transaction updated"))
+                        case .deleted:
+                            HapticManager.instance.notification(type: .success)
+                            toastManager.show(.success("Transaction deleted"))
+                        case .created:
+                            break
+                        }
+                    },
+                    amount: amount
+                )
+                
             }
         }
     }

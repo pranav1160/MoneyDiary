@@ -46,6 +46,45 @@ struct CategoryFormView: View {
         }
         
     }
+    
+    var body: some View {
+        VStack{
+            CustomNavigationHeader(
+                title: navigationTitle,
+                showsBackButton: true) {
+                    ToolBarCapsuleButton(title: "Save") {
+                        onSaveClicked()
+                    }
+                    
+                }
+            
+            ScrollView {
+                VStack(spacing: 28) {
+                    
+                    emojiPickerSection
+                    
+                    categoryAttributesSection
+                    
+                    deleteCategorySection
+                    
+                    colorPickerSection
+                    
+                }
+                .padding(.horizontal, 8)
+            }
+        }
+        .hideSystemNavigation()
+        .showCustomAlert(
+            type: .alert,
+            alert: $appAlert
+        )
+        .showCustomAlert(
+            type: .confirmationDialog,
+            alert: $appAlert
+        )
+        
+        
+    }
 
     private func showInvalidNameAlert() {
         appAlert = AnyAppAlert(
@@ -156,44 +195,7 @@ struct CategoryFormView: View {
     }
 
     
-    var body: some View {
-        VStack{
-            CustomNavigationHeader(
-                title: navigationTitle,
-                showsBackButton: true) {
-                    ToolBarCapsuleButton(title: "Save") {
-                        onSaveClicked()
-                    }
-                    
-                }
-            
-            ScrollView {
-                VStack(spacing: 28) {
-                    
-                    emojiPickerSection
-                    
-                    categoryAttributesSection
-                    
-                    deleteCategorySection
-                    
-                    colorPickerSection
-                    
-                }
-                .padding(.horizontal, 8)
-            }
-        }
-        .hideSystemNavigation()
-        .showCustomAlert(
-            type: .alert,
-            alert: $appAlert
-        )
-        .showCustomAlert(
-            type: .confirmationDialog,
-            alert: $appAlert
-        )
-
-
-    }
+    
     
     private func onCancelClicked(){
         dismiss()
@@ -265,5 +267,6 @@ struct CategoryFormView: View {
     NavigationStack{
         CategoryFormView(mode: .create, onFinish: {_ in})
     }
+    .withPreviewEnvironment()
 }
 
