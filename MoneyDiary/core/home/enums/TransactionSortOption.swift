@@ -7,10 +7,10 @@
 import Foundation
 
 enum TransactionSortOption: String, CaseIterable, Identifiable {
-    case day = "Day"
-    case week = "Week"
-    case month = "Month"
-    case category = "Category"
+    case day = "By Day"
+    case week = "By Week"
+    case month = "By Month"
+    case category = "By Category"
     
 
     var id: String { rawValue }
