@@ -11,7 +11,7 @@ import SwiftUI
 import SwiftData
 
 @MainActor
-final class CategoryStore: ObservableObject {
+final class CategoryStore:ObservableObject {
     private let context: ModelContext
     
     init(context: ModelContext) {

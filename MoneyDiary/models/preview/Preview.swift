@@ -22,11 +22,18 @@ struct Preview {
         }
     }
 
-    func addSamples(_ category: [Category]) {
+    func addSamples(
+        categories: [Category] = [],
+        budgets: [Budget] = []
+    ) {
         Task { @MainActor in
-            category.forEach { category in
-                container.mainContext.insert(category)
+            categories.forEach {
+                container.mainContext.insert($0)
+            }
+            budgets.forEach {
+                container.mainContext.insert($0)
             }
         }
     }
+
 }

@@ -12,7 +12,6 @@ struct TransactionFormView: View {
     let purpose: TransactionFormPurpose
     let onFinish: (TransactionFormResult) -> Void
 
-    
     @EnvironmentObject private var categoryStore: CategoryStore
     @Query(sort: \Category.title) var categories: [Category]
 
@@ -483,37 +482,20 @@ private extension TransactionFormView {
     }
 }
 
+
 #Preview {
-    let container = {
-        let preview = Preview(Category.self)
-        preview.addSamples(Category.mockCategories)
-        return preview.container
-    }()
-    TransactionFormView(
+    let preview = Preview(Category.self, Budget.self)
+    preview.addSamples(
+        categories: Category.mockCategories,
+        budgets: Budget.mockBudgets
+    )
+    
+    return   TransactionFormView(
         purpose: .edit(Transaction.mocks[0]),
         onFinish: {_ in },
         amount: "100"
         
     )
-    .withPreviewEnvironment(container: container)
-    
-  
-}
-
-#Preview {
-    let container = {
-        let preview = Preview(Category.self)
-        preview.addSamples(Category.mockCategories)
-        return preview.container
-    }()
-    TransactionFormView(
-        purpose: .create,
-        onFinish: {_ in },
-        amount: "500"
-        
-    )
-    .withPreviewEnvironment(container: container)
-    
+        .withPreviewEnvironment(container: preview.container)
     
 }
-

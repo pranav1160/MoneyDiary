@@ -27,25 +27,25 @@ final class BudgetManager: ObservableObject {
         
         self.budgetStore = budgetStore
         self.transactionStore = transactionStore
-        bind()
+//        bind()
     }
 
-    private func bind() {
-        Publishers
-            .CombineLatest(
-                budgetStore.$budgets,
-                transactionStore.$transactions
-            )
-           
-            .map { budgets, transactions in
-                return budgets.map { budget in
-                    self.calculator.status(
-                        for: budget,
-                        allTransactions: transactions
-                    )
-                }
-            }
-            .receive(on: DispatchQueue.main)
-            .assign(to: &$budgetStatuses)
-    }
+//    private func bind() {
+//        Publishers
+//            .CombineLatest(
+////                budgetStore.$budgets,
+//                transactionStore.$transactions
+//            )
+//           
+//            .map { budgets, transactions in
+//                return budgets.map { budget in
+//                    self.calculator.status(
+////                        for: budget,
+////                        allTransactions: transactions
+//                    )
+//                }
+//            }
+//            .receive(on: DispatchQueue.main)
+//            .assign(to: &$budgetStatuses)
+//    }
 }

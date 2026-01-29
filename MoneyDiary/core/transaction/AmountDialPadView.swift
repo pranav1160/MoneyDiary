@@ -251,11 +251,13 @@ struct DialButtonStyle: ButtonStyle {
 
 
 #Preview {
-    let container = {
-        let preview = Preview(Category.self)
-        preview.addSamples(Category.mockCategories)
-        return preview.container
-    }()
-    AmountDialPadView(onContinue: {_ in })
-        .withPreviewEnvironment(container: container)
+    let preview = Preview(Category.self, Budget.self)
+    preview.addSamples(
+        categories: Category.mockCategories,
+        budgets: Budget.mockBudgets
+    )
+    
+    return   AmountDialPadView(onContinue: {_ in })
+        .withPreviewEnvironment(container: preview.container)
+    
 }

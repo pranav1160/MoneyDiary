@@ -28,7 +28,7 @@ struct MoneyDiaryApp: App {
     
     init() {
         let schema = Schema([
-            Category.self,
+            Category.self,Budget.self
         ])
         
         let modelConfiguration = ModelConfiguration(
@@ -53,7 +53,7 @@ struct MoneyDiaryApp: App {
         let context = container.mainContext
         
         let transactionStore = TransactionStore()
-        let budgetStore = BudgetStore()
+        let budgetStore = BudgetStore(context: context)
         let categoryStore = CategoryStore(context: context)
         
         _categoryStore = StateObject(wrappedValue: categoryStore)

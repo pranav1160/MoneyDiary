@@ -6,55 +6,71 @@
 //
 import Combine
 import Foundation
+import SwiftData
 
 
 @MainActor
-final class BudgetStore: ObservableObject {
-    @Published private(set) var budgets: [Budget] = []
+final class BudgetStore:ObservableObject {
+    private let context: ModelContext
     
-    var overallBudget: Budget? {
-        budgets.first { $0.categoryId == nil }
+    init(context: ModelContext) {
+        self.context = context
+    }
+    
+    func overallBudget() -> Budget? {
+        let descriptor = FetchDescriptor<Budget>(
+            predicate: #Predicate { $0.categoryId == nil }
+        )
+        return try? context.fetch(descriptor).first
     }
 
-    
-    init() {
-        
-    }
 
     func addBudget(_ budget: Budget) {
-        if budget.categoryId == nil{
-            // Remove existing overall budget (if any)
-            budgets.removeAll { $0.categoryId == nil }
-        }
-        budgets.append(budget)
-    }
-    
-    func updateBudget(_ updated: Budget) {
-        // If editing overall budget, ensure uniqueness
-        if updated.categoryId == nil {
-            budgets.removeAll { $0.categoryId == nil && $0.id != updated.id }
+        // Enforce single overall budget
+        if budget.categoryId == nil {
+            deleteOverallBudget(except: budget.id)
         }
         
-        // Single update operation
-        if let index = budgets.firstIndex(where: { $0.id == updated.id }) {
-            budgets[index] = updated
-        } else {
-            budgets.append(updated)
-        }
+        context.insert(budget)
+        save()
     }
     
-    func deleteBudget(id: UUID) {
-        budgets.removeAll { $0.id == id }
+    func updateBudget(_ budget: Budget) {
+        if budget.categoryId == nil {
+            deleteOverallBudget(except: budget.id)
+        }
+        
+        // SwiftData tracks mutations automatically
+        save()
+    }
+    
+    func save(){
+        try? context.save()
+    }
+    
+    private func deleteOverallBudget(except id: UUID) {
+        let descriptor = FetchDescriptor<Budget>(
+            predicate: #Predicate {
+                $0.categoryId == nil && $0.id != id
+            }
+        )
+        
+        let existing = (try? context.fetch(descriptor)) ?? []
+        existing.forEach { context.delete($0) }
+    }
+    
+    func deleteBudget(_ budget: Budget) {
+        context.delete(budget)
+        save()
     }
 
 
 
     func budgets(for categoryId: UUID) -> [Budget] {
-        budgets.filter { $0.categoryId == categoryId }
+        let descriptor = FetchDescriptor<Budget>(
+            predicate: #Predicate { $0.categoryId == categoryId }
+        )
+        return (try? context.fetch(descriptor)) ?? []
     }
-    
-    
-    func loadMocks(){
-        budgets = Budget.mockBudgets
-    }
+
 }

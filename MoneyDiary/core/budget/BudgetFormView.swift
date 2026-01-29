@@ -208,7 +208,7 @@ private extension BudgetFormView {
     
     func deleteBudget() {
         if case .edit(let budget) = purpose {
-            budgetStore.deleteBudget(id: budget.id)
+            budgetStore.deleteBudget(budget)
             onFinish(.deleted)
         }
     }
@@ -263,43 +263,49 @@ private extension BudgetFormView {
     
     func saveBudget() {
         guard let amount = Double(amount) else { return }
-        
         let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let budget = Budget(
-            id: existingId,
-            name: trimmedName.isEmpty ? nil : trimmedName,
-            amount: amount,
-            period: selectedPeriod,
-            categoryId: mode == .overall ? nil : selectedCategoryId,
-            isActive: isActive
-        )
         
         switch purpose {
         case .create:
-            budgetStore.addBudget(budget)
+            let newBudget = Budget(
+                name: trimmedName.isEmpty ? nil : trimmedName,
+                amount: amount,
+                period: selectedPeriod,
+                categoryId: mode == .overall ? nil : selectedCategoryId,
+                isActive: isActive
+            )
+            budgetStore.addBudget(newBudget)
             onFinish(.created)
             
-        case .edit:
+        case .edit(let budget):
+            // 🔥 THIS IS THE KEY PART
+            budget.name = trimmedName.isEmpty ? nil : trimmedName
+            budget.amount = amount
+            budget.period = selectedPeriod
+            budget.categoryId = mode == .overall ? nil : selectedCategoryId
+            budget.isActive = isActive
+            
             budgetStore.updateBudget(budget)
             onFinish(.updated)
         }
     }
+
 
 }
 
 
 
 #Preview {
-    let container = {
-        let preview = Preview(Category.self)
-        preview.addSamples(Category.mockCategories)
-        return preview.container
-    }()
-    BudgetFormView(
+    let preview = Preview(Category.self, Budget.self)
+    preview.addSamples(
+        categories: Category.mockCategories,
+        budgets: Budget.mockBudgets
+    )
+    
+    return BudgetFormView(
         mode: .category,
         purpose: .edit(Budget.mockBudgets[0]),
-        onFinish: {_ in}
+        onFinish: { _ in }
     )
-    .withPreviewEnvironment(container: container)
+    .withPreviewEnvironment(container: preview.container)
 }

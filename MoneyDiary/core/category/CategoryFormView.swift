@@ -262,14 +262,15 @@ struct CategoryFormView: View {
 
 
 #Preview {
-    let container = {
-        let preview = Preview(Category.self)
-        preview.addSamples(Category.mockCategories)
-        return preview.container
-    }()
-    NavigationStack{
+    let preview = Preview(Category.self, Budget.self)
+    preview.addSamples(
+        categories: Category.mockCategories,
+        budgets: Budget.mockBudgets
+    )
+
+    return NavigationStack{
         CategoryFormView(mode: .create, onFinish: {_ in})
     }
-    .withPreviewEnvironment(container: container)
+    .withPreviewEnvironment(container: preview.container)
 }
 

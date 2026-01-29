@@ -9,11 +9,10 @@ import SwiftUI
 import SwiftData
 
 struct BudgetView: View {
-    @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var categoryStore: CategoryStore
-   
+    @EnvironmentObject private var transactionStore: TransactionStore
 
-    
+    @Query(sort: \Budget.startDate) var budgets: [Budget]
     @Query(sort: \Category.title) var categories: [Category]
 
     @EnvironmentObject private var currencyManager: CurrencyManager
@@ -93,7 +92,7 @@ struct BudgetView: View {
  
     private var overallBudgetSection:some View{
         VStack{
-            if let overallStatus = budgetManager.budgetStatuses
+            if let overallStatus = budgetStatuses
                 .first(where: { $0.budget.categoryId == nil }) {
                 
                 BudgetOverallRow(
@@ -164,10 +163,19 @@ struct BudgetView: View {
         }
     }
     
+    private var budgetStatuses: [BudgetStatus] {
+        budgets.map {
+            BudgetCalculator().status(
+                for: $0,
+                allTransactions: transactionStore.transactions
+            )
+        }
+    }
+    
     private var categoriesSection:some View{
         ScrollView {
             ForEach(
-                budgetManager.budgetStatuses
+                budgetStatuses
                     .filter { $0.budget.categoryId != nil },
                 id: \.budget.id
             ) { status in
@@ -206,12 +214,13 @@ struct BudgetView: View {
 
 #Preview {
     NavigationStack{
-        let container = {
-            let preview = Preview(Category.self)
-            preview.addSamples(Category.mockCategories)
-            return preview.container
-        }()
-        BudgetView()
-            .withPreviewEnvironment(container: container)
+        let preview = Preview(Category.self, Budget.self)
+        preview.addSamples(
+            categories: Category.mockCategories,
+            budgets: Budget.mockBudgets
+        )
+        
+        return BudgetView()
+            .withPreviewEnvironment(container: preview.container)
     }
 }

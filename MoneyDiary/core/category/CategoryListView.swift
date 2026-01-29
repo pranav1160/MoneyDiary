@@ -85,15 +85,20 @@ struct CategoryListView: View {
     }
 }
 
+
+
+
 #Preview {
-    let container = {
-        let preview = Preview(Category.self)
-        preview.addSamples(Category.mockCategories)
-        return preview.container
-    }()
+    let preview = Preview(Category.self, Budget.self)
+    preview.addSamples(
+        categories: Category.mockCategories,
+        budgets: Budget.mockBudgets
+    )
     
-    NavigationStack {
+    return NavigationStack{
         CategoryListView()
-            .withPreviewEnvironment(container: container)
     }
+    .withPreviewEnvironment(container: preview.container)
 }
+
+

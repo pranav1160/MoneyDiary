@@ -7,17 +7,18 @@
 
 import Foundation
 import Combine
+import SwiftData
 
 // MARK: - Budget Model
 
-
-struct Budget: Identifiable, Codable {
-    let id: UUID
-    let name: String?
-    let amount: Double
-    let period: BudgetPeriod
-    let categoryId: UUID?
-    let startDate: Date
+@Model
+final class Budget {
+    @Attribute(.unique) var id: UUID
+    var name: String?
+    var amount: Double
+    var period: BudgetPeriod
+    var categoryId: UUID?
+    var startDate: Date
     var isActive: Bool
     
     init(

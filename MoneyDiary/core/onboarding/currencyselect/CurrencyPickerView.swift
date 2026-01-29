@@ -46,11 +46,12 @@ struct CurrencyPickerView: View {
 
 
 #Preview {
-    let container = {
-        let preview = Preview(Category.self)
-        preview.addSamples(Category.mockCategories)
-        return preview.container
-    }()
-    CurrencyPickerView()
-        .withPreviewEnvironment(container: container)
+    let preview = Preview(Category.self, Budget.self)
+    preview.addSamples(
+        categories: Category.mockCategories,
+        budgets: Budget.mockBudgets
+    )
+    
+    return CurrencyPickerView()
+        .withPreviewEnvironment(container: preview.container)
 }

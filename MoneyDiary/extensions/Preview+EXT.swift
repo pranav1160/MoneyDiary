@@ -18,7 +18,7 @@ extension View {
         let categoryStore = CategoryStore(context: context)
         let transactionStore = TransactionStore()
         let currencyManager = CurrencyManager()
-        let budgetStore = BudgetStore()
+        let budgetStore = BudgetStore(context: context)
         let toastManager = ToastManager()
         let budgetManager = BudgetManager(
             budgetStore: budgetStore,

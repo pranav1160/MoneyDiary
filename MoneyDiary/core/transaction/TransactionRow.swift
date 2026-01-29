@@ -97,12 +97,15 @@ struct TransactionRow: View {
 }
 
 
+
 #Preview {
-    let container = {
-        let preview = Preview(Category.self)
-        preview.addSamples(Category.mockCategories)
-        return preview.container
-    }()
-    TransactionRow(transaction: Transaction.mocks[0])
-        .withPreviewEnvironment(container: container)
+    let preview = Preview(Category.self, Budget.self)
+    preview.addSamples(
+        categories: Category.mockCategories,
+        budgets: Budget.mockBudgets
+    )
+    
+    return   TransactionRow(transaction: Transaction.mocks[0])
+        .withPreviewEnvironment(container: preview.container)
+    
 }
