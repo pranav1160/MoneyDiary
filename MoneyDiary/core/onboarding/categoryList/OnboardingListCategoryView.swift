@@ -33,10 +33,7 @@ struct OnboardingListCategoryView: View {
                         items: Category.mockCategories
                     )
                 
-                   
 
-
-                    
                     Spacer(minLength: 100) // space for button
                 }
                 .padding()

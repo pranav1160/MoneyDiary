@@ -28,7 +28,7 @@ struct OnboardingCurrencySelectView: View {
             
             // CTA
             OnboardingNavigationButton(title: "Continue") {
-                OnboardingWidgetsView()
+                OnboardingCompleteView()
             }
         }
         

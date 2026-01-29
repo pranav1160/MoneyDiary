@@ -5,12 +5,37 @@
 //  Created by Pranav on 04/01/26.
 //
 import SwiftUI
+import SwiftData
 
-struct Category: Identifiable {
-    let id : UUID
-    let title: String
-    let emoji: String
-    let categoryColor: CategoryColor
+@Model
+final class Category: Identifiable {
+    @Attribute(.unique)
+    var id: UUID
+    
+    var title: String
+    var emoji: String
+    private var categoryColorRaw: String
+    
+    var categoryColor: CategoryColor {
+        get {
+            CategoryColor(rawValue: categoryColorRaw) ?? .blue
+        }
+        set {
+            categoryColorRaw = newValue.rawValue
+        }
+    }
+    
+    init(
+        id: UUID = UUID(),
+        title: String,
+        emoji: String,
+        categoryColor: CategoryColor
+    ) {
+        self.id = id
+        self.title = title
+        self.emoji = emoji
+        self.categoryColorRaw = categoryColor.rawValue
+    }
 }
 
 

@@ -5,7 +5,6 @@
 //  Created by Pranav on 02/01/26.
 //
 
-
 import SwiftUI
 import SwiftData
 
@@ -14,33 +13,25 @@ struct MoneyDiaryApp: App {
     
     @Environment(\.scenePhase) private var scenePhase
     
-    @StateObject private var categoryStore = CategoryStore()
     @StateObject private var transactionStore = TransactionStore()
     @StateObject private var currencyManager = CurrencyManager()
     @StateObject private var budgetStore = BudgetStore()
     @StateObject private var toastManager = ToastManager()
     
-    // ✅ Create these ONCE using a custom initializer
+    // ViewModels (created once)
     @StateObject private var budgetManager: BudgetManager
     @StateObject private var timeSeriesViewModel: TimeSeriesViewModel
-    @StateObject private var categoryViewModel: CategoryReportViewModel
+    @StateObject private var categoryReportViewModel: CategoryReportViewModel
     
     init() {
-        // Create stores first
-        let budgetStore = BudgetStore()
         let transactionStore = TransactionStore()
-        let categoryStore = CategoryStore()
-        let currencyManager = CurrencyManager()
-        let toastManager = ToastManager()
+        let budgetStore = BudgetStore()
         
-        // Initialize StateObjects
-        _budgetStore = StateObject(wrappedValue: budgetStore)
         _transactionStore = StateObject(wrappedValue: transactionStore)
-        _categoryStore = StateObject(wrappedValue: categoryStore)
-        _currencyManager = StateObject(wrappedValue: currencyManager)
-        _toastManager = StateObject(wrappedValue: toastManager)
+        _budgetStore = StateObject(wrappedValue: budgetStore)
+        _currencyManager = StateObject(wrappedValue: CurrencyManager())
+        _toastManager = StateObject(wrappedValue: ToastManager())
         
-        // Now create dependent ViewModels
         _budgetManager = StateObject(wrappedValue: BudgetManager(
             budgetStore: budgetStore,
             transactionStore: transactionStore
@@ -50,7 +41,7 @@ struct MoneyDiaryApp: App {
             transactionStore: transactionStore
         ))
         
-        _categoryViewModel = StateObject(wrappedValue: CategoryReportViewModel(
+        _categoryReportViewModel = StateObject(wrappedValue: CategoryReportViewModel(
             transactionStore: transactionStore
         ))
     }
@@ -58,19 +49,19 @@ struct MoneyDiaryApp: App {
     var body: some Scene {
         WindowGroup {
             AppView()
-                .environmentObject(categoryStore)
                 .environmentObject(transactionStore)
                 .environmentObject(currencyManager)
                 .environmentObject(budgetStore)
                 .environmentObject(budgetManager)
                 .environmentObject(toastManager)
                 .environmentObject(timeSeriesViewModel)
-                .environmentObject(categoryViewModel)
+                .environmentObject(categoryReportViewModel)
                 .onChange(of: scenePhase) { _, newPhase in
                     if newPhase == .active {
                         transactionStore.processRecurringTransactions()
                     }
                 }
         }
+        .modelContainer(for: Category.self)
     }
 }

@@ -103,14 +103,14 @@ struct HomeView: View {
                     Text(sortOption.rawValue)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.primary)
-                        .fixedSize() // 👈 Prevent text from being truncated
+                        .fixedSize()
                     
                     Image(systemName: "chevron.down")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                .frame(minWidth: 100) // 👈 Reserve minimum space
-                .animation(.none, value: sortOption) // 👈 Disable animation
+                .frame(minWidth: 100)
+                .animation(.none, value: sortOption)
             }
             
             
