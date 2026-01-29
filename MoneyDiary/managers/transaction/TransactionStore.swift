@@ -19,7 +19,6 @@ final class TransactionStore: ObservableObject {
     @Published private(set) var transactions: [Transaction] = []
     
     init(){
-        loadMockTransactions()
         processRecurringTransactions()
     }
     

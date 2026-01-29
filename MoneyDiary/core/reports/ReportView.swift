@@ -22,6 +22,11 @@ struct ReportView: View {
 }
 
 #Preview {
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
     ReportView()
-        .withPreviewEnvironment()
+        .withPreviewEnvironment(container: container)
 }

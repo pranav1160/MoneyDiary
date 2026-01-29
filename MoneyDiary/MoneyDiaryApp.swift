@@ -10,13 +10,16 @@ import SwiftData
 
 @main
 struct MoneyDiaryApp: App {
+    let container: ModelContainer
     
     @Environment(\.scenePhase) private var scenePhase
     
-    @StateObject private var transactionStore = TransactionStore()
+    @StateObject private var transactionStore:TransactionStore
     @StateObject private var currencyManager = CurrencyManager()
-    @StateObject private var budgetStore = BudgetStore()
+    @StateObject private var budgetStore:BudgetStore
     @StateObject private var toastManager = ToastManager()
+    @StateObject private var categoryStore: CategoryStore
+    
     
     // ViewModels (created once)
     @StateObject private var budgetManager: BudgetManager
@@ -24,9 +27,36 @@ struct MoneyDiaryApp: App {
     @StateObject private var categoryReportViewModel: CategoryReportViewModel
     
     init() {
+        let schema = Schema([
+            Category.self,
+        ])
+        
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false
+        )
+        
+        do {
+            self.container = try ModelContainer(
+                for: schema,
+                configurations: [modelConfiguration]
+            )
+            
+            // Debug: Print the store URL
+            if let storeURL = container.configurations.first?.url {
+                print("📁 SwiftData store location: \(storeURL)")
+            }
+        } catch {
+            fatalError("Failed to create ModelContainer: \(error)")
+        }
+        
+        let context = container.mainContext
+        
         let transactionStore = TransactionStore()
         let budgetStore = BudgetStore()
+        let categoryStore = CategoryStore(context: context)
         
+        _categoryStore = StateObject(wrappedValue: categoryStore)
         _transactionStore = StateObject(wrappedValue: transactionStore)
         _budgetStore = StateObject(wrappedValue: budgetStore)
         _currencyManager = StateObject(wrappedValue: CurrencyManager())
@@ -54,6 +84,7 @@ struct MoneyDiaryApp: App {
                 .environmentObject(budgetStore)
                 .environmentObject(budgetManager)
                 .environmentObject(toastManager)
+                .environmentObject(categoryStore)
                 .environmentObject(timeSeriesViewModel)
                 .environmentObject(categoryReportViewModel)
                 .onChange(of: scenePhase) { _, newPhase in
@@ -62,6 +93,7 @@ struct MoneyDiaryApp: App {
                     }
                 }
         }
-        .modelContainer(for: Category.self)
+        .modelContainer(container)
+
     }
 }

@@ -9,6 +9,7 @@
 import SwiftUI
 
 struct OnboardingPrivacyView: View {
+    @Binding var path: [OnboardingRoute]
     var body: some View {
         VStack(spacing: 32) {
             
@@ -30,11 +31,13 @@ struct OnboardingPrivacyView: View {
             Spacer()
             
             // CTA
-            OnboardingNavigationButton(title: "Continue") {
-                OnboardingListCategoryView()
+            
+            CallToActionButton(title: "Continue") {
+                path.append(.categories)
             }
             
         }
+        .hideSystemNavigation()
         .padding()
     }
     
@@ -58,6 +61,6 @@ struct OnboardingPrivacyView: View {
 
 #Preview {
     NavigationStack{
-        OnboardingPrivacyView ()
+        OnboardingPrivacyView (path: .constant([]))
     }
 }

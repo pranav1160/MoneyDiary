@@ -5,13 +5,15 @@
 //  Created by Pranav on 07/01/26.
 //
 import SwiftUI
+import SwiftData
 
 struct TransactionRow: View {
     let transaction: Transaction
     @EnvironmentObject private var categoryStore: CategoryStore
-    
+    @Query(sort: \Category.title) var categories: [Category]
+
     private var category: Category? {
-        categoryStore.categories.first {
+        categories.first {
             $0.id == transaction.categoryId
         }
     }
@@ -39,7 +41,7 @@ struct TransactionRow: View {
         // Transaction details
         VStack(alignment: .leading, spacing: 2) {
             Text(transaction.displayTitle(
-                using: categoryStore.categories
+                using: categories
             ))
             .font(.subheadline)
             .fontWeight(.medium)
@@ -96,6 +98,11 @@ struct TransactionRow: View {
 
 
 #Preview {
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
     TransactionRow(transaction: Transaction.mocks[0])
-        .withPreviewEnvironment()
+        .withPreviewEnvironment(container: container)
 }

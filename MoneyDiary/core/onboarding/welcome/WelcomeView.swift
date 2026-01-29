@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    @State private var path: [OnboardingRoute] = []
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(spacing: 24) {
                 
                 Spacer()
@@ -33,8 +35,21 @@ struct WelcomeView: View {
                 
                 Spacer()
                 
-                OnboardingNavigationButton(title: "Get Started") {
-                    OnboardingPrivacyView()
+                CallToActionButton(title: "Continue") {
+                    path.append(.privacy)
+                }
+            }
+            .hideSystemNavigation()
+            .navigationDestination(for: OnboardingRoute.self) { route in
+                switch route {
+                case .privacy:
+                    OnboardingPrivacyView(path: $path)
+                case .categories:
+                    OnboardingListCategoryView(path: $path)
+                case .currency:
+                    OnboardingCurrencySelectView(path: $path)
+                case .completed:
+                    OnboardingCompleteView()
                 }
             }
         }

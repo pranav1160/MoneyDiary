@@ -247,16 +247,14 @@ struct CategoryFormView: View {
     ]
 
     private func updateCategory(existing category: Category) {
-        let updated = Category(
-            id: category.id, // 👈 KEEP SAME ID (CRITICAL)
-            title: categoryName,
-            emoji: selectedEmoji,
-            categoryColor: selectedColor,
-        )
+        category.title = categoryName
+        category.emoji = selectedEmoji
+        category.categoryColor = selectedColor
         
-        categoryStore.updateCategory(updated)
+        categoryStore.updateCategory(category)
         onCategorySaved?(category)
     }
+
 
     
     
@@ -264,9 +262,14 @@ struct CategoryFormView: View {
 
 
 #Preview {
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
     NavigationStack{
         CategoryFormView(mode: .create, onFinish: {_ in})
     }
-    .withPreviewEnvironment()
+    .withPreviewEnvironment(container: container)
 }
 

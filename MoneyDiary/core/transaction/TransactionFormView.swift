@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct TransactionFormView: View {
     let purpose: TransactionFormPurpose
@@ -13,6 +14,8 @@ struct TransactionFormView: View {
 
     
     @EnvironmentObject private var categoryStore: CategoryStore
+    @Query(sort: \Category.title) var categories: [Category]
+
     @EnvironmentObject private var transactionStore: TransactionStore
     @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var currencyManager: CurrencyManager
@@ -232,7 +235,7 @@ private extension TransactionFormView {
                 .font(.caption)
                 .foregroundStyle(.appSecondary)
             
-            ForEach(categoryStore.categories) { category in
+            ForEach(categories) { category in
                 categoryRow(category)
             }
             
@@ -481,25 +484,35 @@ private extension TransactionFormView {
 }
 
 #Preview {
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
     TransactionFormView(
         purpose: .edit(Transaction.mocks[0]),
         onFinish: {_ in },
         amount: "100"
         
     )
-    .withPreviewEnvironment()
+    .withPreviewEnvironment(container: container)
     
   
 }
 
 #Preview {
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
     TransactionFormView(
         purpose: .create,
         onFinish: {_ in },
         amount: "500"
         
     )
-    .withPreviewEnvironment()
+    .withPreviewEnvironment(container: container)
     
     
 }

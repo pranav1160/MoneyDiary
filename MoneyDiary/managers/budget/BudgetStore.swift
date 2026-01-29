@@ -18,7 +18,7 @@ final class BudgetStore: ObservableObject {
 
     
     init() {
-        loadMocks()
+        
     }
 
     func addBudget(_ budget: Budget) {

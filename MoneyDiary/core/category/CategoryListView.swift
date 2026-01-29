@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CategoryListView: View {
     @EnvironmentObject private var categoryStore: CategoryStore
     @EnvironmentObject private var toastManager: ToastManager
+    @Query(sort: \Category.title) var categories: [Category]
+
     
     var body: some View {
         VStack{
@@ -18,7 +21,6 @@ struct CategoryListView: View {
             Spacer()
             
             categoryListSection
-            
         }
         .hideSystemNavigation()
     }
@@ -49,13 +51,13 @@ struct CategoryListView: View {
     private var categoryListSection:some View{
         VStack(alignment: .leading, spacing: 12) {
             
-            if categoryStore.categories.isEmpty {
+            if categories.isEmpty {
                 Text("No categories yet")
                     .foregroundStyle(.appSecondary)
                     .padding(.horizontal)
             } else {
                 List{
-                    ForEach(categoryStore.categories) { category in
+                    ForEach(categories) { category in
                         NavigationLink {
                             CategoryFormView(mode: .edit(category),
                                              onFinish: { result in
@@ -74,8 +76,8 @@ struct CategoryListView: View {
                         .buttonStyle(.plain)
                     }
                     .onDelete { offsets in
-                        categoryStore.deleteCategory(at: offsets)
-                        toastManager.show(.success("Category Deleted"))
+                        offsets.map { categories[$0] }
+                            .forEach { categoryStore.deleteCategory($0) }
                     }
                 }
             }
@@ -84,8 +86,14 @@ struct CategoryListView: View {
 }
 
 #Preview {
-    NavigationStack{
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
+    
+    NavigationStack {
         CategoryListView()
-            .withPreviewEnvironment()
+            .withPreviewEnvironment(container: container)
     }
 }

@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 import Charts
 
 struct CategoryReportSection: View {
     
     @EnvironmentObject private var vm: CategoryReportViewModel
     @EnvironmentObject private var categoryStore: CategoryStore
-    
+    @Query(sort: \Category.title) var categories: [Category]
+
     @State private var animateChart = false
     
     // Aggregate data across all buckets for pie chart
@@ -71,7 +73,7 @@ private extension CategoryReportSection {
         VStack(spacing: 24) {
             // Pie Chart with animations
             Chart(pieChartData) { item in
-                if let category = categoryStore.categories.first(where: { $0.id == item.id }) {
+                if let category = categories.first(where: { $0.id == item.id }) {
                     SectorMark(
                         angle: .value("Amount", animateChart ? item.total : 0),
                         innerRadius: .ratio(0.6),
@@ -99,7 +101,7 @@ private extension CategoryReportSection {
             // Legend with staggered animations
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(Array(pieChartData.enumerated()), id: \.element.id) { index, item in
-                    if let category = categoryStore.categories.first(where: { $0.id == item.id }) {
+                    if let category = categories.first(where: { $0.id == item.id }) {
                         legendRow(for: category, amount: item.total)
                             .opacity(animateChart ? 1 : 0)
                             .offset(x: animateChart ? 0 : -20)
@@ -185,6 +187,11 @@ private extension CategoryReportSection {
 }
 
 #Preview {
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
     CategoryReportSection()
-        .withPreviewEnvironment()
+        .withPreviewEnvironment(container: container)
 }

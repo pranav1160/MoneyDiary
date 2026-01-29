@@ -8,59 +8,74 @@
 import Foundation
 import Combine
 import SwiftUI
+import SwiftData
 
 @MainActor
 final class CategoryStore: ObservableObject {
-    @Published private(set) var categories: [Category] = []
+    private let context: ModelContext
     
-    init() {
-        loadMockCategories()
+    init(context: ModelContext) {
+        self.context = context
     }
     
     func addCategory(_ category: Category) {
-        categories.insert(category, at: 0)
+        context.insert(category)
+        save()
     }
     
     func updateCategory(_ updated: Category) {
-        guard let index = categories.firstIndex(where: { $0.id == updated.id }) else { return }
-        categories[index] = updated
+        save()
     }
-    
-    func loadMockCategories() {
-        categories = Category.mockCategories
-    }
-    
-    func emoji(for categoryId: UUID?) -> String {
-        guard let categoryId else {
-            return "🅾️"   // overall budget emoji
-        }
-        return categories.first { $0.id == categoryId }?.emoji ?? "💰"
-    }
-    
-    func color(for categoryId:UUID?) -> CategoryColor{
-        guard let categoryId else {
-            return .pink //fix for overall
-        }
-        return categories.first { $0.id == categoryId }?.categoryColor ?? .green
-    }
-    
-    func title(for categoryId: UUID?) -> String {
-        guard let categoryId else { return "Uncategorized" }
-        return categories.first { $0.id == categoryId }?.title ?? "Uncategorized"
-    }
-
     
     func deleteCategory(id: UUID) {
-        categories.removeAll { $0.id == id }
+        let descriptor = FetchDescriptor<Category>(
+            predicate: #Predicate { $0.id == id }
+        )
+        
+        if let category = try? context.fetch(descriptor).first {
+            context.delete(category)
+            save()
+        }
     }
     
     func deleteCategory(_ category: Category) {
         deleteCategory(id: category.id)
     }
-
-    func deleteCategory(at offsets: IndexSet) {
-        categories.remove(atOffsets: offsets)
+    
+    
+    
+    func emoji(for categoryId: UUID?) -> String {
+        guard let categoryId else { return "🅾️" }
+        
+        return fetchCategory(id: categoryId)?.emoji ?? "💰"
+    }
+    
+    func color(for categoryId:UUID?) -> CategoryColor{
+        guard let categoryId else { return .pink }
+        
+        return fetchCategory(id: categoryId)?.categoryColor ?? .green
+    }
+    
+    func title(for categoryId: UUID?) -> String {
+        guard let categoryId else { return "Uncategorized" }
+        
+        return fetchCategory(id: categoryId)?.title ?? "Uncategorized"
+    }
+    
+    private func fetchCategory(id: UUID) -> Category? {
+        let descriptor = FetchDescriptor<Category>(
+            predicate: #Predicate { $0.id == id }
+        )
+        return try? context.fetch(descriptor).first
     }
 
+    
+    
+
+    
+
+    private func save() {
+        try? context.save()
+    }
 
 }

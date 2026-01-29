@@ -7,11 +7,15 @@
 
 
 import SwiftUI
+import SwiftData
 
 struct BudgetFormView: View {
 
     @EnvironmentObject private var budgetStore: BudgetStore
     @EnvironmentObject private var categoryStore: CategoryStore
+    @Query(sort: \Category.title) var categories: [Category]
+
+
     @Environment(\.dismiss) private var dismiss
     @State private var isDeletePressed = false
     let onFinish: (BudgetFormResult) -> Void
@@ -154,7 +158,7 @@ struct BudgetFormView: View {
                 Picker("Category", selection: $selectedCategoryId) {
                     Text("Select category").tag(UUID?.none)
                     
-                    ForEach(categoryStore.categories) { category in
+                    ForEach(categories) { category in
                         Text("\(category.emoji) \(category.title)")
                             .tag(UUID?.some(category.id))
                     }
@@ -287,10 +291,15 @@ private extension BudgetFormView {
 
 
 #Preview {
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
     BudgetFormView(
         mode: .category,
         purpose: .edit(Budget.mockBudgets[0]),
         onFinish: {_ in}
     )
-        .withPreviewEnvironment()
+    .withPreviewEnvironment(container: container)
 }

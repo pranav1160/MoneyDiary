@@ -90,8 +90,13 @@ struct RecurringTransactionsView: View {
 // MARK: - Preview
 
 #Preview {
+    let container = {
+        let preview = Preview(Category.self)
+        preview.addSamples(Category.mockCategories)
+        return preview.container
+    }()
     NavigationStack {
         RecurringTransactionsView()
-            .withPreviewEnvironment()
+            .withPreviewEnvironment(container: container)
     }
 }

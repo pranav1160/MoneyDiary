@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OnboardingCurrencySelectView: View {
-    
+    @Binding var path: [OnboardingRoute]
     var body: some View {
         VStack(alignment:.leading){
             
@@ -31,12 +31,10 @@ struct OnboardingCurrencySelectView: View {
                 OnboardingCompleteView()
             }
         }
-        
-        
-        
+        .hideSystemNavigation()
     }
 }
 
 #Preview {
-    OnboardingCurrencySelectView()
+    OnboardingCurrencySelectView(path: .constant([]))
 }

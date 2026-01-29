@@ -6,10 +6,16 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct BudgetView: View {
     @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var categoryStore: CategoryStore
+   
+
+    
+    @Query(sort: \Category.title) var categories: [Category]
+
     @EnvironmentObject private var currencyManager: CurrencyManager
     @EnvironmentObject private var toastManager: ToastManager
     
@@ -172,7 +178,7 @@ struct BudgetView: View {
                     status: status,
                     statusBarColor: categoryStore
                         .color(for: status.budget.categoryId),
-                    title: status.budget.displayName(using: categoryStore.categories)
+                    title: status.budget.displayName(using: categories)
                 )
                 .contentShape(Rectangle())
                 .padding(10)
@@ -200,7 +206,12 @@ struct BudgetView: View {
 
 #Preview {
     NavigationStack{
+        let container = {
+            let preview = Preview(Category.self)
+            preview.addSamples(Category.mockCategories)
+            return preview.container
+        }()
         BudgetView()
-            .withPreviewEnvironment()
+            .withPreviewEnvironment(container: container)
     }
 }

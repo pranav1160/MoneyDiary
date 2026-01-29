@@ -11,9 +11,9 @@ struct CategorySectionView: View {
     
     let title: String
     let color: Color
-    let items: [Category]
+    let items: [CategoryDraft]
     
-    @State private var selectedIds: Set<UUID> = []
+    @Binding var selectedIds: Set<UUID>
     
     private let columns = [
         GridItem(.adaptive(minimum: 120), spacing: 12)

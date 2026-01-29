@@ -5,6 +5,7 @@
 //  Created by Pranav on 26/01/26.
 //
 import SwiftUI
+import SwiftData
 
 // MARK: - Row
 
@@ -12,13 +13,15 @@ struct RecurringTransactionRow: View {
     let transaction: Transaction
     @Binding var isEditing:Bool
     @EnvironmentObject private var categoryStore: CategoryStore
+    @Query(sort: \Category.title) var categories: [Category]
+
     @EnvironmentObject private var transactionStore: TransactionStore
     
     var body: some View {
         HStack(spacing: 12) {
             
             // Category Icon
-            if let category = categoryStore.categories.first(
+            if let category = categories.first(
                 where: { $0.id == transaction.categoryId }
             ) {
                 Text(category.emoji)
@@ -31,7 +34,7 @@ struct RecurringTransactionRow: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(transaction.displayTitle(using: categoryStore.categories))
+                Text(transaction.displayTitle(using: categories))
                     .font(.body.weight(.medium))
                     .foregroundStyle(Color.primary)
                 

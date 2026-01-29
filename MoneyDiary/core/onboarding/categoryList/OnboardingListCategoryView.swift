@@ -8,10 +8,12 @@
 import SwiftUI
 
 struct OnboardingListCategoryView: View {
+    @EnvironmentObject var categoryStore: CategoryStore
+    @State private var selectedIds: Set<UUID> = []
+    @Binding var path: [OnboardingRoute]
     
     var body: some View {
         ZStack {
-            
             ScrollView {
                 VStack(alignment: .leading, spacing: 32) {
                     
@@ -25,32 +27,81 @@ struct OnboardingListCategoryView: View {
                             .foregroundStyle(.appSecondary)
                     }
                     
-                   
-                    // MARK: - Essentials
+                    // MARK: - Category Sections
                     CategorySectionView(
-                        title: "All",
-                        color: .appSecondary,
-                        items: Category.mockCategories
+                        title: "Essentials",
+                        color: .green,
+                        items: OnboardingCategories.essentials,
+                        selectedIds: $selectedIds
                     )
-                
-
+                    
+                    CategorySectionView(
+                        title: "Lifestyle & Shopping",
+                        color: .purple,
+                        items: OnboardingCategories.lifestyle,
+                        selectedIds: $selectedIds
+                    )
+                    
+                   
+                    
+                    CategorySectionView(
+                        title: "Financial & Bills",
+                        color: .orange,
+                        items: OnboardingCategories.financial,
+                        selectedIds: $selectedIds
+                    )
+                  
+                    
+                    CategorySectionView(
+                        title: "Other",
+                        color: .appSecondary,
+                        items: OnboardingCategories.other,
+                        selectedIds: $selectedIds
+                    )
+                    
                     Spacer(minLength: 100) // space for button
                 }
                 .padding()
             }
             
-            // Bottom CTA (fixed)
             VStack {
                 Spacer()
-                OnboardingNavigationButton(title: "Continue") {
-                    OnboardingCurrencySelectView()
-                }
+                continueButton
             }
         }
+        .hideSystemNavigation()
+    }
+    
+    private var continueButton: some View {
+        Button {
+            saveSelectedCategories()
+            path.append(.currency)
+        } label: {
+            Text("Continue")
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.accentColor)
+                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+        }
+        .padding()
+    }
+    
+    private func saveSelectedCategories() {
+        OnboardingCategories.all
+            .filter { selectedIds.contains($0.id) }
+            .map {
+                Category(
+                    title: $0.title,
+                    emoji: $0.emoji,
+                    categoryColor: $0.color
+                )
+            }
+            .forEach(categoryStore.addCategory)
     }
 }
 
-
 #Preview {
-    OnboardingListCategoryView()
+    OnboardingListCategoryView(path: .constant([]))
 }

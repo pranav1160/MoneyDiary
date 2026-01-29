@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CategoryChipView: View {
     
-    let item: Category
+    let item: CategoryDraft
     @Binding var isSelected: Bool
     
     var body: some View {

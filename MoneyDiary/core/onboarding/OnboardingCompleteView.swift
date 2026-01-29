@@ -30,12 +30,11 @@ struct OnboardingCompleteView: View {
                 title: "Finish",
                 isLoading: isProfileSetupFinishing
             ) {
+                
                 onFinishButtonPressed()
             }
-
-
-
         }
+        .hideSystemNavigation()
         .padding()
     }
 }
