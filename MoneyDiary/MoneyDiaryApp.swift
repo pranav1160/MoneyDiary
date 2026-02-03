@@ -22,13 +22,13 @@ struct MoneyDiaryApp: App {
     
     
     // ViewModels (created once)
-    @StateObject private var budgetManager: BudgetManager
+   
     @StateObject private var timeSeriesViewModel: TimeSeriesViewModel
     @StateObject private var categoryReportViewModel: CategoryReportViewModel
     
     init() {
         let schema = Schema([
-            Category.self,Budget.self
+            Category.self,Budget.self,Transaction.self
         ])
         
         let modelConfiguration = ModelConfiguration(
@@ -52,7 +52,7 @@ struct MoneyDiaryApp: App {
         
         let context = container.mainContext
         
-        let transactionStore = TransactionStore()
+        let transactionStore = TransactionStore(context: context)
         let budgetStore = BudgetStore(context: context)
         let categoryStore = CategoryStore(context: context)
         
@@ -62,17 +62,14 @@ struct MoneyDiaryApp: App {
         _currencyManager = StateObject(wrappedValue: CurrencyManager())
         _toastManager = StateObject(wrappedValue: ToastManager())
         
-        _budgetManager = StateObject(wrappedValue: BudgetManager(
-            budgetStore: budgetStore,
-            transactionStore: transactionStore
-        ))
+     
         
         _timeSeriesViewModel = StateObject(wrappedValue: TimeSeriesViewModel(
-            transactionStore: transactionStore
+            context: context
         ))
         
         _categoryReportViewModel = StateObject(wrappedValue: CategoryReportViewModel(
-            transactionStore: transactionStore
+            context: context
         ))
     }
     
@@ -82,7 +79,6 @@ struct MoneyDiaryApp: App {
                 .environmentObject(transactionStore)
                 .environmentObject(currencyManager)
                 .environmentObject(budgetStore)
-                .environmentObject(budgetManager)
                 .environmentObject(toastManager)
                 .environmentObject(categoryStore)
                 .environmentObject(timeSeriesViewModel)

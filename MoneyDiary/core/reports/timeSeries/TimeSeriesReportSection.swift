@@ -249,10 +249,10 @@ struct TimeSeriesReportSection: View {
     }
 }
 
-#Preview {
-    TimeSeriesReportSection()
-        .environmentObject({
-            let store = TransactionStore()
-            return TimeSeriesViewModel(transactionStore: store)
-        }())
-}
+//#Preview {
+//    TimeSeriesReportSection()
+//        .environmentObject({
+//            let store = TransactionStore(context: <#ModelContext#>)
+//            return TimeSeriesViewModel(transactionStore: store)
+//        }())
+//}

@@ -8,8 +8,6 @@
 import Foundation
 import SwiftUI
 
-
-
 enum AnyTransactionSection: Identifiable {
     case day(Date, [Transaction])
     case week(Date, [Transaction])

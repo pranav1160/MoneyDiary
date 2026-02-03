@@ -7,18 +7,18 @@
 
 import Foundation
 
-enum RecurrencePattern: Codable, Equatable {
+enum RecurrencePattern: String, Codable, Equatable {
     case daily
     case weekly
     case monthly
-    case customDays(intervalDays: Int)
+    case customDays
     
     var description: String {
         switch self {
         case .daily: return "Daily"
         case .weekly: return "Weekly"
         case .monthly: return "Monthly"
-        case .customDays(let days): return "Every \(days) days"
+        case .customDays: return "Fixed days"
         }
     }
 }
@@ -26,45 +26,51 @@ enum RecurrencePattern: Codable, Equatable {
 
 struct RecurrenceInfo: Codable, Equatable {
     let pattern: RecurrencePattern
+    let intervalDays: Int?        // only for .customDays
     let nextOccurrence: Date
     let lastProcessed: Date?
     
     init(
         pattern: RecurrencePattern,
+        intervalDays: Int? = nil,
         nextOccurrence: Date,
         lastProcessed: Date? = nil
     ) {
         self.pattern = pattern
+        self.intervalDays = intervalDays
         self.nextOccurrence = nextOccurrence
         self.lastProcessed = lastProcessed
     }
     
     func updatingNextOccurrence() -> RecurrenceInfo {
-        let newNext = pattern.nextDate(after: nextOccurrence)
+        let calendar = Calendar.current
+        
+        let newNext: Date = {
+            switch pattern {
+            case .daily:
+                return calendar.date(byAdding: .day, value: 1, to: nextOccurrence)!
+                
+            case .weekly:
+                return calendar.date(byAdding: .weekOfYear, value: 1, to: nextOccurrence)!
+                
+            case .monthly:
+                return calendar.date(byAdding: .month, value: 1, to: nextOccurrence)!
+                
+            case .customDays:
+                return calendar.date(
+                    byAdding: .day,
+                    value: intervalDays ?? 1,
+                    to: nextOccurrence
+                )!
+            }
+        }()
         
         return RecurrenceInfo(
             pattern: pattern,
+            intervalDays: intervalDays,
             nextOccurrence: newNext,
             lastProcessed: Date()
         )
     }
 }
 
-
-
-extension RecurrencePattern {
-    func nextDate(after date: Date) -> Date {
-        let calendar = Calendar.current
-        
-        switch self {
-        case .daily:
-            return calendar.date(byAdding: .day, value: 1, to: date)!
-        case .weekly:
-            return calendar.date(byAdding: .day, value: 7, to: date)!
-        case .monthly:
-            return calendar.date(byAdding: .month, value: 1, to: date)!
-        case .customDays(let days):
-            return calendar.date(byAdding: .day, value: days, to: date)!
-        }
-    }
-}

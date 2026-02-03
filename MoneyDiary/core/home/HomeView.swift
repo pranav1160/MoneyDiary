@@ -6,11 +6,18 @@
 //
 
 import SwiftUI
-
+import SwiftData
 
 struct HomeView: View {
+    
     @State private var path = NavigationPath()
+    @Query(
+        sort: \Transaction.date,
+        order: .reverse
+    )
+    private var transactions: [Transaction]
     @EnvironmentObject private var transactionStore: TransactionStore
+
     @State private var showSettings = false
     @EnvironmentObject private var toastManager: ToastManager
     @State private var sortOption: TransactionSortOption = .day
@@ -130,26 +137,84 @@ struct HomeView: View {
         switch sortOption {
             
         case .day:
-            return transactionStore
-                .transactionsGroupedByDay()
-                .map { .day($0.date, $0.transactions) }
+            return groupByDay(transactions)
+                .map { .day($0.key, $0.value) }
             
         case .week:
-            return transactionStore
-                .transactionsGroupedByWeek()
-                .map { .week($0.weekStart, $0.transactions) }
+            return groupByWeek(transactions)
+                .map { .week($0.key, $0.value) }
             
         case .month:
-            return transactionStore
-                .transactionsGroupedByMonth()
-                .map { .month($0.monthStart, $0.transactions) }
+            return groupByMonth(transactions)
+                .map { .month($0.key, $0.value) }
             
         case .category:
-            return transactionStore
-                .transactionsGroupedByCategory()
-                .map { .category($0.categoryId, $0.transactions) }
+            return groupByCategory(transactions)
+                .map { .category($0.key, $0.value) }
         }
     }
+
+    private func groupByDay(
+        _ transactions: [Transaction]
+    ) -> [(key: Date, value: [Transaction])] {
+        
+        let calendar = Calendar.current
+        
+        let grouped = Dictionary(grouping: transactions) {
+            calendar.startOfDay(for: $0.date)
+        }
+        
+        return grouped
+            .map { ($0.key, $0.value) }
+            .sorted { $0.key > $1.key }
+    }
+    private func groupByWeek(
+        _ transactions: [Transaction]
+    ) -> [(key: Date, value: [Transaction])] {
+        
+        let calendar = Calendar.current
+        
+        let grouped = Dictionary(grouping: transactions) {
+            calendar.dateInterval(of: .weekOfYear, for: $0.date)!.start
+        }
+        
+        return grouped
+            .map { ($0.key, $0.value) }
+            .sorted { $0.key > $1.key }
+    }
+
+    
+    private func groupByMonth(
+        _ transactions: [Transaction]
+    ) -> [(key: Date, value: [Transaction])] {
+        
+        let calendar = Calendar.current
+        
+        let grouped = Dictionary(grouping: transactions) {
+            calendar.dateInterval(of: .month, for: $0.date)!.start
+        }
+        
+        return grouped
+            .map { ($0.key, $0.value) }
+            .sorted { $0.key > $1.key }
+    }
+
+    private func groupByCategory(
+        _ transactions: [Transaction]
+    ) -> [(key: UUID, value: [Transaction])] {
+        
+        let grouped = Dictionary(grouping: transactions) {
+            $0.categoryId
+        }
+        
+        return grouped
+            .map { ($0.key, $0.value) }
+            .sorted { lhs, rhs in
+                lhs.value.count > rhs.value.count
+            }
+    }
+
+    
     
     private func sectionTitle(_ section: AnyTransactionSection) -> String {
         let calendar = Calendar.current
@@ -207,7 +272,7 @@ struct HomeView: View {
             
             
         case .editAmount(let transactionId):
-            if let transaction = transactionStore.transactions.first(where: {
+            if let transaction = transactions.first(where: {
                 $0.id == transactionId
             }) {
                 AmountDialPadView(
@@ -223,7 +288,7 @@ struct HomeView: View {
                 )
             }
         case .edit(let transactionId, let amount):
-            if let transaction = transactionStore.transactions.first(where: {
+            if let transaction = transactions.first(where: {
                 $0.id == transactionId
             }) {
                 TransactionFormView(
@@ -291,16 +356,8 @@ struct HomeView: View {
 }
 
 
-
 #Preview {
-    let preview = Preview(Category.self, Budget.self)
-    preview.addSamples(
-        categories: Category.mockCategories,
-        budgets: Budget.mockBudgets
-    )
-    
-    return HomeView()
-                .withPreviewEnvironment(container: preview.container)
+    HomeView()
+        .withPreviewEnvironment(container: Preview.app.container)
 }
-
 

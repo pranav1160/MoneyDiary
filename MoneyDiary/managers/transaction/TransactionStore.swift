@@ -7,6 +7,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import SwiftData
 
 private func debug(_ message: String) {
 #if DEBUG
@@ -16,69 +17,48 @@ private func debug(_ message: String) {
 
 @MainActor
 final class TransactionStore: ObservableObject {
-    @Published private(set) var transactions: [Transaction] = []
+    private let context: ModelContext
     
-    init(){
-        processRecurringTransactions()
+    init(context: ModelContext){
+        self.context = context
     }
     
     // MARK: - Mutations
     
     func add(_ transaction: Transaction) {
-        debug("ADD → id=\(transaction.id) amount=\(transaction.amount) date=\(transaction.date) recurrence=\(transaction.recurrenceInfo != nil)")
+        debug("ADD → \(transaction.id)")
+        context.insert(transaction)
         
-        addWithoutProcessing(transaction)
-        processRecurringTransactions()
+        if transaction.source == .recurringTemplate {
+            processRecurringTransactions()
+        }
         
+        save()
+    }
+
+    
+     func save() {
+        do {
+            try context.save()
+        } catch {
+            debug("SAVE FAILED → \(error)")
+        }
     }
 
     
     func delete(id: UUID) {
-        transactions.removeAll { $0.id == id }
-    }
-    
-    func update(_ updated: Transaction) {
-        guard let index = transactions.firstIndex(where: { $0.id == updated.id }) else {
-            debug("UPDATE FAILED → id=\(updated.id) not found")
-            return
+        let descriptor = FetchDescriptor<Transaction>(
+            predicate: #Predicate { $0.id == id }
+        )
+        if let tx = try? context.fetch(descriptor).first {
+            context.delete(tx)
+            save()
         }
-        
-        var finalTransaction = updated
-        
-        if transactions[index].source == .recurringGenerated {
-            finalTransaction = Transaction(
-                id: updated.id,
-                title: updated.title,
-                amount: updated.amount,
-                date: updated.date,
-                categoryId: updated.categoryId,
-                recurrenceInfo: nil,
-                source: .manual
-            )
-            debug("CONVERT → recurringGenerated → manual")
-        }
-        
-        transactions[index] = finalTransaction
     }
-
     
-    func delete(at offsets: IndexSet) {
-        transactions.remove(atOffsets: offsets)
-    }
+    
 
 
-    
-    // MARK: - Mocks (internal write access)
-    func loadMockTransactions() {
-        transactions = Transaction.mocks
-    }
-    
-    private func addWithoutProcessing(_ transaction: Transaction) {
-        debug("ADD (internal) → id=\(transaction.id) date=\(transaction.date)")
-        transactions.insert(transaction, at: 0)
-        transactions.sort { $0.date > $1.date }
-    }
-    
     func repeatTransaction(from transaction: Transaction) {
         let repeatedTransaction = Transaction(
             id: UUID(),
@@ -90,15 +70,8 @@ final class TransactionStore: ObservableObject {
             source: .manual                // important
         )
         
-        debug("REPEAT → original=\(transaction.id) new=\(repeatedTransaction.id)")
-        
-        // Add without animation wrapper
-        addWithoutProcessing(repeatedTransaction)
-        
-        // Apply animation only to the list update
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
-            objectWillChange.send()
-        }
+        context.insert(repeatedTransaction)
+        save()
     }
 
     
@@ -107,189 +80,184 @@ final class TransactionStore: ObservableObject {
 
 //Recurring
 extension TransactionStore{
-    /// Returns all recurring template transactions
-    var recurringTransactions: [Transaction] {
-        transactions
-            .filter {
-                $0.source == .recurringTemplate ||
-                $0.source == .recurringPaused
-            }
-            .sorted { $0.date > $1.date }
-    }
-    
-    
     // MARK: - Recurring Management
     
     /// Stops a recurring transaction by converting it to manual
     func stopRecurrence(id: UUID) {
-        guard let index = transactions.firstIndex(where: { $0.id == id }),
-              transactions[index].source == .recurringTemplate else {
-            debug("STOP FAILED → id=\(id)")
-            return
-        }
-        
-        let template = transactions[index]
-        
-        let paused = Transaction(
-            id: template.id,
-            title: template.title,
-            amount: template.amount,
-            date: template.date,
-            categoryId: template.categoryId,
-            recurrenceInfo: template.recurrenceInfo, // keep it!
-            source: .recurringPaused
+        let descriptor = FetchDescriptor<Transaction>(
+            predicate: #Predicate { $0.id == id }
         )
         
-        transactions[index] = paused
+        guard let tx = try? context.fetch(descriptor).first,
+        tx.sourceRaw == "recurringTemplate" else { return }
+        
+        tx.source = .recurringPaused
+        save()
         debug("STOP → id=\(id) paused")
     }
     
     
     
     /// Deletes a recurring template and optionally all generated instances
+    /// Deletes a recurring template and optionally all generated instances
     func deleteRecurring(id: UUID, deleteAllInstances: Bool = false) {
-        guard let index = transactions.firstIndex(where: { $0.id == id }) else {
-            debug("DELETE FAILED → id=\(id) not found")
-            return
-        }
         
-        let transaction = transactions[index]
-        
-        guard transaction.source == .recurringTemplate ||
-                transaction.source == .recurringPaused else {
-            debug("DELETE FAILED → id=\(id) not recurring")
-            return
-        }
-        
-        transactions.remove(at: index)
-        debug("DELETE RECURRING → id=\(id), source=\(transaction.source)")
-        
-        if deleteAllInstances {
-            let beforeCount = transactions.count
-            transactions.removeAll {
-                $0.source == .recurringGenerated &&
-                $0.title == transaction.title &&
-                $0.amount == transaction.amount &&
-                $0.categoryId == transaction.categoryId
+        // 1️⃣ Fetch the template / paused recurring transaction
+        let templateDescriptor = FetchDescriptor<Transaction>(
+            predicate: #Predicate { tx in
+                tx.id == id &&
+                (tx.sourceRaw == "recurringTemplate" ||
+                 tx.sourceRaw == "recurringPaused")
             }
-            debug("DELETE INSTANCES → count=\(beforeCount - transactions.count)")
+        )
+        
+        guard let template = try? context.fetch(templateDescriptor).first else {
+            debug("DELETE FAILED → id=\(id) not found or not recurring")
+            return
+        }
+        
+        // 2️⃣ Read EVERYTHING off the model object NOW, before any delete.
+        //    SwiftData invalidates backing data the moment context.delete()
+        //    is called — any property access after that point crashes.
+        let title      = template.title
+        let amount     = template.amount
+        let categoryId = template.categoryId
+        let sourceRaw  = template.sourceRaw   // grab this too, just in case
+        _ = template.recurrenceInfo            // force-resolve the fault NOW
+        
+        debug("DELETE RECURRING → id=\(id), source=\(sourceRaw)")
+        
+        // 3️⃣ Optionally fetch generated instances BEFORE deleting the template
+        var instancesToDelete: [Transaction] = []
+        if deleteAllInstances {
+            let generatedDescriptor = FetchDescriptor<Transaction>(
+                predicate: #Predicate { tx in
+                    tx.sourceRaw == "recurringGenerated" &&
+                    tx.title == title &&
+                    tx.amount == amount &&
+                    tx.categoryId == categoryId
+                }
+            )
+            instancesToDelete = (try? context.fetch(generatedDescriptor)) ?? []
+        }
+        
+        // 4️⃣ Now delete everything — template first, then instances
+        context.delete(template)
+        
+        for tx in instancesToDelete {
+            context.delete(tx)
+        }
+        debug("DELETE INSTANCES → count=\(instancesToDelete.count)")
+        
+        // 5️⃣ Persist
+        do {
+            try context.save()
+        } catch {
+            debug("DELETE SAVE FAILED → \(error)")
         }
     }
+
 
     
     /// Resume a stopped recurring transaction
     func resumeRecurrence(id: UUID) {
-        guard let index = transactions.firstIndex(where: { $0.id == id }),
-              transactions[index].source == .recurringPaused,
-              var recurrence = transactions[index].recurrenceInfo else {
-            debug("RESUME FAILED → id=\(id)")
-            return
-        }
-        
-        let paused = transactions[index]
-        let now = Date()
-        
-        // CRITICAL FIX: Calculate the next occurrence from NOW, not from the old nextOccurrence
-        // This prevents generating all the "missed" transactions during the pause
-        while recurrence.nextOccurrence <= now {
-            recurrence = recurrence.updatingNextOccurrence()
-            debug("RESUME SKIP → skipping past occurrence: \(recurrence.nextOccurrence)")
-        }
-        
-        debug("RESUME → new next occurrence will be: \(recurrence.nextOccurrence)")
-        
-        let resumed = Transaction(
-            id: paused.id,
-            title: paused.title,
-            amount: paused.amount,
-            date: paused.date,
-            categoryId: paused.categoryId,
-            recurrenceInfo: recurrence, // updated recurrence with future nextOccurrence
-            source: .recurringTemplate
+        let descriptor = FetchDescriptor<Transaction>(
+            predicate: #Predicate { $0.id == id }
         )
         
-        transactions[index] = resumed
-        debug("RESUME → id=\(id)")
+        guard let tx = try? context.fetch(descriptor).first,
+              tx.sourceRaw == "recurringPaused",
+              var recurrence = tx.recurrenceInfo else { return }
+        
+        let now = Date()
+        while recurrence.nextOccurrence <= now {
+            recurrence = recurrence.updatingNextOccurrence()
+        }
+        
+        tx.source = .recurringTemplate
+        tx.recurrenceInfo = recurrence
+        
         
         processRecurringTransactions()
+        save()
     }
-
     
     func processRecurringTransactions() {
         let now = Date()
         debug("PROCESS START → now=\(now)")
         
-        var transactionsToAdd: [Transaction] = []
-        var transactionsToUpdate: [Transaction] = []
         
-        for transaction in transactions where transaction.source == .recurringTemplate {
+        let templateDescriptor = FetchDescriptor<Transaction>(
+            predicate: #Predicate { tx in
+                tx.sourceRaw == "recurringTemplate"
+            }
+        )
 
+
+        
+        guard let templates = try? context.fetch(templateDescriptor) else {
+            debug("PROCESS FAILED → fetch error")
+            return
+        }
+        
+        for template in templates {
+            debug("TEMPLATE FOUND → id=\(template.id)")
             
-            debug("TEMPLATE FOUND → id=\(transaction.id) date=\(transaction.date)")
-            
-            guard var recurrence = transaction.recurrenceInfo else { continue }
+            guard var recurrence = template.recurrenceInfo else { continue }
             
             while now >= recurrence.nextOccurrence {
-                debug("  GENERATE → next=\(recurrence.nextOccurrence)")
+                let occurrenceDate = recurrence.nextOccurrence
+                let categoryId = template.categoryId
                 
-                let newTransaction = Transaction(
-                    id: UUID(),
-                    title: transaction.title,
-                    amount: transaction.amount,
-                    date: recurrence.nextOccurrence,
-                    categoryId: transaction.categoryId,
-                    recurrenceInfo: nil,
-                    source: .recurringGenerated
+                debug("  GENERATE → next=\(occurrenceDate)")
+                
+               
+                let duplicateDescriptor = FetchDescriptor<Transaction>(
+                    predicate: #Predicate { tx in
+                        tx.date == occurrenceDate &&
+                        tx.categoryId == categoryId &&
+                        tx.sourceRaw == "recurringGenerated"
+
+                    }
                 )
                 
-                let exists = transactions.contains {
-                    $0.date == recurrence.nextOccurrence &&
-                    $0.amount == transaction.amount &&
-                    $0.categoryId == transaction.categoryId &&
-                    $0.source == .recurringGenerated
-                }
-
+                let alreadyExists =
+                (try? context.fetch(duplicateDescriptor).isEmpty) == false
                 
-                if exists {
-                    debug("  SKIP (duplicate) → date=\(recurrence.nextOccurrence)")
+                if alreadyExists {
+                    debug("  SKIP (duplicate) → date=\(occurrenceDate)")
                 } else {
-                    debug("  ADD INSTANCE → date=\(recurrence.nextOccurrence)")
-                    transactionsToAdd.append(newTransaction)
+                    let generated = Transaction(
+                        id: UUID(),
+                        title: template.title,
+                        amount: template.amount,
+                        date: occurrenceDate,
+                        categoryId: categoryId,
+                        recurrenceInfo: nil,
+                        source: .recurringGenerated
+                    )
+
+                    
+                    context.insert(generated)
+                    debug("  ADD INSTANCE → date=\(occurrenceDate)")
                 }
                 
                 recurrence = recurrence.updatingNextOccurrence()
                 debug("  ADVANCE → next=\(recurrence.nextOccurrence)")
             }
             
-            if recurrence != transaction.recurrenceInfo {
-                debug("TEMPLATE ADVANCED → id=\(transaction.id) newNext=\(recurrence.nextOccurrence)")
-                
-                let updatedTransaction = Transaction(
-                    id: transaction.id,
-                    title: transaction.title,
-                    amount: transaction.amount,
-                    date: transaction.date,
-                    categoryId: transaction.categoryId,
-                    recurrenceInfo: recurrence,
-                    source: .recurringTemplate
-                )
-
-                transactionsToUpdate.append(updatedTransaction)
+            if recurrence != template.recurrenceInfo {
+                template.recurrenceInfo = recurrence
+                debug("TEMPLATE ADVANCED → id=\(template.id)")
             }
         }
         
-        debug("PROCESS APPLY → add=\(transactionsToAdd.count) update=\(transactionsToUpdate.count)")
-        
-        for newTx in transactionsToAdd {
-            addWithoutProcessing(newTx)
+        do {
+            try context.save()
+            debug("PROCESS END → saved")
+        } catch {
+            debug("PROCESS SAVE FAILED → \(error)")
         }
-
-        
-        for updatedTx in transactionsToUpdate {
-            update(updatedTx)
-        }
-        
-        debug("PROCESS END")
     }
 
 }

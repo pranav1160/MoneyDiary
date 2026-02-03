@@ -9,30 +9,29 @@ import SwiftUI
 
 struct RecurrencePickerView: View {
     
-    @Binding var selectedPattern: RecurrencePattern?
+    @Binding var recurrencePattern: RecurrencePattern?
     @Environment(\.dismiss) private var dismiss
+    @Binding var customDaysInterval: Int
     
-    @State private var customDays: Int = 2
     
     var body: some View {
         NavigationStack {
             Form {
                 
+                // MARK: - Common
                 Section(header: Text("Common")) {
                     patternRow(title: "Daily", pattern: .daily)
                     patternRow(title: "Weekly", pattern: .weekly)
                     patternRow(title: "Monthly", pattern: .monthly)
                 }
                 
+                // MARK: - Custom
                 Section(header: Text("Custom")) {
                     HStack {
                         Text("Every")
                         
-                        Stepper(
-                            value: $customDays,
-                            in: 1...365
-                        ) {
-                            Text("\(customDays)")
+                        Stepper(value: $customDaysInterval, in: 2...365) {
+                            Text("\(customDaysInterval)")
                                 .frame(width: 40)
                         }
                         
@@ -40,21 +39,19 @@ struct RecurrencePickerView: View {
                     }
                     
                     Button("Set Custom Interval") {
-                        selectedPattern = .customDays(intervalDays: customDays)
+                        recurrencePattern = .customDays
                         dismiss()
                     }
                 }
                 
-                if selectedPattern != nil {
+                // MARK: - Remove
+                if recurrencePattern != nil {
                     Section {
                         Button(role: .destructive) {
-                            selectedPattern = nil
+                            recurrencePattern = nil
                             dismiss()
                         } label: {
-                            HStack{
-                                Text("Remove Recurrence")
-                            }
-                            
+                            Text("Remove Recurrence")
                         }
                     }
                 }
@@ -63,26 +60,25 @@ struct RecurrencePickerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
-                        dismiss()
-                    }
+                    Button("Done") { dismiss() }
                 }
             }
         }
     }
     
-    // MARK: - Helper
-    
-    @ViewBuilder
-    private func patternRow(title: String, pattern: RecurrencePattern) -> some View {
+    // MARK: - Row helper
+    private func patternRow(
+        title: String,
+        pattern: RecurrencePattern
+    ) -> some View {
         Button {
-            selectedPattern = pattern
+            recurrencePattern = pattern
             dismiss()
         } label: {
             HStack {
                 Text(title)
                 Spacer()
-                if selectedPattern == pattern {
+                if recurrencePattern == pattern {
                     Image(systemName: "checkmark")
                         .foregroundStyle(.accent)
                 }
@@ -91,9 +87,9 @@ struct RecurrencePickerView: View {
     }
 }
 
-
 #Preview {
     RecurrencePickerView(
-        selectedPattern: .constant(.daily)
+        recurrencePattern: .constant(.daily),
+        customDaysInterval: .constant(2)
     )
 }

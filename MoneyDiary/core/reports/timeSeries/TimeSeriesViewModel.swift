@@ -5,10 +5,9 @@
 //  Created by Pranav on 24/01/26.
 //
 
-
 import Foundation
+import SwiftData
 import Combine
-import SwiftUI
 
 @MainActor
 final class TimeSeriesViewModel: ObservableObject {
@@ -17,34 +16,22 @@ final class TimeSeriesViewModel: ObservableObject {
     @Published private(set) var weekly: [TimeSeriesPoint] = []
     @Published private(set) var monthly: [TimeSeriesPoint] = []
     
-    private let transactionStore: TransactionStore
-    private var cancellables = Set<AnyCancellable>()
+    private let context: ModelContext
     
-    init(transactionStore: TransactionStore) {
-        self.transactionStore = transactionStore
-        bind()
+    init(context: ModelContext) {
+        self.context = context
         recomputeAll()
     }
     
-    private func bind() {
-        transactionStore.$transactions
-            .sink { [weak self] _ in
-                self?.recomputeAll()
-            }
-            .store(in: &cancellables)
-    }
-    
-    // MARK: - Recompute
-    private func recomputeAll() {
+    func recomputeAll() {
+        let analytics = TransactionAnalytics(context: context)
         let calendar = Calendar.current
-        print("Recomputing charts at", Date())
-
         
-        daily = transactionStore.dailyTotals(
+        daily = analytics.dailyTotals(
             from: calendar.date(byAdding: .day, value: -6, to: .now)!
         )
-
-        weekly = transactionStore.weeklyTotals(weeks: 4)
-        monthly = transactionStore.monthlyTotals(months: 6)
+        
+        weekly = analytics.weeklyTotals(weeks: 4)
+        monthly = analytics.monthlyTotals(months: 6)
     }
 }

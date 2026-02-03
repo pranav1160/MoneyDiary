@@ -14,9 +14,11 @@ struct TransactionFormView: View {
 
     @EnvironmentObject private var categoryStore: CategoryStore
     @Query(sort: \Category.title) var categories: [Category]
+    @Query(sort: \Budget.startDate) private var budgets: [Budget]
+    @Query(sort: \Transaction.date) private var transactions: [Transaction]
+
 
     @EnvironmentObject private var transactionStore: TransactionStore
-    @EnvironmentObject private var budgetManager: BudgetManager
     @EnvironmentObject private var currencyManager: CurrencyManager
     @EnvironmentObject private var toastManager: ToastManager
     @Environment(\.dismiss) private var dismiss
@@ -28,10 +30,12 @@ struct TransactionFormView: View {
     @State private var selectedCategoryId: UUID?
     @State private var selectedDate: Date = .now
     @State private var showDatePicker = false
-    
+    @State private var customDaysInterval: Int = 2
     
     @State private var appAlert: AnyAppAlert?
-    @State var recurrencePattern: RecurrencePattern?
+    @State private var recurrencePattern: RecurrencePattern?
+
+
     @State private var showRecurrencePicker = false
     
     init(
@@ -48,6 +52,7 @@ struct TransactionFormView: View {
             _selectedCategoryId = State(initialValue: nil)
             _selectedDate = State(initialValue: .now)
             _recurrencePattern = State(initialValue: nil)
+
             
         case .edit(let transaction):
             _transactionName = State(initialValue: transaction.title ?? "")
@@ -61,6 +66,7 @@ struct TransactionFormView: View {
             _recurrencePattern = State(
                 initialValue: transaction.recurrenceInfo?.pattern
             )
+
         }
     }
 
@@ -105,10 +111,12 @@ struct TransactionFormView: View {
         }
         .sheet(isPresented: $showRecurrencePicker) {
             RecurrencePickerView(
-                selectedPattern: $recurrencePattern
+                recurrencePattern: $recurrencePattern,
+                customDaysInterval: $customDaysInterval
             )
-            .presentationDetents([.fraction(0.7)])
         }
+
+
         .sheet(isPresented: $showDatePicker) {
             VStack(spacing: 16) {
                 Capsule()
@@ -342,10 +350,18 @@ private extension TransactionFormView {
     }
     
     private func budgetStatus(for category: Category) -> BudgetStatus? {
-        budgetManager.budgetStatuses.first {
-            $0.budget.categoryId == category.id && $0.budget.isActive
+        guard let budget = budgets.first(where: {
+            $0.categoryId == category.id && $0.isActive
+        }) else {
+            return nil
         }
+        
+        return BudgetCalculator().status(
+            for: budget,
+            allTransactions: transactions
+        )
     }
+
     
     private var currencySymbol:String{
         return currencyManager.selectedCurrency.symbol
@@ -421,13 +437,21 @@ private extension TransactionFormView {
         let recurrenceInfo: RecurrenceInfo? = {
             switch purpose {
             case .create:
-                return makeRecurrenceInfo()
+                guard let pattern = recurrencePattern else { return nil }
+                let initial = RecurrenceInfo(
+                    pattern: pattern,
+                    intervalDays: pattern == .customDays ? customDaysInterval : nil,
+                    nextOccurrence: selectedDate
+                )
+                return initial.updatingNextOccurrence()
                 
             case .edit(let existing):
-                //  recurrenceInfo is IMMUTABLE in edit mode
+                // IMMUTABLE
                 return existing.recurrenceInfo
             }
         }()
+
+
 
         
         let source: TransactionSource = {
@@ -458,28 +482,20 @@ private extension TransactionFormView {
         case .create:
             transactionStore.add(transaction)
             
-        case .edit:
-            transactionStore.update(transaction)
+        case .edit(let transaction):
+            transaction.title = trimmedTitle.isEmpty ? nil : trimmedTitle
+            transaction.amount = amount
+            transaction.date = selectedDate
+            transaction.categoryId = categoryId
+            // recurrenceInfo immutable by design
+            
+            transactionStore.save()
+
         }
     }
 
     
-    private func makeRecurrenceInfo() -> RecurrenceInfo? {
-        guard let pattern = recurrencePattern else {
-            return nil
-        }
-        
-        let now = Date()
-        
-        // First occurrence should be generated immediately if date <= now
-        let firstOccurrence =
-        selectedDate <= now ? selectedDate : selectedDate
-        
-        return RecurrenceInfo(
-            pattern: pattern,
-            nextOccurrence: firstOccurrence
-        )
-    }
+  
 }
 
 

@@ -5,8 +5,8 @@
 //  Created by Pranav on 25/01/26.
 //
 
-
 import Foundation
+import SwiftData
 import Combine
 
 @MainActor
@@ -18,21 +18,25 @@ final class CategoryReportViewModel: ObservableObject {
     
     @Published private(set) var data: [[CategoryAggregate]] = []
     
-    private let transactionStore: TransactionStore
+    private let context: ModelContext
     
-    init(transactionStore: TransactionStore) {
-        self.transactionStore = transactionStore
+    init(context: ModelContext) {
+        self.context = context
         reload()
     }
     
     private func reload() {
+        let analytics = TransactionAnalytics(context: context)
+        
         switch selectedPeriod {
         case .last7Days:
-            data = [transactionStore.topCategoriesLast7Days()]
+            data = [analytics.topCategoriesLast7Days()]
+            
         case .last4Weeks:
-            data = transactionStore.topCategoriesLast4Weeks()
+            data = analytics.topCategoriesLast4Weeks()
+            
         case .last6Months:
-            data = transactionStore.topCategoriesLast6Months()
+            data = analytics.topCategoriesLast6Months()
         }
     }
 }

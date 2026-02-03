@@ -11,7 +11,7 @@ import SwiftData
 
 struct Preview {
     let container: ModelContainer
-
+    
     init(_ models: any PersistentModel.Type...) {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let schema = Schema(models)
@@ -21,19 +21,21 @@ struct Preview {
             fatalError("The preview container couldn't be created")
         }
     }
-
+    
+    @MainActor
     func addSamples(
         categories: [Category] = [],
-        budgets: [Budget] = []
+        budgets: [Budget] = [],
+        transactions: [Transaction] = []
     ) {
-        Task { @MainActor in
-            categories.forEach {
-                container.mainContext.insert($0)
-            }
-            budgets.forEach {
-                container.mainContext.insert($0)
-            }
+        categories.forEach {
+            container.mainContext.insert($0)
+        }
+        budgets.forEach {
+            container.mainContext.insert($0)
+        }
+        transactions.forEach {
+            container.mainContext.insert($0)
         }
     }
-
 }

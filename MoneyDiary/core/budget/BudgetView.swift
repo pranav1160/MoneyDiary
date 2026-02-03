@@ -14,6 +14,7 @@ struct BudgetView: View {
 
     @Query(sort: \Budget.startDate) var budgets: [Budget]
     @Query(sort: \Category.title) var categories: [Category]
+    @Query(sort: \Transaction.date) private var transactions: [Transaction]
 
     @EnvironmentObject private var currencyManager: CurrencyManager
     @EnvironmentObject private var toastManager: ToastManager
@@ -164,13 +165,16 @@ struct BudgetView: View {
     }
     
     private var budgetStatuses: [BudgetStatus] {
-        budgets.map {
-            BudgetCalculator().status(
-                for: $0,
-                allTransactions: transactionStore.transactions
+        let calculator = BudgetCalculator()
+        
+        return budgets.map { budget in
+            calculator.status(
+                for: budget,
+                allTransactions: transactions
             )
         }
     }
+
     
     private var categoriesSection:some View{
         ScrollView {

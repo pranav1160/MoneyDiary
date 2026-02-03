@@ -40,6 +40,17 @@ final class Budget {
     }
 }
 
+
+
+enum BudgetPeriod: String, Codable, CaseIterable {
+    case daily = "Daily"
+    case weekly = "Weekly"
+    case monthly = "Monthly"
+    case yearly = "Yearly"
+}
+
+
+
 extension Budget {
     func displayName(using categories: [Category]) -> String {
         // 1️⃣ Explicit name wins
@@ -57,20 +68,6 @@ extension Budget {
         return "Overall"
     }
 }
-
-
-
-
-
-enum BudgetPeriod: String, Codable, CaseIterable {
-    case daily = "Daily"
-    case weekly = "Weekly"
-    case monthly = "Monthly"
-    case yearly = "Yearly"
-}
-
-
-
 
 // MARK: - Mock Data
 

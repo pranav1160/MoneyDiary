@@ -16,19 +16,15 @@ extension View {
         let context = container.mainContext
         
         let categoryStore = CategoryStore(context: context)
-        let transactionStore = TransactionStore()
+        let transactionStore = TransactionStore(context: context)
         let currencyManager = CurrencyManager()
         let budgetStore = BudgetStore(context: context)
         let toastManager = ToastManager()
-        let budgetManager = BudgetManager(
-            budgetStore: budgetStore,
-            transactionStore: transactionStore
-        )
         let timeSeriesViewModel = TimeSeriesViewModel(
-            transactionStore: transactionStore
+            context: context
         )
         let categoryreportViewModel = CategoryReportViewModel(
-            transactionStore: transactionStore
+            context: context
         )
         
         return self
@@ -37,10 +33,28 @@ extension View {
             .environmentObject(transactionStore)
             .environmentObject(currencyManager)
             .environmentObject(budgetStore)
-            .environmentObject(budgetManager)
             .environmentObject(toastManager)
             .environmentObject(timeSeriesViewModel)
             .environmentObject(categoryreportViewModel)
     }
 }
 #endif
+
+extension Preview {
+    
+    static let app: Preview = {
+        let preview = Preview(
+            Category.self,
+            Budget.self,
+            Transaction.self
+        )
+        
+        preview.addSamples(
+            categories: Category.mockCategories,
+            budgets: Budget.mockBudgets,
+            transactions: Transaction.mocks
+        )
+        
+        return preview
+    }()
+}

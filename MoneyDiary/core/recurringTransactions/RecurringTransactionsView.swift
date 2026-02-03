@@ -6,11 +6,27 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct RecurringTransactionsView: View {
-    @EnvironmentObject private var transactionStore: TransactionStore
-    @State private var isEditing:Bool = false
     
+    @EnvironmentObject private var transactionStore: TransactionStore
+    @State private var isEditing: Bool = false
+    
+    private static let templateSource = TransactionSource.recurringTemplate
+    private static let pausedSource   = TransactionSource.recurringPaused
+    
+    @Query(sort: \Transaction.date, order: .reverse)
+    private var allTransactions: [Transaction]
+    
+    private var recurringTransactions: [Transaction] {
+        allTransactions.filter {
+            $0.source == .recurringTemplate ||
+            $0.source == .recurringPaused
+        }
+    }
+
+
     
     var body: some View {
         VStack(spacing: 0) {
@@ -18,17 +34,12 @@ struct RecurringTransactionsView: View {
                 title: "Recurring Transactions",
                 showsBackButton: true
             ) {
-                
                 ToolBarCircleButton(systemImage: isEditing ? "checkmark" : "pencil") {
-                    withAnimation {
-                        isEditing.toggle()
-                    }
-                   
+                    withAnimation { isEditing.toggle() }
                 }
-                
             }
             
-            if transactionStore.recurringTransactions.isEmpty {
+            if recurringTransactions.isEmpty {
                 emptyState
             } else {
                 recurringList
@@ -37,6 +48,8 @@ struct RecurringTransactionsView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
     }
+
+
     
     // MARK: - Empty State
     
@@ -61,12 +74,9 @@ struct RecurringTransactionsView: View {
     
     // MARK: - List
     
-    
-    
-    
     private var recurringList: some View {
         List {
-            ForEach(transactionStore.recurringTransactions) { transaction in
+            ForEach(recurringTransactions) { transaction in
                 RecurringTransactionRow(
                     transaction: transaction,
                     isEditing: $isEditing
@@ -83,12 +93,7 @@ struct RecurringTransactionsView: View {
     }
 }
 
-
-
-
-
 // MARK: - Preview
-
 
 #Preview {
     let preview = Preview(Category.self, Budget.self)

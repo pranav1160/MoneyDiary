@@ -5,18 +5,25 @@
 //  Created by Pranav on 02/01/26.
 //
 import Foundation
+import SwiftData
 
-struct Transaction: Identifiable {
-    let id: UUID
-    let title: String?
-    let amount: Double
-    let date: Date
-    let categoryId: UUID
-    let recurrenceInfo: RecurrenceInfo?
-    let source: TransactionSource
+@Model
+final class Transaction {
+    @Attribute(.unique) var id: UUID
+    var title: String?
+    var amount: Double
+    var date: Date
+    var categoryId: UUID
+    var recurrenceInfo: RecurrenceInfo?
+    var sourceRaw: String
+    
+    var source: TransactionSource {
+        get { TransactionSource(rawValue: sourceRaw)! }
+        set { sourceRaw = newValue.rawValue }
+    }
     
     init(
-        id: UUID,
+        id: UUID = UUID(),  
         title: String?,
         amount: Double,
         date: Date,
@@ -30,7 +37,7 @@ struct Transaction: Identifiable {
         self.date = date
         self.categoryId = categoryId
         self.recurrenceInfo = recurrenceInfo
-        self.source = source
+        self.sourceRaw = source.rawValue
     }
 }
 
