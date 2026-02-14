@@ -17,33 +17,137 @@ struct HomeView: View {
     )
     private var transactions: [Transaction]
     @EnvironmentObject private var transactionStore: TransactionStore
-
-    @State private var showSettings = false
     @EnvironmentObject private var toastManager: ToastManager
     @State private var sortOption: TransactionSortOption = .day
     @EnvironmentObject private var categoryStore: CategoryStore
+    
+    // Add search state
+    @State private var searchText = ""
+   
 
     var body: some View {
         NavigationStack(path: $path) {
             VStack{
                 header
+                SearchBarView(searchText: $searchText)
+                
                 recentTrancactionSection
+                    .overlay(alignment: .topTrailing) {
+                        sortMenu
+                            .padding(.trailing)
+                    }
             }
             .overlay(alignment: .bottomTrailing) {
                 transactionAddButton
             }
             .navigationBarBackButtonHidden(true)
-            .toolbar(.hidden, for: .navigationBar)
             .navigationDestination(for: TransactionRoute.self) { route in
                 transactionDestination(for : route)
             }
-            .navigationDestination(isPresented: $showSettings) {
-                SettingsView()
-            }
+            .background(Color(.systemBackground))
         }
     }
     
-  
+    private var sortMenu: some View {
+        Menu {
+            Picker("Sort Transactions", selection: $sortOption) {
+                ForEach(TransactionSortOption.allCases) { option in
+                    Text(option.rawValue)
+                        .tag(option)
+                }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Text(sortOption.rawValue)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.primary)
+                
+                Image(systemName: "chevron.down")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(
+                        Color.secondary.opacity(0.35),
+                        lineWidth: 1
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+    }
+    
+    private var header: some View {
+        HStack(spacing: 12) {
+            
+            Image(.mainlogo)
+                .resizable()
+                .frame(width: 40, height: 40)
+                .scaledToFill()
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            
+            Text("MoneyDiary")
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.primary)
+            
+            Spacer()
+            
+            NavigationLink {
+                SettingsView()
+            } label: {
+                Image(systemName: "gearshape")
+                    .font(.title2)
+                    .foregroundStyle(.white)
+                    .frame(width: 40, height: 40)
+                    .background(
+                        Circle()
+                            .fill(Color.accentColor)
+                    )
+                    .shadow(
+                        color: .black.opacity(0.25),
+                        radius: 3,
+                        x: 0,
+                        y: 2
+                    )
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 8)
+        .background(Color(.systemBackground))
+    }
+
+
+    
+    // Add filtered transactions computed property
+    private var filteredTransactions: [Transaction] {
+        guard !searchText.isEmpty else {
+            return transactions
+        }
+        
+        return transactions.filter { transaction in
+            // Search by title
+            if let title = transaction.title,
+               title.localizedCaseInsensitiveContains(searchText) {
+                return true
+            }
+            
+            // Search by category name
+            let categoryTitle = categoryStore.title(for: transaction.categoryId)
+            if categoryTitle.localizedCaseInsensitiveContains(searchText) {
+                return true
+            }
+            
+            // Search by amount
+            let amountString = String(format: "%.2f", transaction.amount)
+            if amountString.contains(searchText) {
+                return true
+            }
+            
+            return false
+        }
+    }
     
     private var recentTrancactionSection: some View {
         List {
@@ -85,67 +189,30 @@ struct HomeView: View {
                 }
             }
         }
+        
         .animation(.easeInOut, value: sortOption)
+        .animation(.easeInOut, value: searchText)
     }
     
-    private var header: some View{
-        
-        HStack {
-            // LEFT
-            LogoView(size: 40)
-            
-            Spacer()
-            
-            Menu {
-                Picker("Sort Transactions", selection: $sortOption) {
-                    ForEach(TransactionSortOption.allCases) { option in
-                        Text(option.rawValue)
-                            .tag(option)
-                    }
-                }
-            } label: {
-                HStack(spacing: 4) {
-                    Text(sortOption.rawValue)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    
-                    Image(systemName: "chevron.down")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(width: 120)  // Changed from minWidth to width
-                .animation(.none, value: sortOption)
-            }
-            
-            Spacer()
-            
-            ToolBarCircleButton(systemImage: "gearshape") {
-                showSettings = true
-            }
-            
-        }
-        .padding(.horizontal)
-        .background(Color(.systemBackground))
-        
-    }
+  
     
     private var sortedSections: [AnyTransactionSection] {
         switch sortOption {
             
         case .day:
-            return groupByDay(transactions)
+            return groupByDay(filteredTransactions)
                 .map { .day($0.key, $0.value) }
             
         case .week:
-            return groupByWeek(transactions)
+            return groupByWeek(filteredTransactions)
                 .map { .week($0.key, $0.value) }
             
         case .month:
-            return groupByMonth(transactions)
+            return groupByMonth(filteredTransactions)
                 .map { .month($0.key, $0.value) }
             
         case .category:
-            return groupByCategory(transactions)
+            return groupByCategory(filteredTransactions)
                 .map { .category($0.key, $0.value) }
         }
     }

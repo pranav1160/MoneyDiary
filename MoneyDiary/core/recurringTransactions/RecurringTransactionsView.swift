@@ -35,6 +35,9 @@ struct RecurringTransactionsView: View {
                 ToolBarCircleButton(systemImage: isEditing ? "checkmark" : "pencil") {
                     withAnimation { isEditing.toggle() }
                 }
+                .disabled(recurringTransactions.isEmpty)
+                .opacity(recurringTransactions.isEmpty ? 0.4 : 1)
+
             }
             
             if recurringTransactions.isEmpty {

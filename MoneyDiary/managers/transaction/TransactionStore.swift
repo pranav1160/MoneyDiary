@@ -24,7 +24,6 @@ final class TransactionStore: ObservableObject {
     }
     
     // MARK: - Mutations
-    
     func add(_ transaction: Transaction) {
         debug("ADD → \(transaction.id)")
         context.insert(transaction)
@@ -35,7 +34,6 @@ final class TransactionStore: ObservableObject {
         
         save()
     }
-
     
      func save() {
         do {
@@ -45,7 +43,6 @@ final class TransactionStore: ObservableObject {
         }
     }
 
-    
     func delete(id: UUID) {
         let descriptor = FetchDescriptor<Transaction>(
             predicate: #Predicate { $0.id == id }
@@ -56,9 +53,6 @@ final class TransactionStore: ObservableObject {
         }
     }
     
-    
-
-
     func repeatTransaction(from transaction: Transaction) {
         let repeatedTransaction = Transaction(
             id: UUID(),
@@ -73,15 +67,109 @@ final class TransactionStore: ObservableObject {
         context.insert(repeatedTransaction)
         save()
     }
-
-    
 }
-
-
 //Recurring
 extension TransactionStore{
     // MARK: - Recurring Management
+    func processRecurringTransactions() {
+        let now = Date()
+        debug("PROCESS START → now=\(now)")
+        
+        let templateDescriptor = FetchDescriptor<Transaction>(
+            predicate: #Predicate { tx in
+                tx.sourceRaw == "recurringTemplate"
+            }
+        )
+        
+        
+        
+        guard let templates = try? context.fetch(templateDescriptor) else {
+            debug("PROCESS FAILED → fetch error")
+            return
+        }
+        
+        for template in templates {
+            debug("TEMPLATE FOUND → id=\(template.id)")
+            
+            guard var recurrence = template.recurrenceInfo else { continue }
+            
+            while now >= recurrence.nextOccurrence {
+                let occurrenceDate = recurrence.nextOccurrence
+                let categoryId = template.categoryId
+                
+                debug("  GENERATE → next=\(occurrenceDate)")
+                
+                
+                let duplicateDescriptor = FetchDescriptor<Transaction>(
+                    predicate: #Predicate { tx in
+                        tx.date == occurrenceDate &&
+                        tx.categoryId == categoryId &&
+                        tx.sourceRaw == "recurringGenerated"
+                        
+                    }
+                )
+                
+                let alreadyExists =
+                (try? context.fetch(duplicateDescriptor).isEmpty) == false
+                
+                if alreadyExists {
+                    debug("  SKIP (duplicate) → date=\(occurrenceDate)")
+                } else {
+                    let generated = Transaction(
+                        id: UUID(),
+                        title: template.title,
+                        amount: template.amount,
+                        date: occurrenceDate,
+                        categoryId: categoryId,
+                        recurrenceInfo: nil,
+                        source: .recurringGenerated
+                    )
+                    
+                    
+                    context.insert(generated)
+                    debug("  ADD INSTANCE → date=\(occurrenceDate)")
+                }
+                
+                recurrence = recurrence.updatingNextOccurrence()
+                debug("  ADVANCE → next=\(recurrence.nextOccurrence)")
+            }
+            
+            if recurrence != template.recurrenceInfo {
+                template.recurrenceInfo = recurrence
+                debug("TEMPLATE ADVANCED → id=\(template.id)")
+            }
+        }
+        
+        do {
+            try context.save()
+            debug("PROCESS END → saved")
+        } catch {
+            debug("PROCESS SAVE FAILED → \(error)")
+        }
+    }
     
+    /// Resume a stopped recurring transaction
+    func resumeRecurrence(id: UUID) {
+        let descriptor = FetchDescriptor<Transaction>(
+            predicate: #Predicate { $0.id == id }
+        )
+        
+        guard let tx = try? context.fetch(descriptor).first,
+              tx.sourceRaw == "recurringPaused",
+              var recurrence = tx.recurrenceInfo else { return }
+        
+        let now = Date()
+        while recurrence.nextOccurrence <= now {
+            recurrence = recurrence.updatingNextOccurrence()
+        }
+        
+        tx.source = .recurringTemplate
+        tx.recurrenceInfo = recurrence
+        
+        
+        processRecurringTransactions()
+        save()
+    }
     /// Stops a recurring transaction by converting it to manual
     func stopRecurrence(id: UUID) {
         let descriptor = FetchDescriptor<Transaction>(
@@ -152,110 +240,7 @@ extension TransactionStore{
             debug("DELETE SAVE FAILED → \(error)")
         }
     }
-
-
     
-    /// Resume a stopped recurring transaction
-    func resumeRecurrence(id: UUID) {
-        let descriptor = FetchDescriptor<Transaction>(
-            predicate: #Predicate { $0.id == id }
-        )
-        
-        guard let tx = try? context.fetch(descriptor).first,
-              tx.sourceRaw == "recurringPaused",
-              var recurrence = tx.recurrenceInfo else { return }
-        
-        let now = Date()
-        while recurrence.nextOccurrence <= now {
-            recurrence = recurrence.updatingNextOccurrence()
-        }
-        
-        tx.source = .recurringTemplate
-        tx.recurrenceInfo = recurrence
-        
-        
-        processRecurringTransactions()
-        save()
-    }
-    
-    func processRecurringTransactions() {
-        let now = Date()
-        debug("PROCESS START → now=\(now)")
-        
-        
-        let templateDescriptor = FetchDescriptor<Transaction>(
-            predicate: #Predicate { tx in
-                tx.sourceRaw == "recurringTemplate"
-            }
-        )
-
-
-        
-        guard let templates = try? context.fetch(templateDescriptor) else {
-            debug("PROCESS FAILED → fetch error")
-            return
-        }
-        
-        for template in templates {
-            debug("TEMPLATE FOUND → id=\(template.id)")
-            
-            guard var recurrence = template.recurrenceInfo else { continue }
-            
-            while now >= recurrence.nextOccurrence {
-                let occurrenceDate = recurrence.nextOccurrence
-                let categoryId = template.categoryId
-                
-                debug("  GENERATE → next=\(occurrenceDate)")
-                
-               
-                let duplicateDescriptor = FetchDescriptor<Transaction>(
-                    predicate: #Predicate { tx in
-                        tx.date == occurrenceDate &&
-                        tx.categoryId == categoryId &&
-                        tx.sourceRaw == "recurringGenerated"
-
-                    }
-                )
-                
-                let alreadyExists =
-                (try? context.fetch(duplicateDescriptor).isEmpty) == false
-                
-                if alreadyExists {
-                    debug("  SKIP (duplicate) → date=\(occurrenceDate)")
-                } else {
-                    let generated = Transaction(
-                        id: UUID(),
-                        title: template.title,
-                        amount: template.amount,
-                        date: occurrenceDate,
-                        categoryId: categoryId,
-                        recurrenceInfo: nil,
-                        source: .recurringGenerated
-                    )
-
-                    
-                    context.insert(generated)
-                    debug("  ADD INSTANCE → date=\(occurrenceDate)")
-                }
-                
-                recurrence = recurrence.updatingNextOccurrence()
-                debug("  ADVANCE → next=\(recurrence.nextOccurrence)")
-            }
-            
-            if recurrence != template.recurrenceInfo {
-                template.recurrenceInfo = recurrence
-                debug("TEMPLATE ADVANCED → id=\(template.id)")
-            }
-        }
-        
-        do {
-            try context.save()
-            debug("PROCESS END → saved")
-        } catch {
-            debug("PROCESS SAVE FAILED → \(error)")
-        }
-    }
-
 }
 
 
