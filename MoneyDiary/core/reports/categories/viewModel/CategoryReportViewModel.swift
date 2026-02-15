@@ -25,7 +25,7 @@ final class CategoryReportViewModel: ObservableObject {
         reload()
     }
     
-    private func reload() {
+     func reload() {
         let analytics = TransactionAnalytics(context: context)
         
         switch selectedPeriod {

@@ -11,6 +11,7 @@ struct TransactionRow: View {
     let transaction: Transaction
     @EnvironmentObject private var categoryStore: CategoryStore
     @Query(sort: \Category.title) var categories: [Category]
+    @Environment(\.colorScheme) private var colorScheme
 
     private var category: Category? {
         categories.first {
@@ -87,7 +88,7 @@ struct TransactionRow: View {
         case .recurringGenerated:
             Image(systemName: "arrow.triangle.2.circlepath")
                 .font(.caption2)
-                .foregroundStyle(.categoryBlue4)
+                .foregroundStyle(colorScheme == .dark ? .white : .categoryBlue4)
                 .offset(x: 6, y: 6)
         case .recurringPaused:
             EmptyView()

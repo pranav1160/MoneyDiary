@@ -48,6 +48,9 @@ struct CategoryReportSection: View {
             }
         }
         .padding()
+        .onAppear {
+            vm.reload()
+        }
     }
 }
 

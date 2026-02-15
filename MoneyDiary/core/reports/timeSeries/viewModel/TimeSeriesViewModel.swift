@@ -12,6 +12,11 @@ import Combine
 @MainActor
 final class TimeSeriesViewModel: ObservableObject {
     
+    @Published var selectedPeriod: TimePeriod = .daily {
+        didSet { recomputeAll() }
+    }
+
+    
     @Published private(set) var daily: [TimeSeriesPoint] = []
     @Published private(set) var weekly: [TimeSeriesPoint] = []
     @Published private(set) var monthly: [TimeSeriesPoint] = []

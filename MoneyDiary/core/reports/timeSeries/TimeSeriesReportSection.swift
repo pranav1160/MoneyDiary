@@ -7,11 +7,7 @@ struct TimeSeriesReportSection: View {
     @State private var selectedPeriod: TimePeriod = .daily
     @State private var animateChart: CGFloat = 0
     
-    enum TimePeriod: String, CaseIterable {
-        case daily = "Daily"
-        case weekly = "Weekly"
-        case monthly = "Monthly"
-    }
+    
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -24,7 +20,7 @@ struct TimeSeriesReportSection: View {
                 Spacer()
                 
                 // Period Picker
-                Picker("Period", selection: $selectedPeriod) {
+                Picker("Period", selection: $tvm.selectedPeriod) {
                     ForEach(TimePeriod.allCases, id: \.self) { period in
                         Text(period.rawValue).tag(period)
                     }
@@ -39,6 +35,9 @@ struct TimeSeriesReportSection: View {
             }
         }
         .padding()
+        .onAppear {
+            tvm.recomputeAll()
+        }
         .onChange(of: selectedPeriod) { _, _ in
             animateChart = 0
             withAnimation(.easeOut(duration: 1.2)) {

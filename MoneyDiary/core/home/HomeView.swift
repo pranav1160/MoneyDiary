@@ -34,6 +34,7 @@ struct HomeView: View {
                 recentTrancactionSection
                     .overlay(alignment: .topTrailing) {
                         sortMenu
+                            .padding(.top,4)
                             .padding(.trailing)
                     }
             }
@@ -66,10 +67,10 @@ struct HomeView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
             .background(
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 20)
                     .stroke(
                         Color.secondary.opacity(0.35),
                         lineWidth: 1
