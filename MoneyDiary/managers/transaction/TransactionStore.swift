@@ -25,6 +25,7 @@ final class TransactionStore: ObservableObject {
     
     // MARK: - Mutations
     func add(_ transaction: Transaction) {
+        assert(transaction.amount.isFinite, "❌ Amount is NaN or Infinite")
         debug("ADD → \(transaction.id)")
         context.insert(transaction)
         

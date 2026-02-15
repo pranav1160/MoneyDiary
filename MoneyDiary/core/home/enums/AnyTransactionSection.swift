@@ -33,4 +33,16 @@ enum AnyTransactionSection: Identifiable {
             return txs
         }
     }
+    
+    var totalAmount: Double {
+        transactions
+            .map { abs($0.amount) }
+            .filter { $0.isFinite }
+            .reduce(0, +)
+    }
+
+    
+    var formattedTotal: String {
+        totalAmount.formatted(.currency(code: "INR"))
+    }
 }

@@ -32,11 +32,7 @@ struct HomeView: View {
                 SearchBarView(searchText: $searchText)
                 
                 recentTrancactionSection
-                    .overlay(alignment: .topTrailing) {
-                        sortMenu
-                            .padding(.top,4)
-                            .padding(.trailing)
-                    }
+                  
             }
             .overlay(alignment: .bottomTrailing) {
                 transactionAddButton
@@ -89,12 +85,13 @@ struct HomeView: View {
                 .scaledToFill()
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             
-            Text("MoneyDiary")
-                .font(.headline.weight(.semibold))
-                .foregroundStyle(.primary)
+            
             
             Spacer()
             
+            sortMenu
+            
+            Spacer()
             NavigationLink {
                 SettingsView()
             } label: {
@@ -141,10 +138,14 @@ struct HomeView: View {
             }
             
             // Search by amount
-            let amountString = String(format: "%.2f", transaction.amount)
-            if amountString.contains(searchText) {
-                return true
+            let amount = transaction.amount
+            if amount.isFinite {
+                let amountString = String(format: "%.2f", amount)
+                if amountString.contains(searchText) {
+                    return true
+                }
             }
+
             
             return false
         }
@@ -153,7 +154,7 @@ struct HomeView: View {
     private var recentTrancactionSection: some View {
         List {
             ForEach(sortedSections) { section in
-                Section(header: Text(sectionTitle(section))) {
+                Section {
                     
                     ForEach(section.transactions) { transaction in
                         Button {
@@ -186,6 +187,17 @@ struct HomeView: View {
                         idsToDelete.forEach { id in
                             transactionStore.delete(id: id)
                         }
+                    }
+                }header:{
+                    HStack {
+                        Text(sectionTitle(section))
+                            .font(.subheadline.weight(.semibold))
+                        
+                        Spacer()
+                        
+                        Text(section.formattedTotal)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
                     }
                 }
             }
