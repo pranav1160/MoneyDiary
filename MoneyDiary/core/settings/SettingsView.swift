@@ -13,6 +13,8 @@ struct SettingsView: View {
     @State private var navigateToCategoryList = false
     @State private var navigateToRecurringTransaction = false
     @State private var navigateToCurrencyChange = false
+    @State private var navigateToExport = false
+
     var body: some View {
        
         VStack{
@@ -53,6 +55,15 @@ struct SettingsView: View {
                     indicatorText: nil,
                     onTapFunc: {navigateToCurrencyChange = true}
                 )
+                
+                SettingsLabel(
+                    text: "Export Data",
+                    sfIcon: "square.and.arrow.up",
+                    color: .blue,
+                    indicatorText: nil,
+                    onTapFunc: { navigateToExport = true }
+                )
+
             }
         }
         .navigationDestination(
@@ -71,6 +82,12 @@ struct SettingsView: View {
             isPresented: $navigateToCurrencyChange,
             destination: {
                 CurrencyInfoView()
+            }
+        )
+        .navigationDestination(
+            isPresented: $navigateToExport,
+            destination: {
+                ExportOptionsView()
             }
         )
         .hideSystemNavigation()

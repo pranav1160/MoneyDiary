@@ -10,4 +10,4 @@ enum TimePeriod: String, CaseIterable {
         case daily = "Daily"
         case weekly = "Weekly"
         case monthly = "Monthly"
-    }
+}

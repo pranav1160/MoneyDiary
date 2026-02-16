@@ -26,6 +26,9 @@ struct CurrencyInfoView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             }
+            
+            Spacer()
+            
         }
         .navigationTitle("Currency")
         .navigationBarTitleDisplayMode(.inline)
