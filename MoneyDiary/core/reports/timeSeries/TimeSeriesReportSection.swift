@@ -4,6 +4,7 @@ import Charts
 struct TimeSeriesReportSection: View {
     
     @EnvironmentObject private var tvm: TimeSeriesViewModel
+    @EnvironmentObject private var currencyManager:CurrencyManager
     @State private var selectedPeriod: TimePeriod = .daily
     @State private var animateChart: CGFloat = 0
     
@@ -237,9 +238,11 @@ struct TimeSeriesReportSection: View {
     private func formatCurrency(_ amount: Double) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
+        formatter.currencyCode = currencyManager.selectedCurrency.code
         formatter.maximumFractionDigits = 0
-        return formatter.string(from: NSNumber(value: amount)) ?? "₹0"
+        return formatter.string(from: NSNumber(value: amount)) ?? "\(amount)"
     }
+
     
     private func weekLabel(for date: Date) -> String {
         let calendar = Calendar.current

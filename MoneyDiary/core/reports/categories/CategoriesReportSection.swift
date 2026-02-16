@@ -13,6 +13,7 @@ struct CategoryReportSection: View {
     
     @EnvironmentObject private var vm: CategoryReportViewModel
     @EnvironmentObject private var categoryStore: CategoryStore
+    @EnvironmentObject private var currencyManager: CurrencyManager
     @Query(sort: \Category.title) var categories: [Category]
 
     @State private var animateChart = false
@@ -150,7 +151,11 @@ private extension CategoryReportSection {
             
             VStack(alignment: .trailing, spacing: 2) {
                 // Amount
-                Text(amount.formatted(.currency(code: "INR")))
+                Text(
+                    amount.formatted(
+                        .currency(code: currencyManager.selectedCurrency.code)
+                    )
+                )
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .contentTransition(.numericText())

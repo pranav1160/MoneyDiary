@@ -41,8 +41,4 @@ enum AnyTransactionSection: Identifiable {
             .reduce(0, +)
     }
 
-    
-    var formattedTotal: String {
-        totalAmount.formatted(.currency(code: "INR"))
-    }
 }

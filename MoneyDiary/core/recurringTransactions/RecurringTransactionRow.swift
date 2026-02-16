@@ -13,8 +13,9 @@ struct RecurringTransactionRow: View {
     let transaction: Transaction
     @Binding var isEditing:Bool
     @EnvironmentObject private var categoryStore: CategoryStore
+    @EnvironmentObject private var currencyManager: CurrencyManager
     @Query(sort: \Category.title) var categories: [Category]
-
+    
     @EnvironmentObject private var transactionStore: TransactionStore
     
     var body: some View {
@@ -72,18 +73,24 @@ struct RecurringTransactionRow: View {
                         )
                 }
             }
-
+            
             
             Spacer()
             
             ZStack(alignment: .trailing) {
                 
                 // Amount (view mode)
-                Text(transaction.amount, format: .currency(code: "INR"))
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(transaction.amount >= 0 ? .green : .red)
-                    .opacity(isEditing ? 0 : 1)
-                    .offset(x: isEditing ? -8 : 0)
+                Text(
+                    transaction.amount,
+                    format:
+                            .currency(
+                                code: currencyManager.selectedCurrency.code
+                            )
+                )
+                .font(.body.weight(.semibold))
+                .foregroundStyle(transaction.amount >= 0 ? .green : .red)
+                .opacity(isEditing ? 0 : 1)
+                .offset(x: isEditing ? -8 : 0)
                 
                 // Action buttons (edit mode)
                 HStack(spacing: 12) {
@@ -96,7 +103,7 @@ struct RecurringTransactionRow: View {
                             transactionStore.deleteRecurring(id: transaction.id)
                         }
                     }
-
+                    
                     
                     if transaction.source == .recurringTemplate {
                         SwipeActionButton(
@@ -124,7 +131,7 @@ struct RecurringTransactionRow: View {
                 .offset(x: isEditing ? 0 : 8)
             }
             .animation(.easeInOut(duration: 0.2), value: isEditing)
-
+            
             
             
         }

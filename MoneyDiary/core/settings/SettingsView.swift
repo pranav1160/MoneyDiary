@@ -12,6 +12,7 @@ struct SettingsView: View {
     @Environment(AppState.self) private var appstate
     @State private var navigateToCategoryList = false
     @State private var navigateToRecurringTransaction = false
+    @State private var navigateToCurrencyChange = false
     var body: some View {
        
         VStack{
@@ -44,6 +45,14 @@ struct SettingsView: View {
                     indicatorText: nil,
                     onTapFunc: {navigateToRecurringTransaction = true}
                 )
+                
+                SettingsLabel(
+                    text: "Change Currency",
+                    sfIcon: "dollarsign.circle.fill",
+                    color: Color.categoryYellow,
+                    indicatorText: nil,
+                    onTapFunc: {navigateToCurrencyChange = true}
+                )
             }
         }
         .navigationDestination(
@@ -56,6 +65,12 @@ struct SettingsView: View {
             isPresented: $navigateToRecurringTransaction,
             destination: {
                 RecurringTransactionsView()
+            }
+        )
+        .navigationDestination(
+            isPresented: $navigateToCurrencyChange,
+            destination: {
+                CurrencyInfoView()
             }
         )
         .hideSystemNavigation()

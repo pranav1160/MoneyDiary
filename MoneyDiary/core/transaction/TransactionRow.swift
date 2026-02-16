@@ -10,6 +10,7 @@ import SwiftData
 struct TransactionRow: View {
     let transaction: Transaction
     @EnvironmentObject private var categoryStore: CategoryStore
+    @EnvironmentObject private var currencyManager: CurrencyManager
     @Query(sort: \Category.title) var categories: [Category]
     @Environment(\.colorScheme) private var colorScheme
 
@@ -58,7 +59,12 @@ struct TransactionRow: View {
     }
     private var transactionAmount:some View{
         // Amount
-        Text("₹\(transaction.amount, specifier: "%.0f")")
+        Text(
+            transaction.amount.formatted(
+                .currency(code: currencyManager.selectedCurrency.code)
+            )
+        )
+
             .font(.subheadline)
             .fontWeight(.semibold)
             .foregroundStyle(.primary)

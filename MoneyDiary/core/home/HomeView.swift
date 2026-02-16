@@ -18,6 +18,8 @@ struct HomeView: View {
     private var transactions: [Transaction]
     @EnvironmentObject private var transactionStore: TransactionStore
     @EnvironmentObject private var toastManager: ToastManager
+    @EnvironmentObject private var currencyManager: CurrencyManager
+
     @State private var sortOption: TransactionSortOption = .day
     @EnvironmentObject private var categoryStore: CategoryStore
     
@@ -115,6 +117,13 @@ struct HomeView: View {
         .padding(.vertical, 8)
         .background(Color(.systemBackground))
     }
+    
+    private func formattedAmount(_ amount: Double) -> String {
+        amount.formatted(
+            .currency(code: currencyManager.selectedCurrency.code)
+        )
+    }
+
 
 
     
@@ -195,7 +204,7 @@ struct HomeView: View {
                         
                         Spacer()
                         
-                        Text(section.formattedTotal)
+                        Text(formattedAmount(section.totalAmount))
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.secondary)
                     }
