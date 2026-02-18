@@ -5,7 +5,6 @@ struct TimeSeriesReportSection: View {
     
     @EnvironmentObject private var tvm: TimeSeriesViewModel
     @EnvironmentObject private var currencyManager:CurrencyManager
-    @State private var selectedPeriod: TimePeriod = .daily
     @State private var animateChart: CGFloat = 0
     
     
@@ -39,15 +38,19 @@ struct TimeSeriesReportSection: View {
         .onAppear {
             tvm.recomputeAll()
         }
-        .onChange(of: selectedPeriod) { _, _ in
+        .onChange(of: tvm.selectedPeriod) { _, _ in
+            tvm.recomputeAll()
             animateChart = 0
             withAnimation(.easeOut(duration: 1.2)) {
                 animateChart = 1
             }
         }
         .onAppear {
-            withAnimation(.easeOut(duration: 1.2)) {
-                animateChart = 1
+            if animateChart == 0 {
+                tvm.recomputeAll()
+                withAnimation(.easeOut(duration: 1.2)) {
+                    animateChart = 1
+                }
             }
         }
     }
@@ -55,7 +58,7 @@ struct TimeSeriesReportSection: View {
     // MARK: - Computed Properties
     
     private var currentData: [TimeSeriesPoint] {
-        switch selectedPeriod {
+        switch tvm.selectedPeriod {
         case .daily: return tvm.daily
         case .weekly: return tvm.weekly
         case .monthly: return tvm.monthly
@@ -63,7 +66,7 @@ struct TimeSeriesReportSection: View {
     }
     
     private var chartTitle: String {
-        switch selectedPeriod {
+        switch tvm.selectedPeriod {
         case .daily: return "Daily Spending (Last 7 Days)"
         case .weekly: return "Weekly Spending (Last 4 Weeks)"
         case .monthly: return "Monthly Spending (Last 6 Months)"
@@ -74,7 +77,7 @@ struct TimeSeriesReportSection: View {
     
     @ViewBuilder
     private var chartView: some View {
-        switch selectedPeriod {
+        switch tvm.selectedPeriod {
         case .daily:
             dailyChart
         case .weekly:
