@@ -35,6 +35,7 @@ struct CategorySectionView: View {
                                 selectedIds.contains(item.id)
                             },
                             set: { newValue in
+                                HapticManager.instance.tap()
                                 if newValue {
                                     selectedIds.insert(item.id)
                                 } else {

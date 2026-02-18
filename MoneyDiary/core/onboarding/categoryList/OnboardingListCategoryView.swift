@@ -74,6 +74,7 @@ struct OnboardingListCategoryView: View {
     
     private var continueButton: some View {
         Button {
+            HapticManager.instance.notification(type: .success)
             saveSelectedCategories()
             path.append(.currency)
         } label: {

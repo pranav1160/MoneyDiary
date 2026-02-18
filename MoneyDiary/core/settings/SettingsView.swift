@@ -25,14 +25,6 @@ struct SettingsView: View {
             
             List{
                 SettingsLabel(
-                    text: "Sign Out",
-                    sfIcon: "arrow.backward",
-                    color: Color.categoryPink,
-                    indicatorText: nil,
-                    onTapFunc: signOut
-                )
-                
-                SettingsLabel(
                     text: "Categories",
                     sfIcon: "square.grid.2x2.fill",
                     color: Color.categoryPurple2,
@@ -43,7 +35,7 @@ struct SettingsView: View {
                 SettingsLabel(
                     text: "Recurring Transactions",
                     sfIcon: "arrow.trianglehead.clockwise",
-                    color: Color.categoryBrown,
+                    color: Color.categoryBlue4,
                     indicatorText: nil,
                     onTapFunc: {navigateToRecurringTransaction = true}
                 )
@@ -51,7 +43,7 @@ struct SettingsView: View {
                 SettingsLabel(
                     text: "Change Currency",
                     sfIcon: "dollarsign.circle.fill",
-                    color: Color.categoryYellow,
+                    color: Color.categoryGreen3,
                     indicatorText: nil,
                     onTapFunc: {navigateToCurrencyChange = true}
                 )
@@ -64,6 +56,13 @@ struct SettingsView: View {
                     onTapFunc: { navigateToExport = true }
                 )
 
+                SettingsLabel(
+                    text: "Sign Out",
+                    sfIcon: "arrow.backward",
+                    color: Color.categoryRed,
+                    indicatorText: nil,
+                    onTapFunc: signOut
+                )
             }
         }
         .navigationDestination(
@@ -104,7 +103,6 @@ struct SettingsView: View {
 #Preview {
     NavigationStack{
         SettingsView()
-        
     }
     .environment(AppState(showTabBar: true))
 }

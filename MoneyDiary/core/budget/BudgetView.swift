@@ -221,7 +221,8 @@ struct BudgetView: View {
         let preview = Preview(Category.self, Budget.self)
         preview.addSamples(
             categories: Category.mockCategories,
-            budgets: Budget.mockBudgets
+            budgets: Budget.mockBudgets,
+            transactions:Transaction.mockTransactions
         )
         
         return BudgetView()

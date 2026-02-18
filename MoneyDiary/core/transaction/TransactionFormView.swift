@@ -507,7 +507,7 @@ private extension TransactionFormView {
     )
     
     return   TransactionFormView(
-        purpose: .edit(Transaction.mocks[0]),
+        purpose: .edit(Transaction.mockTransactions[0]),
         onFinish: {_ in },
         amount: "100"
         

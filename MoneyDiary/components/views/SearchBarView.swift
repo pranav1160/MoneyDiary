@@ -19,7 +19,7 @@ struct SearchBarView: View {
                     searchText.isEmpty ? Color.appSecondary : Color.accent
                 )
             
-            TextField("Search any trsnaction...", text: $searchText)
+            TextField("Search any transaction...", text: $searchText)
                 .focused($isFocused)
                 .disableAutocorrection(true)
                 .overlay(

@@ -112,7 +112,7 @@ struct TransactionRow: View {
         budgets: Budget.mockBudgets
     )
     
-    return   TransactionRow(transaction: Transaction.mocks[0])
+    return   TransactionRow(transaction: Transaction.mockTransactions[0])
         .withPreviewEnvironment(container: preview.container)
     
 }

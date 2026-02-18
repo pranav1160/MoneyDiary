@@ -23,7 +23,7 @@ final class Transaction {
     }
     
     init(
-        id: UUID = UUID(),  
+        id: UUID = UUID(),
         title: String?,
         amount: Double,
         date: Date,
@@ -77,7 +77,7 @@ extension Transaction {
 
 extension Transaction {
     
-    static let mocks: [Transaction] = [
+    static let mockTransactions: [Transaction] = [
         // Recent transactions (0-7 days ago)
         .mock(
             id: UUID(uuidString: "20000000-0000-0000-0000-000000000001")!,
@@ -87,17 +87,14 @@ extension Transaction {
             category: .eggs,
             source: .manual
         ),
-        
-           
-        
-            .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000003")!,
-                title: "Electricity Bill",
-                amount: 2000,
-                daysAgo: 5,
-                category: .utilities,
-                source: .manual
-            ),
+        .mock(
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000003")!,
+            title: "Electricity Bill",
+            amount: 2000,
+            daysAgo: 5,
+            category: .utilities,
+            source: .manual
+        ),
         
             .mock(
                 id: UUID(uuidString: "20000000-0000-0000-0000-000000000004")!,
@@ -209,15 +206,15 @@ extension Transaction {
                 source: .manual
             ),
         
-            // 3-4 weeks ago
-            .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000016")!,
-                title: "Action Figure",
-                amount: 899,
-                daysAgo: 22,
-                category: .toys,
-                source: .manual
-            ),
+        // 3-4 weeks ago
+        .mock(
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000016")!,
+            title: "Action Figure",
+            amount: 899,
+            daysAgo: 22,
+            category: .toys,
+            source: .manual
+        ),
         
             .mock(
                 id: UUID(uuidString: "20000000-0000-0000-0000-000000000017")!,
@@ -246,13 +243,13 @@ extension Transaction {
                 source: .manual
             ),
         .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000021")!,
-                title: "Postpaid Bill",
-                amount: 649,
-                daysAgo: 32,
-                category: .phoneBill,
-                source: .manual
-            ),
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000021")!,
+            title: "Postpaid Bill",
+            amount: 649,
+            daysAgo: 32,
+            category: .phoneBill,
+            source: .manual
+        ),
         
             .mock(
                 id: UUID(uuidString: "20000000-0000-0000-0000-000000000022")!,
@@ -262,14 +259,14 @@ extension Transaction {
                 category: .toys,
                 source: .manual
             ),
-            .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000023")!,
-                title: "Electricity Bill",
-                amount: 2100,
-                daysAgo: 36,
-                category: .utilities,
-                source: .manual
-            ),
+        .mock(
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000023")!,
+            title: "Electricity Bill",
+            amount: 2100,
+            daysAgo: 36,
+            category: .utilities,
+            source: .manual
+        ),
         .mock(
             id: UUID(uuidString: "20000000-0000-0000-0000-000000000024")!,
             title: "Brown Eggs",
@@ -278,46 +275,46 @@ extension Transaction {
             category: .eggs,
             source: .manual
         ),
-            .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000025")!,
-                title: "Fiber Internet",
-                amount: 1299,
-                daysAgo: 45,
-                category: .internet,
-                source: .manual
-            ),
-            .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000026")!,
-                title: "Doll House",
-                amount: 3200,
-                daysAgo: 50,
-                category: .toys,
-                source: .manual
-            ),
-            .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000027")!,
-                title: "Phone Plan",
-                amount: 599,
-                daysAgo: 55,
-                category: .phoneBill,
-                source: .manual
-            ),
-            .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000029")!,
-                title: "Water + Gas",
-                amount: 2050,
-                daysAgo: 65,
-                category: .utilities,
-                source: .manual
-            ),
-            .mock(
-                id: UUID(uuidString: "20000000-0000-0000-0000-000000000030")!,
-                title: "Dozen Eggs",
-                amount: 210,
-                daysAgo: 70,
-                category: .eggs,
-                source: .manual
-            ),
+        .mock(
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000025")!,
+            title: "Fiber Internet",
+            amount: 1299,
+            daysAgo: 45,
+            category: .internet,
+            source: .manual
+        ),
+        .mock(
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000026")!,
+            title: "Doll House",
+            amount: 3200,
+            daysAgo: 50,
+            category: .toys,
+            source: .manual
+        ),
+        .mock(
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000027")!,
+            title: "Phone Plan",
+            amount: 599,
+            daysAgo: 55,
+            category: .phoneBill,
+            source: .manual
+        ),
+        .mock(
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000029")!,
+            title: "Water + Gas",
+            amount: 2050,
+            daysAgo: 65,
+            category: .utilities,
+            source: .manual
+        ),
+        .mock(
+            id: UUID(uuidString: "20000000-0000-0000-0000-000000000030")!,
+            title: "Dozen Eggs",
+            amount: 210,
+            daysAgo: 70,
+            category: .eggs,
+            source: .manual
+        ),
         
         // HOUSE RENT
         .mock(
@@ -335,7 +332,7 @@ extension Transaction {
             daysAgo: 33,
             category: .rent,
             source: .manual
-            ),
+        ),
         .mock(
             id: UUID(uuidString: "20000000-0000-0000-0000-000000000028")!,
             title: "House Rent",
@@ -343,7 +340,7 @@ extension Transaction {
             daysAgo: 66,
             category: .rent,
             source: .manual
-            ),
+        ),
         .mock(
             id: UUID(uuidString: "20000000-0000-0000-0000-000000000031")!,
             title: "Monthly Rent",

@@ -33,6 +33,7 @@ struct OnboardingPrivacyView: View {
             // CTA
             
             CallToActionButton(title: "Continue") {
+                HapticManager.instance.notification(type: .success)
                 path.append(.categories)
             }
             

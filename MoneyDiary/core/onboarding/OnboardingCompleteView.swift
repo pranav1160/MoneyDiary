@@ -29,6 +29,7 @@ struct OnboardingCompleteView: View {
                 title: "Finish",
                 isLoading: isProfileSetupFinishing
             ) {
+                HapticManager.instance.notification(type: .success)
                 onFinishButtonPressed()
             }
         }

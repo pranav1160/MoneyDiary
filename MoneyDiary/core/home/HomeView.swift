@@ -12,6 +12,10 @@ struct HomeView: View {
     
     @State private var path = NavigationPath()
     @Query(
+        filter: #Predicate<Transaction> { tx in
+            tx.sourceRaw != "recurringTemplate" &&
+            tx.sourceRaw != "recurringPaused"
+        },
         sort: \Transaction.date,
         order: .reverse
     )

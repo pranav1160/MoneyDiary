@@ -34,10 +34,20 @@ final class TransactionAnalytics {
         predicate: Predicate<Transaction>? = nil,
         sortBy: [SortDescriptor<Transaction>] = []
     ) -> [Transaction] {
+        
+        // 1️⃣ Fetch everything matching the user predicate (or all)
         var descriptor = FetchDescriptor<Transaction>(predicate: predicate)
         descriptor.sortBy = sortBy
-        return (try? context.fetch(descriptor)) ?? []
+        
+        let fetched = (try? context.fetch(descriptor)) ?? []
+        
+        // 2️⃣ Filter hidden sources IN MEMORY (SwiftData-safe)
+        return fetched.filter {
+            $0.sourceRaw != "recurringTemplate" &&
+            $0.sourceRaw != "recurringPaused"
+        }
     }
+
     
     // ----------------------------------------------------------------
     // MARK: - "Real" transactions (excludes recurring templates)

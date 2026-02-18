@@ -27,13 +27,42 @@ final class TransactionStore: ObservableObject {
     func add(_ transaction: Transaction) {
         assert(transaction.amount.isFinite, "❌ Amount is NaN or Infinite")
         debug("ADD → \(transaction.id)")
-        context.insert(transaction)
         
         if transaction.source == .recurringTemplate {
+            
+            // 1️⃣ Insert template
+            context.insert(transaction)
+            save()
+            
+            // 2️⃣ Insert first generated instance (you want this — fine)
+            let firstInstance = Transaction(
+                id: UUID(),
+                title: transaction.title,
+                amount: transaction.amount,
+                date: transaction.date,
+                categoryId: transaction.categoryId,
+                recurrenceInfo: nil,
+                source: .recurringGenerated
+            )
+            context.insert(firstInstance)
+            debug("ADD FIRST INSTANCE → date=\(transaction.date)")
+            
+            // 3️⃣ Let the generator backfill EVERYTHING
             processRecurringTransactions()
+            save()
+            
+        } else {
+            context.insert(transaction)
+            save()
         }
-        
-        save()
+    }
+
+    
+    func debugAll() -> [Transaction] {
+        var descriptor = FetchDescriptor<Transaction>()
+        let all = (try? context.fetch(descriptor)) ?? []
+        all.forEach { print("TX: \($0.sourceRaw) | \($0.date) | \($0.amount)") }
+        return all
     }
     
      func save() {
@@ -73,6 +102,7 @@ final class TransactionStore: ObservableObject {
 extension TransactionStore{
     // MARK: - Recurring Management
     func processRecurringTransactions() {
+        debugAll()
         let now = Date()
         debug("PROCESS START → now=\(now)")
         

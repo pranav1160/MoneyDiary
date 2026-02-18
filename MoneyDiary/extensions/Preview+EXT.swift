@@ -14,11 +14,10 @@ extension View {
     @MainActor
     func withPreviewEnvironment(container: ModelContainer) -> some View {
         let context = container.mainContext
-        
         let categoryStore = CategoryStore(context: context)
         let transactionStore = TransactionStore(context: context)
-        let currencyManager = CurrencyManager()
         let budgetStore = BudgetStore(context: context)
+        let currencyManager = CurrencyManager()
         let toastManager = ToastManager()
         let timeSeriesViewModel = TimeSeriesViewModel(
             context: context
@@ -26,7 +25,6 @@ extension View {
         let categoryreportViewModel = CategoryReportViewModel(
             context: context
         )
-        
         return self
             .modelContainer(container)
             .environmentObject(categoryStore)
@@ -52,7 +50,7 @@ extension Preview {
         preview.addSamples(
             categories: Category.mockCategories,
             budgets: Budget.mockBudgets,
-            transactions: Transaction.mocks
+            transactions: Transaction.mockTransactions
         )
         
         return preview
