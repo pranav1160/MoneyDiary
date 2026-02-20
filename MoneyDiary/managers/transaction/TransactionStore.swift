@@ -19,6 +19,9 @@ private func debug(_ message: String) {
 final class TransactionStore: ObservableObject {
     private let context: ModelContext
     
+    private var pendingUndo: Transaction?
+    private var undoTask: Task<Void, Never>?
+    
     init(context: ModelContext){
         self.context = context
     }
@@ -83,6 +86,43 @@ final class TransactionStore: ObservableObject {
         }
     }
     
+    func deleteWithUndo(_ transaction: Transaction, undoDuration: Double = 4) {
+        
+        // 1️⃣ Create a snapshot BEFORE deleting
+        let snapshot = Transaction(
+            id: transaction.id,
+            title: transaction.title,
+            amount: transaction.amount,
+            date: transaction.date,
+            categoryId: transaction.categoryId,
+            recurrenceInfo: transaction.recurrenceInfo,
+            source: transaction.source
+        )
+        
+        pendingUndo = snapshot
+        
+        // 2️⃣ Delete immediately (UI updates instantly)
+        context.delete(transaction)
+        save()
+        
+        // 3️⃣ Schedule finalization
+        undoTask?.cancel()
+        undoTask = Task {
+            try? await Task.sleep(for: .seconds(undoDuration))
+            pendingUndo = nil
+        }
+    }
+    
+    func undoDelete() {
+        guard let transaction = pendingUndo else { return }
+        
+        context.insert(transaction)
+        save()
+        
+        pendingUndo = nil
+        undoTask?.cancel()
+    }
+    
     func repeatTransaction(from transaction: Transaction) {
         let repeatedTransaction = Transaction(
             id: UUID(),
@@ -102,7 +142,7 @@ final class TransactionStore: ObservableObject {
 extension TransactionStore{
     // MARK: - Recurring Management
     func processRecurringTransactions() {
-        debugAll()
+//        debugAll()
         let now = Date()
         debug("PROCESS START → now=\(now)")
         

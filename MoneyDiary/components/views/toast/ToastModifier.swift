@@ -32,10 +32,8 @@ struct ToastModifier: ViewModifier {
     }
     
     private func showToast(_ toast: Toast) {
-        // Cancel any existing work item
         workItem?.cancel()
         
-        // Create new work item
         let task = DispatchWorkItem {
             withAnimation {
                 self.toast = nil
@@ -44,8 +42,15 @@ struct ToastModifier: ViewModifier {
         
         workItem = task
         
-        // Schedule dismissal
-        DispatchQueue.main.asyncAfter(deadline: .now() + toast.duration, execute: task)
+        DispatchQueue.main.asyncAfter(
+            deadline: .now() + toast.duration,
+            execute: task
+        )
+    }
+    
+    private func cancelDismiss() {
+        workItem?.cancel()
+        workItem = nil
     }
 }
 

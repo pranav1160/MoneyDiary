@@ -26,6 +26,18 @@ struct AnimatedRoundedRectProgress: View {
     private var remaining: Double {
         totalVal - inputVal
     }
+    
+    private var isOverspent: Bool {
+        inputVal > totalVal
+    }
+    
+    private var displayAmount: Double {
+        abs(remaining)
+    }
+    
+    private var displayLabel: String {
+        isOverspent ? "overspent" : "left"
+    }
 
     // MARK: - Animation
     @State private var animatedProgress: Double = 0
@@ -69,13 +81,14 @@ struct AnimatedRoundedRectProgress: View {
                         .foregroundStyle(.appSecondary)
                     
                     
-                    Text("\(Int(remaining))")
+                    Text("\(Int(displayAmount))")
                         .font(.system(size: min(size.width, size.height) * 0.22, weight: .bold))
-                        .foregroundStyle(strokeColor)
+                        .foregroundStyle(isOverspent ? .red : strokeColor)
                 }
-                Text("left")
+                
+                Text(displayLabel)
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(isOverspent ? .red : .secondary)
             }
         }
         .frame(width: size.width, height: size.height)

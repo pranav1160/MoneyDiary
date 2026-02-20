@@ -183,7 +183,10 @@ struct HomeView: View {
                             Button {
                                 HapticManager.instance.impact(style: .medium)
                                 toastManager.show(.success("Transaction repeated"))
-                                transactionStore.repeatTransaction(from: transaction)
+                                
+                                withAnimation(.none) {
+                                    transactionStore.repeatTransaction(from: transaction)
+                                }
                             } label: {
                                 Label("Repeat", systemImage: "arrow.clockwise")
                             }
@@ -192,13 +195,18 @@ struct HomeView: View {
                     }
                     .onDelete { offsets in
                         HapticManager.instance.notification(type: .warning)
-                        toastManager.show(.success("Transaction deleted"))
-                        let idsToDelete = offsets.map {
-                            section.transactions[$0].id
-                        }
                         
-                        idsToDelete.forEach { id in
-                            transactionStore.delete(id: id)
+                        offsets.forEach { index in
+                            let tx = section.transactions[index]
+                            
+                            transactionStore.deleteWithUndo(tx)
+                            
+                            toastManager.show(
+                                .undo("Deleted") {
+                                    transactionStore.undoDelete()
+                                    toastManager.clear()
+                                }
+                            )
                         }
                     }
                 }header:{

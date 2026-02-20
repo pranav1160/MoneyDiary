@@ -8,21 +8,31 @@ import SwiftUI
 
 struct ToastView: View {
     @Environment(\.colorScheme) private var colorScheme
-
     let toast: Toast
-
+    
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.headline)
                 .foregroundColor(.accent)
-                
-
+            
             Text(toast.message)
                 .foregroundColor(.accent)
                 .font(.subheadline)
                 .multilineTextAlignment(.leading)
             
+            
+            
+            if let actionTitle = toast.actionTitle,
+               let action = toast.action {
+                
+                Button(actionTitle) {
+                    action()
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.accent)
+                .padding(.leading,4)
+            }
         }
         .padding()
         .background(.darkPurple)
@@ -30,7 +40,7 @@ struct ToastView: View {
         .shadow(radius: 8)
         .padding(.horizontal, 16)
     }
-
+    
     private var icon: String {
         switch toast.style {
         case .success: return "checkmark.circle.fill"
@@ -38,16 +48,7 @@ struct ToastView: View {
         case .info:    return "info.circle.fill"
         }
     }
-
-    private var backgroundColor: Color {
-        switch toast.style {
-        case .success: return .green
-        case .error:   return .red
-        case .info:    return .blue
-        }
-    }
 }
-
 
 
 #Preview {
