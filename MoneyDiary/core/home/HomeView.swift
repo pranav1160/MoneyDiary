@@ -94,7 +94,6 @@ struct HomeView: View {
             // LEFT
             LogoView(size: 40)
             
-            
             Spacer()
             
             Menu {
@@ -109,16 +108,14 @@ struct HomeView: View {
                     Text(sortOption.rawValue)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.primary)
-                        .fixedSize()
                     
                     Image(systemName: "chevron.down")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
-                .frame(minWidth: 100)
+                .frame(width: 120)  // Changed from minWidth to width
                 .animation(.none, value: sortOption)
             }
-            
             
             Spacer()
             
