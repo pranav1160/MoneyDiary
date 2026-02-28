@@ -12,7 +12,6 @@ struct ReportView: View {
     var body: some View {
         ScrollView {
             TimeSeriesReportSection()
-                
             
             Divider()
             

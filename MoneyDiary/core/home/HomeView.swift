@@ -23,7 +23,6 @@ struct HomeView: View {
     @State private var sortOption: TransactionSortOption = .day
     @EnvironmentObject private var categoryStore: CategoryStore
 
-    
     var body: some View {
         NavigationStack(path: $path) {
             VStack{
@@ -168,6 +167,7 @@ struct HomeView: View {
             .map { ($0.key, $0.value) }
             .sorted { $0.key > $1.key }
     }
+    
     private func groupByWeek(
         _ transactions: [Transaction]
     ) -> [(key: Date, value: [Transaction])] {

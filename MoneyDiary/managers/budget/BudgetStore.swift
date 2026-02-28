@@ -72,5 +72,15 @@ final class BudgetStore:ObservableObject {
         )
         return (try? context.fetch(descriptor)) ?? []
     }
+    
+    func categoryIdsWithBudgets() -> Set<UUID> {
+        let descriptor = FetchDescriptor<Budget>(
+            predicate: #Predicate { $0.categoryId != nil }
+        )
+        
+        let budgets = (try? context.fetch(descriptor)) ?? []
+        return Set(budgets.compactMap { $0.categoryId })
+    }
+
 
 }

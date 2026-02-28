@@ -95,10 +95,6 @@ extension TransactionStore{
         save()
         debug("STOP → id=\(id) paused")
     }
-    
-    
-    
-    /// Deletes a recurring template and optionally all generated instances
     /// Deletes a recurring template and optionally all generated instances
     func deleteRecurring(id: UUID, deleteAllInstances: Bool = false) {
         

@@ -28,5 +28,3 @@ extension HapticManager {
     func success() { notification(type: .success) }
     func warning() { notification(type: .warning) }
 }
-
-

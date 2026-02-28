@@ -9,7 +9,6 @@
 import SwiftUI
 
 struct OnboardingCompleteView: View {
-    
     @Environment(AppState.self) private var appstate
     @State private var isProfileSetupFinishing = false
     
@@ -30,7 +29,6 @@ struct OnboardingCompleteView: View {
                 title: "Finish",
                 isLoading: isProfileSetupFinishing
             ) {
-                
                 onFinishButtonPressed()
             }
         }
@@ -40,7 +38,6 @@ struct OnboardingCompleteView: View {
 }
 
 private extension OnboardingCompleteView {
-    
     var completionMessage: some View {
         VStack(spacing: 12) {
             Text("You're all set! 🎉")
@@ -61,7 +58,6 @@ private extension OnboardingCompleteView {
     func onFinishButtonPressed() {
         isProfileSetupFinishing = true
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-
         Task {
             try await Task.sleep(for: .seconds(1.5))
             isProfileSetupFinishing = false

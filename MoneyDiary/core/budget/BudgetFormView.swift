@@ -158,7 +158,7 @@ struct BudgetFormView: View {
                 Picker("Category", selection: $selectedCategoryId) {
                     Text("Select category").tag(UUID?.none)
                     
-                    ForEach(categories) { category in
+                    ForEach(availableCategories) { category in
                         Text("\(category.emoji) \(category.title)")
                             .tag(UUID?.some(category.id))
                     }
@@ -257,7 +257,26 @@ private extension BudgetFormView {
         )
     }
 
-    
+    private var availableCategories: [Category] {
+        let usedCategoryIds = budgetStore.categoryIdsWithBudgets()
+        
+        // Editing → allow the current category
+        let editingCategoryId: UUID? = {
+            if case .edit(let budget) = purpose {
+                return budget.categoryId
+            }
+            return nil
+        }()
+        
+        return categories.filter { category in
+            // Allow if:
+            // 1. Category has no budget
+            // 2. OR it is the currently edited category
+            !usedCategoryIds.contains(category.id) ||
+            category.id == editingCategoryId
+        }
+    }
+
    
 
     

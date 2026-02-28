@@ -25,8 +25,6 @@ struct RecurringTransactionsView: View {
             $0.source == .recurringPaused
         }
     }
-
-
     
     var body: some View {
         VStack(spacing: 0) {
@@ -49,8 +47,6 @@ struct RecurringTransactionsView: View {
         .toolbar(.hidden, for: .navigationBar)
     }
 
-
-    
     // MARK: - Empty State
     
     private var emptyState: some View {

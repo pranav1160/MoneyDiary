@@ -13,6 +13,7 @@ struct RecurringTransactionSwipeActions: View {
     let store: TransactionStore
     
     var body: some View {
+        
         Button(role: .destructive) {
             withAnimation {
                 store.deleteRecurring(id: transaction.id)
@@ -43,5 +44,6 @@ struct RecurringTransactionSwipeActions: View {
             }
             .tint(.green)
         }
+        
     }
 }
